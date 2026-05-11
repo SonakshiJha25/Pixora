@@ -15,3 +15,5 @@ server/dist/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+server/public/generated/*.png
