@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -5,8 +8,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import "dotenv/config";
-import { connectDb, getDbName, isDbConnected } from "./config/db.js";
+import mongoose from "mongoose";
+import connectDB from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import creditRouter from "./routes/creditRoutes.js";
 import userRouter from "./routes/userRoutes.js";
@@ -53,7 +56,7 @@ const generationLimiter = rateLimit({
   },
 });
 
-await connectDb();
+await connectDB();
 
 app.use("/api/auth", authRouter);
 app.use("/api/credits", creditRouter);
@@ -67,12 +70,12 @@ app.use("/api/v1/image", generationLimiter, imageRouter);
 app.get("/", (req, res) => res.send("API Working"));
 
 app.get("/health", (req, res) => {
-  const dbOk = isDbConnected();
+  const dbOk = mongoose.connection.readyState === 1;
   res.status(dbOk ? 200 : 503).json({
     success: dbOk,
     status: dbOk ? "ok" : "degraded",
     database: dbOk ? "connected" : "disconnected",
-    databaseName: getDbName(),
+    databaseName: mongoose.connection?.db?.databaseName ?? null,
   });
 });
 
