@@ -9,7 +9,7 @@ async function connectDB() {
   } catch (error) {
     console.error("MongoDB connection error:");
     console.error(error);
-    process.exit(1);
+    throw error;
   }
 }
 

@@ -22,7 +22,6 @@ if (!process.env.JWT_SECRET?.trim()) {
   process.exit(1);
 }
 
-const PORT = Number(process.env.PORT) || 4000;
 const app = express();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,8 +55,6 @@ const generationLimiter = rateLimit({
   },
 });
 
-await connectDB();
-
 app.use("/api/auth", authRouter);
 app.use("/api/credits", creditRouter);
 app.use("/api/user", userRouter);
@@ -81,6 +78,20 @@ app.get("/health", (req, res) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await connectDB();
+
+    const PORT = process.env.PORT || 4000;
+
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:");
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+startServer();
