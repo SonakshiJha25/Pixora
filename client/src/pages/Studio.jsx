@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
-import { BASE_URL } from "../config/api.js";
+import { BASE_URL, resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
@@ -159,8 +159,9 @@ export default function Studio() {
 
       console.log("Generated image:", response);
 
-      const previewSrc =
-        response.resultImage ?? response.imageUrl ?? response.image?.imageUrl;
+      const previewSrc = resolveImageUrl(
+        response.resultImage ?? response.imageUrl ?? response.image?.imageUrl
+      );
       const credits = response.creditBalance;
 
       setImage(previewSrc);
@@ -401,7 +402,7 @@ export default function Studio() {
             onClick={() => setLightbox(null)}
           />
           <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-3xl border border-white/20 bg-slate-900 shadow-2xl">
-            <img src={lightbox.imageUrl} alt="" className="max-h-[60vh] w-full object-contain" />
+            <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
             <div className="space-y-2 p-5 text-left text-sm text-white/90">
               <p className="font-medium text-white">{lightbox.promptRaw}</p>
               <p className="text-xs text-white/60">

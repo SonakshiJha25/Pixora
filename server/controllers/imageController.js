@@ -23,7 +23,7 @@ export const generateImage = asyncHandler(async (req, res) => {
     provider: "clipdrop",
   });
 
-  const serialized = serializeImage(image);
+  const serialized = serializeImage(image, req);
 
   return res.status(200).json({
     success: true,
@@ -51,7 +51,7 @@ export const getMyImages = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    images: images.map(serializeImage),
+    images: images.map((img) => serializeImage(img, req)),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 });
@@ -85,7 +85,7 @@ export const toggleFavoriteImage = asyncHandler(async (req, res) => {
   image.isFavorite = !image.isFavorite;
   await image.save();
 
-  return res.status(200).json({ success: true, image: serializeImage(image) });
+  return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
 export const toggleImagePublic = asyncHandler(async (req, res) => {
@@ -101,7 +101,7 @@ export const toggleImagePublic = asyncHandler(async (req, res) => {
   image.isPublic = !image.isPublic;
   await image.save();
 
-  return res.status(200).json({ success: true, image: serializeImage(image) });
+  return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
 export const getPublicGallery = asyncHandler(async (req, res) => {
@@ -122,7 +122,7 @@ export const getPublicGallery = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    images: images.map(serializeImage),
+    images: images.map((img) => serializeImage(img, req)),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 });
@@ -138,7 +138,7 @@ export const likePublicImage = asyncHandler(async (req, res) => {
     throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
   }
 
-  return res.status(200).json({ success: true, image: serializeImage(image) });
+  return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
 export const getPromptStyles = asyncHandler(async (req, res) => {

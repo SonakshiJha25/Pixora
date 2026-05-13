@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
-import { BASE_URL } from "../config/api.js";
+import { BASE_URL, resolveImageUrl } from "../config/api.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory } = useContext(AppContext);
@@ -126,7 +126,7 @@ export default function Gallery() {
 
               <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
                 <a
-                  href={item.imageUrl}
+                  href={resolveImageUrl(item.imageUrl)}
                   download={`pixorify-${item._id}.png`}
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
                 >
@@ -157,7 +157,7 @@ export default function Gallery() {
         >
           <button type="button" className="absolute inset-0" aria-label="Close" onClick={() => setLightbox(null)} />
           <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-3xl border border-white/20 bg-slate-900 shadow-2xl">
-            <img src={lightbox.imageUrl} alt="" className="max-h-[60vh] w-full object-contain" />
+            <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
             <div className="p-5 text-left text-sm text-white/90">
               <p className="font-medium text-white">{lightbox.promptRaw}</p>
               <p className="mt-2 text-xs text-white/60">

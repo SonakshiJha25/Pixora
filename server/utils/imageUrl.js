@@ -1,13 +1,41 @@
 /**
- * Convert any stored image URL into an absolute, production-safe URL by
- * prepending process.env.BACKEND_PUBLIC_URL. This also heals legacy records
- * whose imageUrl was persisted as http://localhost:4000/... — we strip the
- * stored host and re-attach the current public base URL.
+ * Resolve the public base URL of this backend for serving /generated images.
+ *
+ * Order of preference:
+ *   1. BACKEND_PUBLIC_URL env var (explicit override, e.g. production CDN)
+ *   2. Derived from the incoming request: `${req.protocol}://${req.get("host")}`
+ *      (works correctly on Render because `app.set("trust proxy", 1)` is set,
+ *      so req.protocol returns "https" and req.get("host") returns the
+ *      external Render hostname).
+ *   3. Empty string (returns relative URLs as last resort).
  */
-export function absoluteImageUrl(stored) {
+function publicBaseUrl(req) {
+  const fromEnv = (process.env.BACKEND_PUBLIC_URL || "").trim().replace(/\/+$/, "");
+  if (fromEnv) return fromEnv;
+
+  if (req) {
+    const host = req.get?.("host");
+    const protocol = req.protocol || "http";
+    if (host) return `${protocol}://${host}`;
+  }
+
+  return "";
+}
+
+/**
+ * Convert any stored image URL into an absolute, production-safe URL.
+ *
+ * Heals legacy records whose imageUrl was persisted as
+ *   http://localhost:4000/generated/foo.png
+ * by stripping the stored host and re-attaching the current public base URL.
+ *
+ * @param {string} stored - imageUrl value from DB (relative or absolute)
+ * @param {import("express").Request} [req] - request, used to derive host when env var is absent
+ */
+export function absoluteImageUrl(stored, req) {
   if (!stored || typeof stored !== "string") return stored;
 
-  const base = (process.env.BACKEND_PUBLIC_URL || "").replace(/\/+$/, "");
+  const base = publicBaseUrl(req);
 
   let pathPart = stored;
   if (/^https?:\/\//i.test(stored)) {
@@ -23,12 +51,13 @@ export function absoluteImageUrl(stored) {
 }
 
 /**
- * Return a plain image object with imageUrl normalized through
- * absoluteImageUrl. Accepts either a Mongoose document or a plain object.
+ * Return a plain image object with imageUrl normalized through absoluteImageUrl.
+ * Accepts a Mongoose document or plain object. Pass the request so the helper
+ * can derive the public host even if BACKEND_PUBLIC_URL is not configured.
  */
-export function serializeImage(image) {
+export function serializeImage(image, req) {
   if (!image) return image;
   const plain = typeof image.toJSON === "function" ? image.toJSON({ virtuals: true }) : { ...image };
-  plain.imageUrl = absoluteImageUrl(plain.imageUrl);
+  plain.imageUrl = absoluteImageUrl(plain.imageUrl, req);
   return plain;
 }
