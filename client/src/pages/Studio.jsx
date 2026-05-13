@@ -239,7 +239,7 @@ export default function Studio() {
                   </button>
                   <a
                     href={image}
-                    download="pixora-image.png"
+                    download="pixorify-image.png"
                     className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-center text-sm font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/50 hover:bg-slate-50"
                   >
                     Download
@@ -251,7 +251,7 @@ export default function Studio() {
                     Want to improve your results?
                   </p>
                   <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-slate-600">
-                    Share feedback — we love hearing how Pixora works for you.
+                    Share feedback — we love hearing how Pixorify works for you.
                   </p>
                   <Link
                     to="/feedback"
@@ -405,7 +405,7 @@ export default function Studio() {
             <div className="space-y-2 p-5 text-left text-sm text-white/90">
               <p className="font-medium text-white">{lightbox.promptRaw}</p>
               <p className="text-xs text-white/60">
-                {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style} · Pixora
+                {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style} · Pixorify
               </p>
               <button
                 type="button"

@@ -58,7 +58,7 @@ export const stepsData = [
     },
     {
       title: 'Watch the Magic',
-      description: 'Pick a style, hit generate, and Pixora returns an image in moments. Tweak the prompt and try again until it feels right.',
+      description: 'Pick a style, hit generate, and Pixorify returns an image in moments. Tweak the prompt and try again until it feels right.',
       icon: step_icon_2,
     },
     {

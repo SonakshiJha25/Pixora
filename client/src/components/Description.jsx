@@ -18,7 +18,7 @@ export default function Description() {
       <div className="max-w-xl text-center md:text-left">
         <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Built for real workflows</h2>
         <p className="mt-4 text-slate-600">
-          Credits, history, publish-to-explore, and a studio layout that stays out of your way. Pixora is designed to
+          Credits, history, publish-to-explore, and a studio layout that stays out of your way. Pixorify is designed to
           feel like a product — not a weekend demo.
         </p>
         <p className="mt-4 text-slate-600">

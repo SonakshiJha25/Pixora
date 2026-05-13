@@ -65,7 +65,7 @@ export default function Feedback() {
         </p>
         <h1 className="mt-2 text-center text-3xl font-bold text-slate-900">Tell us what you think</h1>
         <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-600">
-          Your input helps us improve Pixora.
+          Your input helps us improve Pixorify.
         </p>
 
         <form

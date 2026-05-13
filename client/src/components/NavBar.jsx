@@ -54,7 +54,7 @@ export default function NavBar() {
         >
           <img src={assets.brandMark} alt="" className="h-9 w-9 shrink-0 sm:h-10 sm:w-10" />
           <span className="truncate text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
-            Pixora
+            Pixorify
           </span>
         </button>
 

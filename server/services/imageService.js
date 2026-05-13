@@ -12,13 +12,6 @@ const MAX_PROMPT_LEN = 1000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
 
-function publicBaseUrl() {
-  const explicit = process.env.BACKEND_PUBLIC_URL?.trim();
-  if (explicit) return explicit.replace(/\/+$/, "");
-  const port = process.env.PORT || 4000;
-  return `http://localhost:${port}`;
-}
-
 function buildClipDropPrompt({ prompt, promptEnhanced }) {
   const base = (promptEnhanced || prompt || "").trim();
   if (!base) {
@@ -29,7 +22,11 @@ function buildClipDropPrompt({ prompt, promptEnhanced }) {
 }
 
 /**
- * Calls ClipDrop text-to-image, saves PNG under /public/generated, returns absolute URL.
+ * Calls ClipDrop text-to-image, saves PNG under /public/generated, and returns
+ * a relative URL path (e.g. "/generated/<filename>.png"). The absolute URL is
+ * constructed at response time using process.env.BACKEND_PUBLIC_URL — see
+ * server/utils/imageUrl.js. Storing relative paths keeps DB records portable
+ * across environments.
  */
 export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   const apiKey = process.env.CLIPDROP_API?.trim();
@@ -77,7 +74,7 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   const filepath = path.join(GENERATED_DIR, filename);
   await fs.writeFile(filepath, buffer);
 
-  const imageUrl = `${publicBaseUrl()}/generated/${filename}`;
-  console.log("Generated image URL:", imageUrl);
-  return imageUrl;
+  const relativeUrl = `/generated/${filename}`;
+  console.log("Generated image stored at:", relativeUrl);
+  return relativeUrl;
 }

@@ -34,7 +34,7 @@ export default function Header() {
           onClick={goHomeTop}
           className="rounded-full font-semibold tracking-widest text-brand-sky transition hover:text-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
         >
-          Pixora
+          Pixorify
         </button>
         <img src={assets.star_icon} alt="" className="h-4 w-4" />
       </motion.div>

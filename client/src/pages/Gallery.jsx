@@ -127,7 +127,7 @@ export default function Gallery() {
               <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
                 <a
                   href={item.imageUrl}
-                  download={`pixora-${item._id}.png`}
+                  download={`pixorify-${item._id}.png`}
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
                 >
                   Download
@@ -162,7 +162,7 @@ export default function Gallery() {
               <p className="font-medium text-white">{lightbox.promptRaw}</p>
               <p className="mt-2 text-xs text-white/60">
                 {new Date(lightbox.createdAt).toLocaleString()} · Style: {lightbox.style} ·{" "}
-                Pixora
+                Pixorify
               </p>
               <button
                 type="button"

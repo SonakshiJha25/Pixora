@@ -4,12 +4,13 @@ import AppError from "../utils/appError.js";
 import { deductCreditAndSaveImage } from "../services/creditService.js";
 import { resolveGeneratedImageUrl } from "../services/imageService.js";
 import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
+import { serializeImage } from "../utils/imageUrl.js";
 
 export const generateImage = asyncHandler(async (req, res) => {
   const { prompt, style, isPublic, tags } = req.body;
 
   const promptEnhanced = enhancePrompt(prompt, style);
-  const imageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced });
+  const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced });
 
   const { image, remainingCredits } = await deductCreditAndSaveImage({
     userId: req.user.id,
@@ -18,18 +19,20 @@ export const generateImage = asyncHandler(async (req, res) => {
     style,
     tags,
     isPublic,
-    imageUrl,
+    imageUrl: relativeImageUrl,
     provider: "clipdrop",
   });
+
+  const serialized = serializeImage(image);
 
   return res.status(200).json({
     success: true,
     message: "Image generated",
     creditBalance: remainingCredits,
-    imageUrl: image.imageUrl,
+    imageUrl: serialized.imageUrl,
     remainingCredits,
-    resultImage: image.imageUrl,
-    image,
+    resultImage: serialized.imageUrl,
+    image: serialized,
   });
 });
 
@@ -48,7 +51,7 @@ export const getMyImages = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    images,
+    images: images.map(serializeImage),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 });
@@ -82,7 +85,7 @@ export const toggleFavoriteImage = asyncHandler(async (req, res) => {
   image.isFavorite = !image.isFavorite;
   await image.save();
 
-  return res.status(200).json({ success: true, image });
+  return res.status(200).json({ success: true, image: serializeImage(image) });
 });
 
 export const toggleImagePublic = asyncHandler(async (req, res) => {
@@ -98,7 +101,7 @@ export const toggleImagePublic = asyncHandler(async (req, res) => {
   image.isPublic = !image.isPublic;
   await image.save();
 
-  return res.status(200).json({ success: true, image });
+  return res.status(200).json({ success: true, image: serializeImage(image) });
 });
 
 export const getPublicGallery = asyncHandler(async (req, res) => {
@@ -117,14 +120,9 @@ export const getPublicGallery = asyncHandler(async (req, res) => {
     Image.countDocuments({ isPublic: true, deletedAt: null }),
   ]);
 
-  const mapped = images.map((doc) => {
-    const j = doc.toJSON({ virtuals: true });
-    return j;
-  });
-
   return res.status(200).json({
     success: true,
-    images: mapped,
+    images: images.map(serializeImage),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 });
@@ -140,7 +138,7 @@ export const likePublicImage = asyncHandler(async (req, res) => {
     throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
   }
 
-  return res.status(200).json({ success: true, image });
+  return res.status(200).json({ success: true, image: serializeImage(image) });
 });
 
 export const getPromptStyles = asyncHandler(async (req, res) => {

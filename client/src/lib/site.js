@@ -2,13 +2,13 @@
 import { assets } from "../assets/assets";
 
 export const SITE = {
-  name: "Pixora",
+  name: "Pixorify",
   tagline: "AI image generation for creators",
-  helpEmail: "help@pixora.app",
-  twitter: "https://example.com/pixora-twitter",
-  instagram: "https://example.com/pixora-instagram",
-  facebook: "https://example.com/pixora-facebook",
-  discord: "https://example.com/pixora-discord",
+  helpEmail: "help@pixorify.app",
+  twitter: "https://example.com/pixorify-twitter",
+  instagram: "https://example.com/pixorify-instagram",
+  facebook: "https://example.com/pixorify-facebook",
+  discord: "https://example.com/pixorify-discord",
 };
 
 /**
@@ -43,12 +43,12 @@ export const STUDIO_STYLE_SAMPLES = [
   },
 ];
 
-/** Home hero: what Pixora offers (product-focused copy). */
+/** Home hero: what Pixorify offers (product-focused copy). */
 export const HERO_SLIDES = [
   {
     image:
       "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=85&auto=format&fit=crop",
-    kicker: "What is Pixora",
+    kicker: "What is Pixorify",
     title: "A studio for text-to-image creation",
     sub: "Type a prompt, choose a look, and generate. Your work stays in one place: Studio and My gallery.",
   },
