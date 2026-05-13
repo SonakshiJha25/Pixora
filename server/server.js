@@ -35,8 +35,25 @@ app.use(
   })
 );
 
+const allowedOrigins = ["http://localhost:5173"];
+if (process.env.ALLOWED_ORIGINS) {
+  for (const origin of process.env.ALLOWED_ORIGINS.split(",")) {
+    const trimmed = origin.trim();
+    if (trimmed) allowedOrigins.push(trimmed);
+  }
+}
+
 app.use(express.json({ limit: "1mb" }));
-app.use(cors());
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  })
+);
 app.use(helmet());
 app.use(morgan("dev"));
 app.set("trust proxy", 1);
