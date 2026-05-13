@@ -4,7 +4,13 @@ import { STUDIO_STYLE_SAMPLES } from "../lib/site";
 const AUTO_MS = 4500;
 
 /**
- * Cycles through example “looks” before first generation. Same max frame as the previous single preview.
+ * Cycles through example "looks" before the first generation.
+ *
+ * Implementation note: every slide is rendered up-front as a sibling <img>
+ * with absolute positioning; switching slides only toggles opacity. We do NOT
+ * key the <img> on the slide label, because doing so would unmount and remount
+ * the element on every cycle, causing the page to "blink" as the browser
+ * fetched and decoded the next image. Cross-fading mounted elements is smooth.
  */
 export default function StylePreviewCarousel() {
   const [i, setI] = useState(0);
@@ -21,19 +27,27 @@ export default function StylePreviewCarousel() {
   const slide = STUDIO_STYLE_SAMPLES[i];
 
   return (
-    <div className="mx-auto w-fit max-w-[min(92vw,520px)]">
-      <div className="glass relative inline-block w-fit overflow-hidden rounded-3xl p-2 shadow-glow">
-        <div className="relative inline-block max-w-full overflow-hidden rounded-2xl leading-none">
-          <img
-            key={slide.label}
-            src={slide.image}
-            alt={slide.label}
-            className="block h-auto max-h-[min(52vh,520px)] w-auto max-w-[min(92vw,520px)] rounded-2xl object-contain bg-slate-100/80"
-            loading="eager"
-            decoding="async"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/5 to-transparent" />
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-3 pb-9 sm:p-4 sm:pb-10">
+    <div className="mx-auto w-full max-w-[min(92vw,520px)]">
+      <div className="glass relative w-full overflow-hidden rounded-3xl p-2 shadow-glow">
+        <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100/80">
+          {STUDIO_STYLE_SAMPLES.map((s, idx) => (
+            <img
+              key={s.label}
+              src={s.image}
+              alt={s.label}
+              className={`absolute inset-0 h-full w-full rounded-2xl object-cover transition-opacity duration-700 ease-in-out ${
+                idx === i ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+              loading={idx === 0 ? "eager" : "lazy"}
+              decoding="async"
+              draggable="false"
+              aria-hidden={idx !== i}
+            />
+          ))}
+
+          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-slate-900/55 via-slate-900/5 to-transparent" />
+
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-3 pb-10 sm:p-4 sm:pb-11">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100/90 sm:text-xs">Look</p>
             <p className="mt-0.5 text-base font-extrabold text-white sm:text-lg">{slide.label}</p>
             <p className="mt-0.5 line-clamp-2 text-xs text-white/90 sm:line-clamp-1 sm:text-sm">{slide.caption}</p>
