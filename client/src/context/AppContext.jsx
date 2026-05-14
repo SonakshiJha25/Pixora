@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BASE_URL } from "../config/api.js";
+import { getApiBase } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 
@@ -23,8 +23,9 @@ const AppContextProvider = ({ children }) => {
   }, []);
 
   const api = useMemo(() => {
-    const instance = axios.create({ baseURL: BASE_URL || "" });
+    const instance = axios.create({ baseURL: "" });
     instance.interceptors.request.use((config) => {
+      config.baseURL = getApiBase() || "";
       if (config.skipAuth) {
         delete config.headers.Authorization;
         return config;
@@ -51,7 +52,7 @@ const AppContextProvider = ({ children }) => {
       }
     );
     return instance;
-  }, [logout, setShowLogin, BASE_URL]);
+  }, [logout, setShowLogin]);
 
   const fetchUserData = useCallback(async () => {
     if (!getToken()) return;
@@ -101,7 +102,7 @@ const AppContextProvider = ({ children }) => {
     setUser,
     showLogin,
     setShowLogin,
-    backendUrl: BASE_URL,
+    backendUrl: getApiBase(),
     token,
     setToken,
     credit,

@@ -223,7 +223,7 @@ export default function Studio() {
         setGuestTrialModal({ open: true, variant: "network" });
       } else if (error?.response?.status === 404) {
         toast.error(
-          "Image API returned 404 — open the app from your backend URL after deploy, or set VITE_BACKEND_URL when building the client."
+          "Image API 404 — the page’s host has no /api routes. Prefer one URL where Node serves Studio + API, set VITE_BACKEND_URL on frontend build to your API origin, or meta pixora-api-base / localStorage key pixora_api_base."
         );
       } else {
         toast.error(message);

@@ -94,6 +94,34 @@ app.get("/health", (req, res) => {
   });
 });
 
+/** Optional: load from another host via <script src="https://your-api…/pixora-runtime.js"></script> before app bundle. */
+function resolvePublicBackendOrigin() {
+  const explicit = process.env.PUBLIC_BACKEND_ORIGIN?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+  const railway = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (railway) {
+    const host = railway.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+    return `https://${host}`;
+  }
+  const renderUrl = process.env.RENDER_EXTERNAL_URL?.trim();
+  if (renderUrl) return renderUrl.replace(/\/+$/, "");
+  return "";
+}
+
+app.get("/pixora-runtime.js", (_req, res) => {
+  res.type("application/javascript");
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.set("Cache-Control", "public, max-age=120");
+  const origin = resolvePublicBackendOrigin();
+  if (!origin) {
+    res.send(
+      '// Pixora: set PUBLIC_BACKEND_ORIGIN (full https origin) when the SPA loads from a separate host.'
+    );
+    return;
+  }
+  res.send(`globalThis.__PIXORA_API_BASE__=${JSON.stringify(origin)};\n`);
+});
+
 const clientDist = path.join(__dirname, "..", "client", "dist");
 
 if (fs.existsSync(clientDist)) {

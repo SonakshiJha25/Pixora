@@ -1,28 +1,80 @@
-/** Backend origin without trailing slash. Empty string = same origin (use Vite proxy in dev). */
-export const BASE_URL = String(import.meta.env.VITE_BACKEND_URL ?? "").trim().replace(/\/+$/, "");
+/** Strip trailing slashes for origins. */
+function normalizeOrigin(raw) {
+  return String(raw ?? "")
+    .trim()
+    .replace(/\/+$/, "");
+}
 
-if (import.meta.env.PROD && !BASE_URL) {
-  console.warn(
-    "[Pixorify] VITE_BACKEND_URL is unset — requests use this page’s origin (works when the API serves the built client). For a separate API host, set VITE_BACKEND_URL before building the client."
-  );
+/** Applies <meta name="pixora-api-base"> so split deploys can steer the API origin without another JS rebuild. */
+export function hydrateApiBaseFromMeta() {
+  try {
+    if (typeof document === "undefined") return;
+    const existing = normalizeOrigin(globalThis.__PIXORA_API_BASE__);
+    if (existing) return;
+    const el = document.querySelector('meta[name="pixora-api-base"]');
+    const raw = el?.getAttribute("content")?.trim() ?? "";
+    if (!raw) return;
+    globalThis.__PIXORA_API_BASE__ = normalizeOrigin(raw);
+  } catch {
+    // ignore
+  }
+}
+
+if (typeof document !== "undefined") {
+  hydrateApiBaseFromMeta();
+}
+
+/**
+ * Backend origin without trailing slash. Empty string means same-origin
+ * (Vite proxies /api in dev; production works when Express serves client/dist).
+ *
+ * Overrides (first match wins): localStorage pixora_api_base,
+ * window.__PIXORA_API_BASE__ (hydrated from meta — see vite.config — or `/pixora-runtime.js`),
+ * then build-time VITE_BACKEND_URL.
+ */
+export function getApiBase() {
+  const fromEnvBuild = normalizeOrigin(import.meta.env.VITE_BACKEND_URL ?? "");
+
+  if (typeof window === "undefined") return fromEnvBuild;
+
+  try {
+    const ls = window.localStorage.getItem("pixora_api_base");
+    if (ls != null && String(ls).trim() !== "") return normalizeOrigin(ls);
+  } catch {
+    /* private mode etc. */
+  }
+
+  const injected = globalThis.__PIXORA_API_BASE__;
+  if (injected != null && String(injected).trim() !== "") return normalizeOrigin(injected);
+
+  return fromEnvBuild;
+}
+
+if (import.meta.env.PROD && typeof window !== "undefined") {
+  queueMicrotask(() => {
+    if (!getApiBase()) {
+      console.warn(
+        "[Pixora] Backend URL is unset (same-origin /api). Works when the Node server serves this SPA from client/dist; " +
+          "if frontend and API are on different domains, build with VITE_BACKEND_URL set or inject <meta name=\"pixora-api-base\" …>."
+      );
+    }
+  });
 }
 
 /**
  * Normalize any image URL the backend returns into an absolute URL that the
- * browser can fetch from BASE_URL. Handles three legacy / edge shapes:
+ * browser can fetch from the API origin. Handles three legacy / edge shapes:
  *
  *   - Already absolute, non-localhost  -> return as-is (e.g. a CDN URL)
- *   - Absolute but localhost-baked     -> strip the host, re-prefix with BASE_URL
- *     (heals records persisted as http://localhost:4000/generated/foo.png)
- *   - Relative path (starts with "/")  -> prefix with BASE_URL
- *   - Bare filename                    -> prefix with BASE_URL + "/"
+ *   - Absolute but localhost-baked     -> strip the host, re-prefix with base
+ *   - Relative path (starts with "/")  -> prefix with base
+ *   - Bare filename                    -> prefix with base + "/"
  *
- * If BASE_URL is empty (which would be a misconfiguration), returns the input
- * unchanged so the browser at least tries the original value.
+ * If no base is configured, returns the input unchanged.
  */
 export function resolveImageUrl(stored) {
   if (!stored || typeof stored !== "string") return stored;
-  const base = (BASE_URL || "").replace(/\/+$/, "");
+  const base = normalizeOrigin(getApiBase());
   if (!base) return stored;
 
   let pathPart = stored;
