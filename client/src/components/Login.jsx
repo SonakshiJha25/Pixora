@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'motion/react'
@@ -9,12 +10,19 @@ const Login = () => {
 
     const [state, setState] = useState('Login')
     const {setShowLogin, setToken, api} = useContext(AppContext)
+    const navigate = useNavigate()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const inFlight = useRef(false)
+
+    const goHome = () => {
+        if (loading) return
+        setShowLogin(false)
+        navigate('/')
+    }
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
@@ -118,6 +126,15 @@ const Login = () => {
             :
             <p className='mt-5 text-center'> Already have an account? 
                 <span className='text-blue-600 cursor-pointer' onClick={() => !loading && setState('Login')}>Login</span></p>}
+
+            <button
+                type='button'
+                onClick={goHome}
+                disabled={loading}
+                className='mt-3 inline-flex w-full items-center justify-center gap-1 text-xs font-medium text-slate-500 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50'
+            >
+                <span aria-hidden='true'>←</span> Back to home
+            </button>
 
             <img onClick={() => !loading && setShowLogin(false)} src={assets.cross_icon} alt="" className={`absolute top-5 right-5 ${loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}/>
         </motion.form>

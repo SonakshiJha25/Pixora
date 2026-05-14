@@ -65,15 +65,6 @@ export default function NavBar() {
           <NavLink to="/pricing" className={linkClass}>
             Pricing
           </NavLink>
-          <button
-            type="button"
-            className="nav-link"
-            onClick={() => {
-              scrollToHelp(navigate, location.pathname);
-            }}
-          >
-            Help
-          </button>
           {user ? (
             <>
               <NavLink to="/studio" className={linkClass}>
@@ -84,6 +75,15 @@ export default function NavBar() {
               </NavLink>
             </>
           ) : null}
+          <button
+            type="button"
+            className="nav-link"
+            onClick={() => {
+              scrollToHelp(navigate, location.pathname);
+            }}
+          >
+            Help
+          </button>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -191,16 +191,6 @@ export default function NavBar() {
             <NavLink to="/pricing" className={linkClass} onClick={closeMobile}>
               Pricing
             </NavLink>
-            <button
-              type="button"
-              className="nav-link text-left"
-              onClick={() => {
-                scrollToHelp(navigate, location.pathname);
-                closeMobile();
-              }}
-            >
-              Help
-            </button>
             {user ? (
               <>
                 <NavLink to="/studio" className={linkClass} onClick={closeMobile}>
@@ -229,6 +219,16 @@ export default function NavBar() {
                 </button>
               </>
             ) : null}
+            <button
+              type="button"
+              className="nav-link text-left"
+              onClick={() => {
+                scrollToHelp(navigate, location.pathname);
+                closeMobile();
+              }}
+            >
+              Help
+            </button>
           </div>
         </div>
       ) : null}
