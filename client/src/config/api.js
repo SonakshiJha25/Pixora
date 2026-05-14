@@ -68,26 +68,33 @@ if (import.meta.env.PROD && typeof window !== "undefined") {
  *   - Already absolute, non-localhost  -> return as-is (e.g. a CDN URL)
  *   - Absolute but localhost-baked     -> strip the host, re-prefix with base
  *   - Relative path (starts with "/")  -> prefix with base
- *   - Bare filename                    -> prefix with base + "/"
+ *   - Bare filename                    -> prefix with effective origin + "/"
  *
- * If no base is configured, returns the input unchanged.
+ * If no configured API base exists, `/…` resolves against the SPA origin so
+ * relative /generated URLs still work behind the same host as Express.
  */
 export function resolveImageUrl(stored) {
   if (!stored || typeof stored !== "string") return stored;
   const base = normalizeOrigin(getApiBase());
-  if (!base) return stored;
-
   let pathPart = stored;
+
   if (/^https?:\/\//i.test(stored)) {
     try {
       const u = new URL(stored);
-      const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/i.test(u.hostname);
+      const isLocalhost =
+        /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|::1)$/i.test(u.hostname);
       if (!isLocalhost) return stored;
-      pathPart = u.pathname;
+      pathPart = `${u.pathname}${u.search}`;
     } catch {
       return stored;
     }
   }
+
   if (!pathPart.startsWith("/")) pathPart = `/${pathPart}`;
-  return `${base}${pathPart}`;
+
+  const origin =
+    base ||
+    (typeof window !== "undefined" ? window.location.origin.replace(/\/+$/, "") : "");
+
+  return origin ? `${origin}${pathPart}` : stored;
 }

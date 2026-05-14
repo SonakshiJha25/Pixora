@@ -22,12 +22,17 @@ function publicBaseUrl(req) {
   return "";
 }
 
+const LOCALHOST_HOSTS =
+  /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|::1)$/i;
+
 /**
  * Convert any stored image URL into an absolute, production-safe URL.
  *
  * Heals legacy records whose imageUrl was persisted as
  *   http://localhost:4000/generated/foo.png
- * by stripping the stored host and re-attaching the current public base URL.
+ * by stripping localhost and re-attaching the current public base URL.
+ * Full URLs on other hosts (e.g. Cloudinary) are left unchanged — critical
+ * so serializeImage never rewrites CDN links into bogus API-host paths.
  *
  * @param {string} stored - imageUrl value from DB (relative or absolute)
  * @param {import("express").Request} [req] - request, used to derive host when env var is absent
@@ -40,9 +45,13 @@ export function absoluteImageUrl(stored, req) {
   let pathPart = stored;
   if (/^https?:\/\//i.test(stored)) {
     try {
-      pathPart = new URL(stored).pathname;
+      const u = new URL(stored);
+      if (!LOCALHOST_HOSTS.test(u.hostname)) {
+        return stored;
+      }
+      pathPart = `${u.pathname}${u.search}`;
     } catch {
-      pathPart = stored;
+      return stored;
     }
   }
   if (!pathPart.startsWith("/")) pathPart = `/${pathPart}`;
