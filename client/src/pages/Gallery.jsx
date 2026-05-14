@@ -10,7 +10,6 @@ export default function Gallery() {
   const [busyId, setBusyId] = useState(null);
   const [lightbox, setLightbox] = useState(null);
   const [view, setView] = useState("all"); // all | favorites
-  const [cleaning, setCleaning] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -30,37 +29,6 @@ export default function Gallery() {
       toast.error(e?.response?.data?.error?.message || e.message);
     } finally {
       setBusyId(null);
-    }
-  };
-
-  const cleanupBroken = async () => {
-    if (cleaning) return;
-    if (
-      !confirm(
-        "Scan your gallery and remove images that no longer load? This deletes records whose underlying file is gone. New Cloudinary-hosted images won't be touched."
-      )
-    ) {
-      return;
-    }
-    setCleaning(true);
-    try {
-      const { data } = await api.post(`${BASE_URL}/api/image/cleanup-broken`);
-      if (data.cleaned === 0) {
-        toast.info(
-          data.checked === 0
-            ? "Nothing to scan — all your images look durable already."
-            : "All your images are reachable. Nothing was removed."
-        );
-      } else {
-        toast.success(
-          `Removed ${data.cleaned} unavailable ${data.cleaned === 1 ? "image" : "images"} from your gallery.`
-        );
-      }
-      await fetchHistory();
-    } catch (e) {
-      toast.error(e?.response?.data?.error?.message || e.message || "Cleanup failed");
-    } finally {
-      setCleaning(false);
     }
   };
 
@@ -120,24 +88,6 @@ export default function Gallery() {
         >
           Favorites ♥
         </button>
-        {history.length > 0 ? (
-          <button
-            type="button"
-            onClick={cleanupBroken}
-            disabled={cleaning}
-            title="Scan and remove images whose underlying file no longer exists"
-            className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
-          >
-            {cleaning ? (
-              <>
-                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-rose-300 border-t-rose-700" />
-                Scanning…
-              </>
-            ) : (
-              <>Clean up unavailable</>
-            )}
-          </button>
-        ) : null}
       </div>
 
       {history.length === 0 ? (
