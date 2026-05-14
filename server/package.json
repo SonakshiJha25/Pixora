@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\"",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "wipe-images": "node scripts/wipeAllImages.js",
+    "wipe-images:confirm": "node scripts/wipeAllImages.js --confirm"
   },
   "dependencies": {
     "axios": "^1.13.2",
