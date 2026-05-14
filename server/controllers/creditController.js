@@ -1,7 +1,12 @@
 import User from "../models/User.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
-import { ensureDailyCredits, getDailyCreditLimit } from "../services/dailyCreditsService.js";
+import {
+  ensureDailyCredits,
+  getDailyCreditLimit,
+  getCreditsPerImage,
+  getNextResetAt,
+} from "../services/dailyCreditsService.js";
 import { useCreditsAtomic } from "../services/creditService.js";
 
 const sanitizeUser = (user) => ({
@@ -26,6 +31,8 @@ export const getCredits = asyncHandler(async (req, res) => {
     credits: user.credits,
     remainingCredits: user.credits,
     dailyLimit: getDailyCreditLimit(),
+    creditsPerImage: getCreditsPerImage(),
+    nextResetAt: getNextResetAt(),
     user: sanitizeUser(user),
   });
 });

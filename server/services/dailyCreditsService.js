@@ -1,4 +1,5 @@
-const DAILY_CREDITS = 10;
+const DAILY_CREDITS = 100;
+const CREDITS_PER_IMAGE = 10;
 
 const sameUtcDay = (a, b) => {
   if (!a || !b) return false;
@@ -28,4 +29,18 @@ export async function ensureDailyCredits(user, { session } = {}) {
 
 export function getDailyCreditLimit() {
   return DAILY_CREDITS;
+}
+
+export function getCreditsPerImage() {
+  return CREDITS_PER_IMAGE;
+}
+
+/**
+ * UTC midnight of the next day — used to tell users when their credits reset.
+ */
+export function getNextResetAt(now = new Date()) {
+  const next = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0)
+  );
+  return next.toISOString();
 }

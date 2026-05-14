@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 import Image from "../models/Image.js";
 import AppError from "../utils/appError.js";
-import { ensureDailyCredits } from "./dailyCreditsService.js";
+import { ensureDailyCredits, getCreditsPerImage } from "./dailyCreditsService.js";
 
 export async function deductCreditAndSaveImage({
   userId,
@@ -25,11 +25,16 @@ export async function deductCreditAndSaveImage({
 
     await ensureDailyCredits(user, { session });
 
-    if (user.credits < 1) {
-      throw new AppError("Insufficient credits", 402, "INSUFFICIENT_CREDITS");
+    const cost = getCreditsPerImage();
+    if (user.credits < cost) {
+      throw new AppError(
+        "Daily image limit reached. Come back tomorrow.",
+        402,
+        "DAILY_LIMIT_REACHED"
+      );
     }
 
-    user.credits -= 1;
+    user.credits -= cost;
     await user.save({ session });
 
     const [image] = await Image.create(

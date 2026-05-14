@@ -90,8 +90,7 @@ export default function NavBar() {
           <button
             type="button"
             onClick={() => {
-              if (!user) setShowLogin(true);
-              else navigate("/studio");
+              navigate("/studio");
               closeMobile();
             }}
             className="btn-primary inline-flex rounded-full px-3 py-1.5 text-xs font-semibold sm:px-5 sm:py-2 sm:text-sm"
@@ -136,7 +135,14 @@ export default function NavBar() {
                       <p className="font-semibold">{user.name}</p>
                       <p className="text-xs text-slate-500">{user.email}</p>
                     </div>
-                    <div className="px-4 py-2 text-sm text-slate-700">Credits: {credit}</div>
+                    <div className="px-4 py-2">
+                      <p className="text-sm font-semibold text-slate-800">
+                        Credits: {credit} <span className="text-xs font-normal text-slate-500">/ 100</span>
+                      </p>
+                      <p className="mt-0.5 text-[10px] leading-snug text-slate-500">
+                        10 credits per image · refreshes daily at midnight UTC
+                      </p>
+                    </div>
                     <button
                       type="button"
                       className="w-full px-4 py-2.5 text-left text-sm font-semibold text-slate-900 hover:bg-slate-50"
@@ -203,7 +209,14 @@ export default function NavBar() {
                 <NavLink to="/gallery" className={linkClass} onClick={closeMobile}>
                   My gallery
                 </NavLink>
-                <p className="px-3 py-2 text-sm text-slate-600">Credits: {credit}</p>
+                <div className="px-3 py-2">
+                  <p className="text-sm font-semibold text-slate-700">
+                    Credits: {credit} <span className="text-xs font-normal text-slate-500">/ 100</span>
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">
+                    10 credits per image · refreshes daily at midnight UTC
+                  </p>
+                </div>
                 <button
                   type="button"
                   className="px-3 py-2 text-left text-sm font-semibold text-slate-900"
