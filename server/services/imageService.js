@@ -72,10 +72,15 @@ async function saveLocallyAsFallback(buffer, filename) {
  * (Cloudinary) or a relative /generated/... path (local fallback). The
  * absoluteImageUrl helper in utils/imageUrl.js handles both transparently.
  *
- * In NODE_ENV=production, Cloudinary must succeed — local disk is ephemeral on
- * hosts like Render and would produce URLs that vanish on redeploy.
+ * In NODE_ENV=production, signed-in flows require Cloudinary (or upload succeeds).
+ * Guest trials may fall back to ephemeral disk when ephemeralOk is true so try-outs work without CDN keys (URLs may not survive redeploy).
  */
-export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
+/**
+ * @param {{ ephemeralOk?: boolean }} [options] — Guest trials may use ephemeral disk on prod when Cloudinary is missing or fails (signed-in users still require durable storage).
+ */
+export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }, options = {}) {
+  const ephemeralOk = Boolean(options.ephemeralOk);
+
   const apiKey = process.env.CLIPDROP_API?.trim();
   if (!apiKey) {
     throw new AppError("CLIPDROP_API is not configured", 500, "CLIPDROP_NOT_CONFIGURED");
@@ -98,19 +103,26 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
       return cloudUrl;
     } catch (err) {
       console.error("Cloudinary upload failed:", err.message);
-      if (isProd) {
+      if (isProd && !ephemeralOk) {
         throw new AppError(
           `Image storage failed (Cloudinary): ${err.message}`,
           502,
           "STORAGE_UPLOAD_FAILED"
         );
       }
+      if (isProd && ephemeralOk) {
+        console.warn("[guest] Cloudinary failed — using ephemeral disk for this trial image only.");
+      }
     }
-  } else if (isProd) {
+  } else if (isProd && !ephemeralOk) {
     throw new AppError(
       "Image storage is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.",
       500,
       "STORAGE_NOT_CONFIGURED"
+    );
+  } else if (isProd && ephemeralOk) {
+    console.warn(
+      "[guest] Cloudinary not configured — saving to ephemeral disk so trials work; configure Cloudinary for production persistence."
     );
   } else {
     console.warn(

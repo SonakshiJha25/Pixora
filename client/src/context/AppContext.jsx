@@ -25,6 +25,10 @@ const AppContextProvider = ({ children }) => {
   const api = useMemo(() => {
     const instance = axios.create({ baseURL: BASE_URL || "" });
     instance.interceptors.request.use((config) => {
+      if (config.skipAuth) {
+        delete config.headers.Authorization;
+        return config;
+      }
       const t = getToken();
       if (t) {
         config.headers.Authorization = `Bearer ${t}`;

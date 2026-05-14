@@ -241,7 +241,7 @@ export const generateGuestImage = asyncHandler(async (req, res) => {
   const { prompt, style } = req.body;
 
   const promptEnhanced = enhancePrompt(prompt, style);
-  const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced });
+  const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced }, { ephemeralOk: true });
   const fullUrl = absoluteImageUrl(relativeImageUrl, req);
 
   return res.status(200).json({

@@ -15,7 +15,7 @@ import { normalizeCreditsPoints, DAILY_CREDITS_LIMIT, CREDITS_PER_IMAGE } from "
 
 const SPEECH_AUTO_STOP_MS = 8000;
 /** Bump key to reset everyone's trial counter without clearing all localStorage. */
-const GUEST_GEN_KEY = "pixorify_guest_gens_v3";
+const GUEST_GEN_KEY = "pixorify_guest_gens_v4";
 
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
@@ -23,8 +23,11 @@ function getSpeechRecognitionCtor() {
 }
 
 export default function Studio() {
-  const { api, token, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit } =
+  const { api, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit } =
     useContext(AppContext);
+
+  const authToken = getToken()?.trim() ?? "";
+  const isGuestUser = !authToken;
   const [image, setImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -144,7 +147,8 @@ export default function Studio() {
       return;
     }
 
-    const isGuest = !token;
+    const isGuest = !(getToken()?.trim());
+
     if (isGuest) {
       const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
       if (used >= GUEST_FREE_IMAGE_LIMIT) {
@@ -160,9 +164,7 @@ export default function Studio() {
       const payload = isGuest
         ? { prompt: input.trim(), style }
         : { prompt: input.trim(), style, isPublic: false };
-      const config = isGuest
-        ? {}
-        : { headers: { Authorization: `Bearer ${getToken()}` } };
+      const config = isGuest ? { skipAuth: true } : {};
 
       const { data: response } = await api.post(endpoint, payload, config);
 
@@ -245,7 +247,7 @@ export default function Studio() {
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
           Describe your scene, pick a style, and generate.
-          {!token ? (
+          {isGuestUser ? (
             <>
               {" "}
               <span className="font-semibold text-slate-800">
@@ -256,7 +258,7 @@ export default function Studio() {
         </p>
         <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-          {token ? (
+          {!isGuestUser ? (
             <span>
               You have{" "}
               <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
@@ -451,7 +453,7 @@ export default function Studio() {
         </div>
         {history.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-slate-300 bg-white/50 py-12 text-center text-sm text-slate-500">
-            {token
+            {!isGuestUser
               ? "No images yet"
               : "Sign in to save generations here — as a guest, use Download on each image while you're trying Pixorify."}
           </p>
