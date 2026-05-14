@@ -10,9 +10,9 @@ import LimitReachedModal from "../components/LimitReachedModal";
 import GuestTrialEndedModal from "../components/GuestTrialEndedModal";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
+import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
-const GUEST_GEN_LIMIT = 5;
 /** Bump key to reset everyone's trial counter without clearing all localStorage. */
 const GUEST_GEN_KEY = "pixorify_guest_gens_v3";
 
@@ -145,7 +145,7 @@ export default function Studio() {
     const isGuest = !token;
     if (isGuest) {
       const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
-      if (used >= GUEST_GEN_LIMIT) {
+      if (used >= GUEST_FREE_IMAGE_LIMIT) {
         setGuestTrialModal({ open: true, variant: "browser" });
         return;
       }
@@ -183,11 +183,11 @@ export default function Studio() {
         const next = used + 1;
         localStorage.setItem(GUEST_GEN_KEY, String(next));
         setGuestGensUsed(next);
-        const remaining = Math.max(0, GUEST_GEN_LIMIT - next);
+        const remaining = Math.max(0, GUEST_FREE_IMAGE_LIMIT - next);
         toast.success(
           remaining === 0
-            ? "Here's your last preview — we'd love you to stay when you're ready."
-            : `Image ready — ${remaining} free ${remaining === 1 ? "preview" : "previews"} left.`
+            ? "Here's your last free image — we'd love you to stay when you're ready."
+            : `Image ready — ${remaining} free ${remaining === 1 ? "image" : "images"} left before sign-in.`
         );
         if (remaining === 0) {
           setGuestTrialModal({ open: true, variant: "browser" });
@@ -240,6 +240,14 @@ export default function Studio() {
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
           Describe your scene, pick a style, and generate.
+          {!token ? (
+            <>
+              {" "}
+              <span className="font-semibold text-slate-800">
+                {GUEST_FREE_IMAGE_LIMIT} tries are free without an account.
+              </span>
+            </>
+          ) : null}
         </p>
         <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
@@ -252,10 +260,10 @@ export default function Studio() {
           ) : (
             <span>
               <span className="font-bold text-slate-900">
-                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed)} free{" "}
-                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed) === 1 ? "preview" : "previews"}
+                {Math.max(0, GUEST_FREE_IMAGE_LIMIT - guestGensUsed)} free{" "}
+                {Math.max(0, GUEST_FREE_IMAGE_LIMIT - guestGensUsed) === 1 ? "image" : "images"}
               </span>{" "}
-              left · sign in for daily credits (no card needed)
+              left without signing in · sign in after that for daily credits & gallery
             </span>
           )}
         </div>
@@ -437,7 +445,9 @@ export default function Studio() {
         </div>
         {history.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-slate-300 bg-white/50 py-12 text-center text-sm text-slate-500">
-            No images yet
+            {token
+              ? "No images yet"
+              : "Sign in to save generations here — as a guest, use Download on each image while you're trying Pixorify."}
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">

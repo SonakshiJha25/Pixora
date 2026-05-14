@@ -4,14 +4,14 @@ import { motion } from "motion/react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import { scrollPageTop } from "../lib/navigation";
+import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
 
 export default function Header() {
-  const { user, setShowLogin } = useContext(AppContext);
+  const { user } = useContext(AppContext);
   const navigate = useNavigate();
 
   const goStudio = () => {
-    if (user) navigate("/studio");
-    else setShowLogin(true);
+    navigate("/studio");
   };
 
   const goHomeTop = () => {
@@ -54,7 +54,15 @@ export default function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        100 daily credits refresh every day. Keep everything in your gallery.
+        {user ? (
+          "100 daily credits refresh every day. Keep everything in your gallery."
+        ) : (
+          <>
+            Try{" "}
+            <span className="font-semibold text-slate-800">{GUEST_FREE_IMAGE_LIMIT} images</span> in the Studio with no
+            account — then sign in for daily credits and a saved gallery.
+          </>
+        )}
       </motion.p>
 
       <motion.div

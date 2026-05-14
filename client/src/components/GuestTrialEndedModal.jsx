@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { motion } from "motion/react";
+import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
 
 /**
  * Shown when a guest finishes their browser trial or hits the server guest cap.
  *
  * variant:
- *   - browser — localStorage cap (5 previews)
+ *   - browser — localStorage cap (guest trial images)
  *   - network — per-IP guest rate limit on the API
  */
 export default function GuestTrialEndedModal({ open, onClose, onSignIn, variant = "browser" }) {
@@ -41,18 +42,20 @@ export default function GuestTrialEndedModal({ open, onClose, onSignIn, variant 
           </span>
         </div>
         <h2 id="guest-trial-title" className="mt-5 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
-          {isNetwork ? "A quick pause on previews" : "Hope you enjoyed your previews"}
+          {isNetwork ? "A quick pause on free tries" : "Hope you enjoyed your free images"}
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
           {isNetwork ? (
             <>
-              Lots of free previews were used from this connection today — thanks for the interest. Sign in for your
+              Lots of guest generations were used from this connection today — thanks for the interest. Sign in for your
               own daily quota, or come back tomorrow to try again without an account.
             </>
           ) : (
             <>
               You&apos;ve used all{" "}
-              <span className="font-semibold text-slate-800">five free trial images</span>
+              <span className="font-semibold text-slate-800">
+                {GUEST_FREE_IMAGE_LIMIT} free trial images (no login)
+              </span>
               . Take a moment to create a free account when you&apos;re ready — then you get fresh credits every day and
               your gallery saves automatically.
             </>
