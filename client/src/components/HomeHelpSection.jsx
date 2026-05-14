@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { BASE_URL } from "../config/api.js";
-import { getToken } from "../utils/token.js";
+import { AppContext } from "../context/AppContext";
 
 export default function HomeHelpSection() {
+  const { api } = useContext(AppContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -27,15 +26,9 @@ export default function HomeHelpSection() {
       .filter(Boolean)
       .join("\n\n");
 
-    const token = getToken();
-    const headers = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
     try {
       setLoading(true);
-      const { data } = await axios.post(`${BASE_URL}/api/feedback`, { message: composed }, { headers });
+      const { data } = await api.post("/api/feedback", { message: composed });
       if (data.success) {
         toast.success("Feedback submitted successfully");
         setName("");

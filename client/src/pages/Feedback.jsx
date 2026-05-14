@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { AppContext } from "../context/AppContext";
-import { BASE_URL } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 
 export default function Feedback() {
@@ -37,7 +36,7 @@ export default function Feedback() {
 
     try {
       setLoading(true);
-      const { data } = await api.post(`${BASE_URL}/api/feedback`, body, { headers });
+      const { data } = await api.post("/api/feedback", body, { headers });
 
       if (data.success) {
         setSuccessMessage("Feedback submitted successfully");

@@ -7,12 +7,14 @@ import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
 import LimitReachedModal from "../components/LimitReachedModal";
-import { BASE_URL, resolveImageUrl } from "../config/api.js";
+import GuestTrialEndedModal from "../components/GuestTrialEndedModal";
+import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 const GUEST_GEN_LIMIT = 5;
-const GUEST_GEN_KEY = "pixorify_guest_gens";
+/** Bump key to reset everyone's trial counter without clearing all localStorage. */
+const GUEST_GEN_KEY = "pixorify_guest_gens_v3";
 
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
@@ -31,6 +33,7 @@ export default function Studio() {
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
   const [limitModal, setLimitModal] = useState({ open: false, resetAt: null });
+  const [guestTrialModal, setGuestTrialModal] = useState({ open: false, variant: "browser" });
   const [guestGensUsed, setGuestGensUsed] = useState(() =>
     Number(localStorage.getItem(GUEST_GEN_KEY) || 0)
   );
@@ -143,8 +146,7 @@ export default function Studio() {
     if (isGuest) {
       const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
       if (used >= GUEST_GEN_LIMIT) {
-        toast.info("You've used your 5 free images — sign up to keep creating.");
-        setShowLogin(true);
+        setGuestTrialModal({ open: true, variant: "browser" });
         return;
       }
     }
@@ -152,9 +154,7 @@ export default function Studio() {
     try {
       setLoading(true);
 
-      const endpoint = isGuest
-        ? `${BASE_URL}/api/images/guest/generate`
-        : `${BASE_URL}/api/images/generate`;
+      const endpoint = isGuest ? "/api/images/guest/generate" : "/api/images/generate";
       const payload = isGuest
         ? { prompt: input.trim(), style }
         : { prompt: input.trim(), style, isPublic: false };
@@ -186,9 +186,12 @@ export default function Studio() {
         const remaining = Math.max(0, GUEST_GEN_LIMIT - next);
         toast.success(
           remaining === 0
-            ? "Image generated! Sign up to keep going."
-            : `Image generated — ${remaining} free ${remaining === 1 ? "image" : "images"} left.`
+            ? "Here's your last preview — we'd love you to stay when you're ready."
+            : `Image ready — ${remaining} free ${remaining === 1 ? "preview" : "previews"} left.`
         );
+        if (remaining === 0) {
+          setGuestTrialModal({ open: true, variant: "browser" });
+        }
       } else {
         if (response.image) {
           setHistory((prev) => [
@@ -209,6 +212,12 @@ export default function Studio() {
 
       if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
         setLimitModal({ open: true, resetAt: error?.response?.data?.error?.nextResetAt || null });
+      } else if (code === "GUEST_DAILY_LIMIT") {
+        setGuestTrialModal({ open: true, variant: "network" });
+      } else if (error?.response?.status === 404) {
+        toast.error(
+          "Image API returned 404 — open the app from your backend URL after deploy, or set VITE_BACKEND_URL when building the client."
+        );
       } else {
         toast.error(message);
       }
@@ -243,10 +252,10 @@ export default function Studio() {
           ) : (
             <span>
               <span className="font-bold text-slate-900">
-                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed)} free trial{" "}
-                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed) === 1 ? "image" : "images"}
+                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed)} free{" "}
+                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed) === 1 ? "preview" : "previews"}
               </span>{" "}
-              left · sign up for 10 daily, free forever
+              left · sign in for daily credits (no card needed)
             </span>
           )}
         </div>
@@ -474,6 +483,13 @@ export default function Studio() {
         open={limitModal.open}
         resetAt={limitModal.resetAt}
         onClose={() => setLimitModal({ open: false, resetAt: null })}
+      />
+
+      <GuestTrialEndedModal
+        open={guestTrialModal.open}
+        variant={guestTrialModal.variant}
+        onClose={() => setGuestTrialModal((s) => ({ ...s, open: false }))}
+        onSignIn={() => setShowLogin(true)}
       />
     </div>
   );

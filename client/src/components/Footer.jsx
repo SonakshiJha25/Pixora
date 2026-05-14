@@ -27,14 +27,49 @@ export default function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-stretch justify-between gap-3 px-0 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-2.5">
           {[
-            { label: "Facebook", icon: assets.facebook_icon, outer: "bg-slate-900", invert: true },
-            { label: "X", icon: assets.twitter_x_icon, outer: "bg-slate-900", invert: true },
-            { label: "Instagram", icon: assets.instagram_icon, outer: "bg-slate-900", invert: true },
-            { label: "Discord", icon: assets.discord_icon, outer: "bg-[#5865F2]", invert: false },
+            {
+              channel: "facebook",
+              label: "Facebook",
+              icon: assets.facebook_icon,
+              outer: "bg-slate-900",
+              invert: true,
+            },
+            {
+              channel: "twitter",
+              label: "X",
+              icon: assets.twitter_x_icon,
+              outer: "bg-slate-900",
+              invert: true,
+            },
+            {
+              channel: "instagram",
+              label: "Instagram",
+              icon: assets.instagram_icon,
+              outer: "bg-slate-900",
+              invert: true,
+            },
+            {
+              channel: "discord",
+              label: "Discord",
+              icon: assets.discord_icon,
+              outer: "bg-[#5865F2]",
+              invert: false,
+            },
           ].map((s) => (
             <Link
-              key={s.label}
-              to="/coming-soon"
+              key={s.channel}
+              to={`/coming-soon?channel=${encodeURIComponent(s.channel)}`}
+              onClick={(e) => {
+                const params = new URLSearchParams(location.search);
+                const current = params.get("channel")?.toLowerCase() ?? "";
+                if (
+                  location.pathname === "/coming-soon" &&
+                  current === s.channel.toLowerCase()
+                ) {
+                  e.preventDefault();
+                  window.location.reload();
+                }
+              }}
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${s.outer} shadow-sm transition hover:opacity-90`}
               aria-label={`${s.label} — coming soon`}
             >

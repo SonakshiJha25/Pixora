@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
-import { BASE_URL, resolveImageUrl } from "../config/api.js";
+import { resolveImageUrl } from "../config/api.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory } = useContext(AppContext);
@@ -37,7 +37,7 @@ export default function Gallery() {
     const next = !item.isFavorite;
     setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: next } : x)));
     api
-      .patch(`${BASE_URL}/api/image/${id}/favorite`)
+      .patch(`/api/image/${id}/favorite`)
       .catch((e) => {
         setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: !next } : x)));
         toast.error(e?.response?.data?.error?.message || e.message);
@@ -138,7 +138,7 @@ export default function Gallery() {
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
                   onClick={() => {
                     if (!confirm("Delete this image?")) return;
-                    run(item._id, () => api.delete(`${BASE_URL}/api/image/${item._id}`));
+                    run(item._id, () => api.delete(`/api/image/${item._id}`));
                   }}
                 >
                   Delete

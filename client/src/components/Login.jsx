@@ -4,7 +4,6 @@ import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'motion/react'
 import { toast } from 'react-toastify'
-import { BASE_URL } from '../config/api.js'
 
 const Login = () => {
 
@@ -32,8 +31,8 @@ const Login = () => {
 
         try {
             const url = state === 'Login'
-                ? `${BASE_URL}/api/user/login`
-                : `${BASE_URL}/api/user/register`;
+                ? '/api/user/login'
+                : '/api/user/register';
             const payload = state === 'Login'
                 ? { email, password }
                 : { name, email, password };

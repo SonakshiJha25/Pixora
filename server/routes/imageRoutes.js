@@ -19,19 +19,22 @@ import validate from '../middlewares/validate.js';
 
 const imageRouter = express.Router()
 
-// Guests share a per-IP daily budget that's roughly aligned with the 5-image
-// localStorage cap on the client. A motivated visitor who clears localStorage
-// can re-roll, but they still hit the IP ceiling.
+// Guests share a per-IP daily budget (override with GUEST_IP_MAX_PER_DAY). The
+// browser still caps anonymous previews separately via localStorage.
+const guestIpMaxRaw = Number.parseInt(process.env.GUEST_IP_MAX_PER_DAY ?? "120", 10);
+const guestIpMaxPerDay = Number.isFinite(guestIpMaxRaw) && guestIpMaxRaw >= 5 ? guestIpMaxRaw : 120;
+
 const guestGenerateLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
-  max: 10,
+  max: guestIpMaxPerDay,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
     error: {
       code: "GUEST_DAILY_LIMIT",
-      message: "Free trial limit reached for today. Sign up to keep creating.",
+      message:
+        "This connection has reached today's guest preview limit. Sign in for your own daily quota, or try again tomorrow.",
     },
   },
 });

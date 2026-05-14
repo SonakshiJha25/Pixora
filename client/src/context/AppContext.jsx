@@ -22,7 +22,7 @@ const AppContextProvider = ({ children }) => {
   }, []);
 
   const api = useMemo(() => {
-    const instance = axios.create({ baseURL: "" });
+    const instance = axios.create({ baseURL: BASE_URL || "" });
     instance.interceptors.request.use((config) => {
       const t = getToken();
       if (t) {
@@ -46,14 +46,14 @@ const AppContextProvider = ({ children }) => {
       }
     );
     return instance;
-  }, [logout, setShowLogin]);
+  }, [logout, setShowLogin, BASE_URL]);
 
   const fetchUserData = useCallback(async () => {
     if (!getToken()) return;
     try {
       const [meRes, creditsRes] = await Promise.all([
-        api.get(`${BASE_URL}/api/user/me`),
-        api.get(`${BASE_URL}/api/user/credits`),
+        api.get("/api/user/me"),
+        api.get("/api/user/credits"),
       ]);
       setUser(meRes.data.user);
       setCredit(creditsRes.data.credits || 0);
@@ -65,7 +65,7 @@ const AppContextProvider = ({ children }) => {
   const fetchHistory = useCallback(async () => {
     if (!getToken()) return;
     try {
-      const { data } = await api.get(`${BASE_URL}/api/image/history?limit=24&page=1`);
+      const { data } = await api.get("/api/image/history?limit=24&page=1");
       const images = data.images ?? data.data ?? [];
       setHistory(images);
       console.log("History fetch loaded:", images?.length ?? 0, "items");

@@ -1,4 +1,11 @@
-export const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+/** Backend origin without trailing slash. Empty string = same origin (use Vite proxy in dev). */
+export const BASE_URL = String(import.meta.env.VITE_BACKEND_URL ?? "").trim().replace(/\/+$/, "");
+
+if (import.meta.env.PROD && !BASE_URL) {
+  console.warn(
+    "[Pixorify] VITE_BACKEND_URL is unset — requests use this page’s origin (works when the API serves the built client). For a separate API host, set VITE_BACKEND_URL before building the client."
+  );
+}
 
 /**
  * Normalize any image URL the backend returns into an absolute URL that the

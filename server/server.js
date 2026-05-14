@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import helmet from "helmet";
@@ -82,8 +83,6 @@ app.use("/api/feedback", feedbackRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/image", generationLimiter, imageRouter);
 
-app.get("/", (req, res) => res.send("API Working"));
-
 app.get("/health", (req, res) => {
   const dbOk = mongoose.connection.readyState === 1;
   res.status(dbOk ? 200 : 503).json({
@@ -92,6 +91,36 @@ app.get("/health", (req, res) => {
     database: dbOk ? "connected" : "disconnected",
     databaseName: mongoose.connection?.db?.databaseName ?? null,
     cloudinary: isCloudinaryConfigured() ? "configured" : "missing",
+  });
+});
+
+const clientDist = path.join(__dirname, "..", "client", "dist");
+
+if (fs.existsSync(clientDist)) {
+  console.log("[server] Serving SPA from", clientDist);
+  app.use(express.static(clientDist));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    if (req.path.startsWith("/api") || req.path.startsWith("/generated")) return next();
+    res.sendFile(path.join(clientDist, "index.html"), (err) => {
+      if (err) next(err);
+    });
+  });
+} else {
+  app.get("/", (_req, res) =>
+    res.type("text/plain").send(
+      "API working — build the React app into ../client/dist (npm run build from server/) to serve the web UI here."
+    )
+  );
+}
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      code: "NOT_FOUND",
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+    },
   });
 });
 
