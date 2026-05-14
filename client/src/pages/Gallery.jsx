@@ -3,12 +3,14 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
+import ConfirmModal from "../components/ConfirmModal";
 import { resolveImageUrl } from "../config/api.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory } = useContext(AppContext);
   const [busyId, setBusyId] = useState(null);
   const [lightbox, setLightbox] = useState(null);
+  const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
   const [view, setView] = useState("all"); // all | favorites
 
   useEffect(() => {
@@ -136,10 +138,7 @@ export default function Gallery() {
                   type="button"
                   disabled={busyId === item._id}
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
-                  onClick={() => {
-                    if (!confirm("Delete this image?")) return;
-                    run(item._id, () => api.delete(`/api/image/${item._id}`));
-                  }}
+                  onClick={() => setPendingDeleteItem(item)}
                 >
                   Delete
                 </button>
@@ -148,6 +147,21 @@ export default function Gallery() {
           ))}
         </ul>
       )}
+
+      <ConfirmModal
+        open={pendingDeleteItem !== null}
+        title="Delete this image?"
+        description="You can’t undo this. It will be removed from your gallery."
+        confirmLabel="Delete"
+        cancelLabel="Keep"
+        danger
+        onCancel={() => setPendingDeleteItem(null)}
+        onConfirm={() => {
+          const item = pendingDeleteItem;
+          setPendingDeleteItem(null);
+          if (item) run(item._id, () => api.delete(`/api/image/${item._id}`));
+        }}
+      />
 
       {lightbox ? (
         <div
