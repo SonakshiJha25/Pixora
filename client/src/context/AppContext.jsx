@@ -13,6 +13,10 @@ const AppContextProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [credit, setCredit] = useState(0);
   const [history, setHistory] = useState([]);
+  const [dailyCreditSchedule, setDailyCreditSchedule] = useState({
+    timezone: "UTC",
+    nextResetAtIso: null,
+  });
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
@@ -20,6 +24,7 @@ const AppContextProvider = ({ children }) => {
     setUser(null);
     setCredit(0);
     setHistory([]);
+    setDailyCreditSchedule({ timezone: "UTC", nextResetAtIso: null });
   }, []);
 
   const api = useMemo(() => {
@@ -68,6 +73,10 @@ const AppContextProvider = ({ children }) => {
       const u = meRes.data?.user ?? null;
       setUser(u ? { ...u, creditBalance: pts } : null);
       setCredit(pts);
+      setDailyCreditSchedule({
+        timezone: creditsRes.data?.dailyResetTimezone ?? "UTC",
+        nextResetAtIso: creditsRes.data?.nextResetAt ?? null,
+      });
     } catch (error) {
       logout();
     }
@@ -109,6 +118,7 @@ const AppContextProvider = ({ children }) => {
     fetchUserData,
     logout,
     api,
+    dailyCreditSchedule,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

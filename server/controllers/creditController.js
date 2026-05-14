@@ -6,6 +6,7 @@ import {
   getDailyCreditLimit,
   getCreditsPerImage,
   getNextResetAt,
+  getCreditsResetTimezoneLabel,
 } from "../services/dailyCreditsService.js";
 import { useCreditsAtomic } from "../services/creditService.js";
 
@@ -33,6 +34,7 @@ export const getCredits = asyncHandler(async (req, res) => {
     dailyLimit: getDailyCreditLimit(),
     creditsPerImage: getCreditsPerImage(),
     nextResetAt: getNextResetAt(),
+    dailyResetTimezone: getCreditsResetTimezoneLabel(),
     user: sanitizeUser(user),
   });
 });

@@ -1,4 +1,4 @@
-import { getNextResetAt } from "../services/dailyCreditsService.js";
+import { getNextResetAt, getCreditsResetTimezoneLabel } from "../services/dailyCreditsService.js";
 
 const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -16,6 +16,7 @@ const errorHandler = (err, req, res, next) => {
 
   if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
     errorPayload.nextResetAt = getNextResetAt();
+    errorPayload.dailyResetTimezone = getCreditsResetTimezoneLabel();
   }
 
   res.status(statusCode).json({

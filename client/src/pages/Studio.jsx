@@ -19,7 +19,7 @@ function getSpeechRecognitionCtor() {
 }
 
 export default function Studio() {
-  const { api, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit } =
+  const { api, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit, dailyCreditSchedule } =
     useContext(AppContext);
 
   const authToken = getToken()?.trim() ?? "";
@@ -33,7 +33,7 @@ export default function Studio() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
-  const [limitModal, setLimitModal] = useState({ open: false, resetAt: null });
+  const [limitModal, setLimitModal] = useState({ open: false, resetAt: null, dailyResetTimezone: null });
 
   const recognitionRef = useRef(null);
   const autoStopTimerRef = useRef(null);
@@ -188,7 +188,12 @@ export default function Studio() {
         "Generation failed";
 
       if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
-        setLimitModal({ open: true, resetAt: error?.response?.data?.error?.nextResetAt || null });
+        const err = error?.response?.data?.error;
+        setLimitModal({
+          open: true,
+          resetAt: err?.nextResetAt || null,
+          dailyResetTimezone: err?.dailyResetTimezone ?? null,
+        });
       } else if (error?.response?.status === 404) {
         toast.error(
           "Image API 404 — the page’s host has no /api routes. Prefer one URL where Node serves Studio + API, set VITE_BACKEND_URL on frontend build to your API origin, or meta pixora-api-base / localStorage key pixora_api_base."
@@ -225,11 +230,34 @@ export default function Studio() {
         <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
           {isSignedIn ? (
-            <span>
+            <span className="inline-block max-w-xl text-center leading-snug sm:text-left">
               You have{" "}
               <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
               <span className="font-bold text-slate-900">{DAILY_CREDITS_LIMIT}</span>/day ·{" "}
-              <span className="font-bold text-slate-900">{CREDITS_PER_IMAGE}</span> per image · midnight UTC
+              <span className="font-bold text-slate-900">{CREDITS_PER_IMAGE}</span> per image.
+              {dailyCreditSchedule?.nextResetAtIso ? (
+                <>
+                  {" "}
+                  Next refill:{" "}
+                  <time dateTime={dailyCreditSchedule.nextResetAtIso} className="font-semibold text-slate-800">
+                    {new Date(dailyCreditSchedule.nextResetAtIso).toLocaleString(undefined, {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </time>
+                  <span className="text-slate-600">
+                    {" "}
+                    ({dailyCreditSchedule.timezone === "UTC" ? "UTC calendar day" : dailyCreditSchedule.timezone})
+                  </span>
+                </>
+              ) : (
+                <span className="text-slate-600">
+                  Next refill time loads with your credits (UTC calendar day unless the API sets CREDITS_RESET_TIMEZONE).
+                </span>
+              )}
             </span>
           ) : (
             <span>
@@ -460,7 +488,14 @@ export default function Studio() {
       <LimitReachedModal
         open={limitModal.open}
         resetAt={limitModal.resetAt}
-        onClose={() => setLimitModal({ open: false, resetAt: null })}
+        dailyResetTimezone={
+          limitModal.dailyResetTimezone ??
+          dailyCreditSchedule?.timezone ??
+          "UTC"
+        }
+        onClose={() =>
+          setLimitModal({ open: false, resetAt: null, dailyResetTimezone: null })
+        }
       />
     </div>
   );

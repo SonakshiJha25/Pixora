@@ -5,11 +5,12 @@ import { motion } from "motion/react";
  * Friendly "you're out of credits for today" popup.
  *
  * Props:
- *   open    - boolean
- *   onClose - () => void
- *   resetAt - ISO date string of when the daily limit refreshes (optional)
+ *   open                 - boolean
+ *   onClose              - () => void
+ *   resetAt              - ISO date string of when the daily limit refreshes (optional)
+ *   dailyResetTimezone   - IANA label from API, e.g. "UTC" or "Asia/Kolkata" (optional)
  */
-export default function LimitReachedModal({ open, onClose, resetAt }) {
+export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTimezone }) {
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
@@ -33,6 +34,11 @@ export default function LimitReachedModal({ open, onClose, resetAt }) {
       untilLabel = "tomorrow";
     }
   }
+
+  const tzSuffix =
+    dailyResetTimezone && dailyResetTimezone !== "UTC"
+      ? `${dailyResetTimezone} calendar day`
+      : "UTC calendar day";
 
   return (
     <div
@@ -74,8 +80,8 @@ export default function LimitReachedModal({ open, onClose, resetAt }) {
           Oops — you're all out for today!
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          You've used up your daily image credits. Your free quota refreshes at
-          midnight UTC — come back {untilLabel} to keep creating.
+          You've used up your daily image credits. Your pool rolls over at the next{" "}
+          {tzSuffix} boundary — around <strong>{untilLabel}</strong> on your device.
         </p>
         <div className="mt-5 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-cyan-100">
           You get <span className="font-bold text-slate-900">100 credits</span> per day.
