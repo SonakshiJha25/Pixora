@@ -54,7 +54,7 @@ export default function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        10 free credits return every day. Keep everything in your gallery.
+        100 daily credits refresh every day. Keep everything in your gallery.
       </motion.p>
 
       <motion.div

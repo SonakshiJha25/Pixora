@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import { scrollPageTop } from "../lib/navigation";
+import { CREDITS_PER_IMAGE, DAILY_CREDITS_LIMIT, generationsRemaining } from "../lib/credits.js";
 
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
@@ -22,6 +23,8 @@ export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+
+  const gensLeft = generationsRemaining(credit);
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -137,10 +140,12 @@ export default function NavBar() {
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-sm font-semibold text-slate-800">
-                        Credits: {credit} <span className="text-xs font-normal text-slate-500">/ 100</span>
+                        Credits: {credit}{" "}
+                        <span className="text-xs font-normal text-slate-500">/ {DAILY_CREDITS_LIMIT}</span>
                       </p>
                       <p className="mt-0.5 text-[10px] leading-snug text-slate-500">
-                        10 credits per image · refreshes daily at midnight UTC
+                        ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left today · {CREDITS_PER_IMAGE} credits each ·
+                        refreshes midnight UTC
                       </p>
                     </div>
                     <button
@@ -201,10 +206,11 @@ export default function NavBar() {
                 </NavLink>
                 <div className="px-3 py-2">
                   <p className="text-sm font-semibold text-slate-700">
-                    Credits: {credit} <span className="text-xs font-normal text-slate-500">/ 100</span>
+                    Credits: {credit}{" "}
+                    <span className="text-xs font-normal text-slate-500">/ {DAILY_CREDITS_LIMIT}</span>
                   </p>
                   <p className="mt-0.5 text-[10px] text-slate-500">
-                    10 credits per image · refreshes daily at midnight UTC
+                    ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left · {CREDITS_PER_IMAGE} credits each · midnight UTC
                   </p>
                 </div>
                 <button

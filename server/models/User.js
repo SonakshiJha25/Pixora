@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
       maxlength: 254,
     },
     password: { type: String, required: true, select: false },
-    credits: { type: Number, required: true, default: 10, min: 0 },
+    credits: { type: Number, required: true, default: 100, min: 0 },
     creditBalance: { type: Number, min: 0 },
     dailyCreditResetAt: { type: Date, default: null },
     role: { type: String, enum: ["user", "admin"], default: "user" },

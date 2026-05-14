@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { toast } from "react-toastify";
 
 const comparison = [
-  { label: "10 credits every day", free: true, pro: true },
+  { label: "100 credits every day", free: true, pro: true },
   { label: "Private gallery", free: true, pro: true },
   { label: "Download generated images", free: true, pro: true },
   { label: "Favorites", free: true, pro: true },
@@ -36,7 +36,7 @@ export default function BuyCredits() {
       return;
     }
     if (plan === "Free") {
-      toast.info("You're on Free — 10 daily credits are already included.");
+      toast.info("You're on Free — 100 daily credits are already included.");
       return;
     }
     navigate("/coming-soon");
