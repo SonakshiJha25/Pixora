@@ -4,7 +4,7 @@ import AppError from "../utils/appError.js";
 import { deductCreditAndSaveImage } from "../services/creditService.js";
 import { resolveGeneratedImageUrl } from "../services/imageService.js";
 import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
-import { serializeImage } from "../utils/imageUrl.js";
+import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 
 export const generateImage = asyncHandler(async (req, res) => {
   const { prompt, style, isPublic, tags } = req.body;
@@ -151,4 +151,29 @@ export const getPromptStyles = asyncHandler(async (req, res) => {
 export const previewEnhancedPrompt = asyncHandler(async (req, res) => {
   const { prompt, style } = req.body;
   return res.status(200).json({ success: true, promptEnhanced: enhancePrompt(prompt, style) });
+});
+
+/**
+ * Guest image generation — no auth required, no DB persistence, no credit
+ * accounting on the server. The frontend enforces a per-browser cap of 5
+ * generations via localStorage; once that's reached the UI forces a login.
+ *
+ * This route is intentionally lightweight: it lets visitors try Pixorify
+ * before signing up. It IS rate-limited per IP at the router layer to
+ * defend against the localStorage cap being bypassed.
+ */
+export const generateGuestImage = asyncHandler(async (req, res) => {
+  const { prompt, style } = req.body;
+
+  const promptEnhanced = enhancePrompt(prompt, style);
+  const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced });
+  const fullUrl = absoluteImageUrl(relativeImageUrl, req);
+
+  return res.status(200).json({
+    success: true,
+    message: "Image generated (guest)",
+    imageUrl: fullUrl,
+    resultImage: fullUrl,
+    guest: true,
+  });
 });

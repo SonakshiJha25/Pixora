@@ -6,10 +6,13 @@ import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
+import LimitReachedModal from "../components/LimitReachedModal";
 import { BASE_URL, resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
+const GUEST_GEN_LIMIT = 5;
+const GUEST_GEN_KEY = "pixorify_guest_gens";
 
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
@@ -27,6 +30,10 @@ export default function Studio() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
+  const [limitModal, setLimitModal] = useState({ open: false, resetAt: null });
+  const [guestGensUsed, setGuestGensUsed] = useState(() =>
+    Number(localStorage.getItem(GUEST_GEN_KEY) || 0)
+  );
 
   const recognitionRef = useRef(null);
   const autoStopTimerRef = useRef(null);
@@ -127,37 +134,40 @@ export default function Studio() {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (!token) {
-      setShowLogin(true);
-      return;
-    }
     if (!input.trim()) {
       toast.error("Please enter a prompt");
       return;
     }
 
+    const isGuest = !token;
+    if (isGuest) {
+      const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
+      if (used >= GUEST_GEN_LIMIT) {
+        toast.info("You've used your 5 free images — sign up to keep creating.");
+        setShowLogin(true);
+        return;
+      }
+    }
+
     try {
       setLoading(true);
-      const { data: response } = await api.post(
-        `${BASE_URL}/api/images/generate`,
-        {
-          prompt: input.trim(),
-          style,
-          isPublic: false,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
+
+      const endpoint = isGuest
+        ? `${BASE_URL}/api/images/guest/generate`
+        : `${BASE_URL}/api/images/generate`;
+      const payload = isGuest
+        ? { prompt: input.trim(), style }
+        : { prompt: input.trim(), style, isPublic: false };
+      const config = isGuest
+        ? {}
+        : { headers: { Authorization: `Bearer ${getToken()}` } };
+
+      const { data: response } = await api.post(endpoint, payload, config);
 
       if (!response.success) {
         toast.error(response?.error?.message || response.message || "Generation failed");
         return;
       }
-
-      console.log("Generated image:", response);
 
       const previewSrc = resolveImageUrl(
         response.resultImage ?? response.imageUrl ?? response.image?.imageUrl
@@ -165,21 +175,43 @@ export default function Studio() {
       const credits = response.creditBalance;
 
       setImage(previewSrc);
-      setCredit(credits);
+      if (credits !== undefined) setCredit(credits);
       setIsImageLoaded(true);
 
-      if (response.image) {
-        setHistory((prev) => [
-          response.image,
-          ...prev.filter((h) => String(h?._id) !== String(response.image?._id)),
-        ]);
+      if (isGuest) {
+        const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
+        const next = used + 1;
+        localStorage.setItem(GUEST_GEN_KEY, String(next));
+        setGuestGensUsed(next);
+        const remaining = Math.max(0, GUEST_GEN_LIMIT - next);
+        toast.success(
+          remaining === 0
+            ? "Image generated! Sign up to keep going."
+            : `Image generated — ${remaining} free ${remaining === 1 ? "image" : "images"} left.`
+        );
+      } else {
+        if (response.image) {
+          setHistory((prev) => [
+            response.image,
+            ...prev.filter((h) => String(h?._id) !== String(response.image?._id)),
+          ]);
+        }
+        await fetchHistory();
+        toast.success("Image generated successfully");
       }
-
-      await fetchHistory();
-
-      toast.success("Image generated successfully");
     } catch (error) {
-      alert(error?.response?.data?.error?.message || error.message);
+      const code = error?.response?.data?.error?.code;
+      const message =
+        error?.response?.data?.error?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Generation failed";
+
+      if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
+        setLimitModal({ open: true, resetAt: error?.response?.data?.error?.nextResetAt || null });
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -198,8 +230,26 @@ export default function Studio() {
           Create in seconds
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
-          Describe your scene, pick a style, and generate. Credits update automatically.
+          Describe your scene, pick a style, and generate.
         </p>
+        <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
+          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+          {token ? (
+            <span>
+              <span className="font-bold text-slate-900">100 free credits</span> daily ·{" "}
+              <span className="font-bold text-slate-900">10 credits</span> per image ·{" "}
+              refreshes midnight UTC
+            </span>
+          ) : (
+            <span>
+              <span className="font-bold text-slate-900">
+                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed)} free trial{" "}
+                {Math.max(0, GUEST_GEN_LIMIT - guestGensUsed) === 1 ? "image" : "images"}
+              </span>{" "}
+              left · sign up for 10 daily, free forever
+            </span>
+          )}
+        </div>
       </motion.div>
 
       <motion.form
@@ -419,6 +469,12 @@ export default function Studio() {
           </div>
         </div>
       ) : null}
+
+      <LimitReachedModal
+        open={limitModal.open}
+        resetAt={limitModal.resetAt}
+        onClose={() => setLimitModal({ open: false, resetAt: null })}
+      />
     </div>
   );
 }

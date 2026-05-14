@@ -9,6 +9,7 @@ import Studio from "./pages/Studio";
 import Gallery from "./pages/Gallery";
 import Feedback from "./pages/Feedback";
 import Pricing from "./pages/Pricing";
+import PricingPro from "./pages/PricingPro";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
@@ -33,6 +34,7 @@ const App = () => {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/pricing/pro" element={<PricingPro />} />
             <Route path="/buyCredits" element={<BuyCredits />} />
             <Route path="/coming-soon" element={<ComingSoon />} />
             <Route path="*" element={<Navigate to="/" replace />} />
