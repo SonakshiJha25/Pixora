@@ -28,7 +28,9 @@ export default function HistoryImageCard({ item, onOpen, showFavoritePip = true 
     >
       {failed ? (
         <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-100 to-slate-200 px-4 text-center">
-          <span aria-hidden="true" className="text-2xl text-slate-400">⚠</span>
+          <span aria-hidden="true" className="text-2xl text-slate-400">
+            ⚠
+          </span>
           <p className="line-clamp-3 text-xs font-medium text-slate-600">
             {item.promptRaw || "Image unavailable"}
           </p>

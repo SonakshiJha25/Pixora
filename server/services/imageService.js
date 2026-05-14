@@ -71,6 +71,9 @@ async function saveLocallyAsFallback(buffer, filename) {
  * The Image.imageUrl column is now expected to hold either a full https URL
  * (Cloudinary) or a relative /generated/... path (local fallback). The
  * absoluteImageUrl helper in utils/imageUrl.js handles both transparently.
+ *
+ * In NODE_ENV=production, Cloudinary must succeed — local disk is ephemeral on
+ * hosts like Render and would produce URLs that vanish on redeploy.
  */
 export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   const apiKey = process.env.CLIPDROP_API?.trim();
@@ -86,6 +89,7 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   }
 
   const baseName = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
+  const isProd = process.env.NODE_ENV === "production";
 
   if (isCloudinaryConfigured()) {
     try {
@@ -93,12 +97,25 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
       console.log("Generated image uploaded to Cloudinary:", cloudUrl);
       return cloudUrl;
     } catch (err) {
-      console.error("Cloudinary upload failed, falling back to local disk:", err.message);
+      console.error("Cloudinary upload failed:", err.message);
+      if (isProd) {
+        throw new AppError(
+          `Image storage failed (Cloudinary): ${err.message}`,
+          502,
+          "STORAGE_UPLOAD_FAILED"
+        );
+      }
     }
+  } else if (isProd) {
+    throw new AppError(
+      "Image storage is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.",
+      500,
+      "STORAGE_NOT_CONFIGURED"
+    );
   } else {
     console.warn(
       "Cloudinary not configured (set CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET). " +
-        "Saving to ephemeral local disk; images WILL be lost on next Render redeploy."
+        "Saving to local disk — ok for development only."
     );
   }
 

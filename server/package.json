@@ -12,7 +12,8 @@
     "dev": "nodemon server.js",
     "server": "nodemon server.js",
     "wipe-images": "node scripts/wipeAllImages.js",
-    "wipe-images:confirm": "node scripts/wipeAllImages.js --confirm"
+    "wipe-images:confirm": "node scripts/wipeAllImages.js --confirm",
+    "wipe-full:confirm": "node scripts/wipeAllImages.js --confirm --users"
   },
   "dependencies": {
     "axios": "^1.13.2",

@@ -13,8 +13,11 @@
  *   # Dry run (just report what would happen):
  *   npm run wipe-images
  *
- *   # Actually delete everything:
+ *   # Actually delete everything (images only):
  *   npm run wipe-images:confirm
+ *
+ *   # Nuclear reset — images + Cloudinary + disk + ALL users + feedback:
+ *   npm run wipe-full:confirm
  *
  * Make sure server/.env points at the database/Cloudinary account you want
  * to wipe before running. The script will print which database name it is
@@ -30,6 +33,8 @@ import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 
 import Image from "../models/Image.js";
+import User from "../models/User.js";
+import Feedback from "../models/Feedback.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
@@ -38,6 +43,9 @@ const CLOUDINARY_FOLDER = "pixorify/generated";
 const CONFIRMED =
   (process.env.WIPE_CONFIRM || "").toLowerCase() === "yes" ||
   process.argv.includes("--confirm");
+
+/** Also delete every User + Feedback document (MongoDB only — keeps Cloudinary wipe aligned). */
+const WIPE_USERS = process.argv.includes("--users");
 
 const log = (...args) => console.log("[wipe]", ...args);
 
@@ -77,6 +85,37 @@ async function wipeMongo() {
   const res = await Image.deleteMany({});
   log(`MongoDB: deleted ${res.deletedCount} record(s).`);
   return { total, deleted: res.deletedCount, dryRun: false };
+}
+
+async function wipeAccounts() {
+  if (!WIPE_USERS) {
+    return { skipped: true };
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    log("MongoDB accounts: database not connected — skipping.");
+    return { skipped: true };
+  }
+
+  const fbCount = await Feedback.countDocuments({});
+  const userCount = await User.countDocuments({});
+  log(`MongoDB: ${userCount} user(s), ${fbCount} feedback row(s).`);
+
+  if (!CONFIRMED) {
+    log("MongoDB accounts: dry-run — would delete all users + feedback.");
+    return { feedback: fbCount, users: userCount, deletedFeedback: 0, deletedUsers: 0, dryRun: true };
+  }
+
+  const fr = await Feedback.deleteMany({});
+  const ur = await User.deleteMany({});
+  log(`MongoDB accounts: deleted ${fr.deletedCount} feedback row(s), ${ur.deletedCount} user(s).`);
+  return {
+    feedback: fbCount,
+    users: userCount,
+    deletedFeedback: fr.deletedCount,
+    deletedUsers: ur.deletedCount,
+    dryRun: false,
+  };
 }
 
 async function wipeCloudinary() {
@@ -164,17 +203,22 @@ async function wipeDisk() {
   log("===================================================");
   log(CONFIRMED ? "MODE: DESTRUCTIVE — will delete data!" : "MODE: dry-run (no data will be deleted)");
   log("Re-run with --confirm (or WIPE_CONFIRM=yes) to actually delete.");
+  if (WIPE_USERS) {
+    log("FLAG --users: will also delete ALL accounts + feedback rows.");
+  }
   log("===================================================");
 
   let exitCode = 0;
   try {
     const mongoResult = await wipeMongo();
+    const accountsResult = await wipeAccounts();
     const cloudResult = await wipeCloudinary();
     const diskResult = await wipeDisk();
 
     log("---------------------------------------------------");
     log("Summary:");
-    log("  MongoDB    :", mongoResult);
+    log("  MongoDB images:", mongoResult);
+    log("  MongoDB accounts:", accountsResult);
     log("  Cloudinary :", cloudResult);
     log("  Local disk :", diskResult);
     if (!CONFIRMED) {
