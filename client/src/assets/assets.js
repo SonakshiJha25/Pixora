@@ -24,6 +24,7 @@ import style_anime from './style_anime.png'
 import style_cyberpunk from './style_cyberpunk.png'
 import style_fantasy from './style_fantasy.png'
 import style_minimal from './style_minimal.png'
+import home_mascot from './home-mascot.png'
 
 export const assets = {
     brandMark,
@@ -47,7 +48,8 @@ export const assets = {
     style_anime,
     style_cyberpunk,
     style_fantasy,
-    style_minimal
+    style_minimal,
+    home_mascot
 }
 
 export const stepsData = [

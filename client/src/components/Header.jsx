@@ -96,11 +96,12 @@ export default function Header() {
 
           <div className="shrink-0 sm:pl-2">
             <img
-              src={assets.style_realistic}
-              alt="Example output style preview"
-              className="h-[180px] w-[180px] rounded-2xl object-cover shadow-sm sm:h-[200px] sm:w-[200px]"
-              loading="lazy"
+              src={assets.home_mascot}
+              alt="Friendly Pixorify mascot painting magic on a tablet"
+              className="h-[200px] w-[260px] rounded-2xl bg-gradient-to-br from-sky-100/60 to-cyan-100/40 object-cover shadow-sm sm:h-[220px] sm:w-[300px]"
+              loading="eager"
               decoding="async"
+              draggable="false"
             />
           </div>
         </div>
