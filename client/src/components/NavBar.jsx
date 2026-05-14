@@ -146,7 +146,7 @@ export default function NavBar() {
                       </p>
                       <p className="mt-0.5 text-[10px] leading-snug text-slate-500">
                         ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left today · {CREDITS_PER_IMAGE} credits each ·
-                        refreshes midnight UTC
+                        refreshes midnight IST
                       </p>
                     </div>
                     <button
@@ -211,7 +211,7 @@ export default function NavBar() {
                     <span className="text-xs font-normal text-slate-500">/ {DAILY_CREDITS_LIMIT}</span>
                   </p>
                   <p className="mt-0.5 text-[10px] text-slate-500">
-                    ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left · {CREDITS_PER_IMAGE} credits each · midnight UTC
+                    ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left · {CREDITS_PER_IMAGE} credits each · midnight IST
                   </p>
                 </div>
                 <button

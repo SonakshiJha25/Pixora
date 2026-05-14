@@ -2,10 +2,14 @@ const DAILY_CREDITS = 100;
 const CREDITS_PER_IMAGE = 10;
 const DAY_MS = 86400000;
 
-/** IANA zone (e.g. Asia/Kolkata). Empty → reset by UTC calendar day. */
+/** Default: Indian Standard Time (IST). Set CREDITS_RESET_TIMEZONE=UTC to use UTC calendar days. */
+const DEFAULT_CREDITS_RESET_IANA = "Asia/Kolkata";
+
+/** IANA zone for daily rollover. Empty string means UTC calendar day. */
 export function getCreditsResetTimezone() {
   const t = process.env.CREDITS_RESET_TIMEZONE?.trim();
-  if (!t || t.toUpperCase() === "UTC") return "";
+  if (!t) return DEFAULT_CREDITS_RESET_IANA;
+  if (t.toUpperCase() === "UTC") return "";
   return t;
 }
 
@@ -26,8 +30,8 @@ function calendarDayKey(dateInput, tz) {
     });
     return fmt.format(d);
   } catch (err) {
-    console.warn("[dailyCredits] Invalid CREDITS_RESET_TIMEZONE — using UTC:", tz, err?.message ?? err);
-    return calendarDayKey(d, "");
+    console.warn("[dailyCredits] Invalid CREDITS_RESET_TIMEZONE — using IST (Asia/Kolkata):", tz, err?.message ?? err);
+    return calendarDayKey(d, DEFAULT_CREDITS_RESET_IANA);
   }
 }
 
@@ -111,5 +115,7 @@ export function getNextResetAt(nowInput = new Date()) {
 
 export function getCreditsResetTimezoneLabel() {
   const tz = getCreditsResetTimezone();
-  return tz || "UTC";
+  if (!tz) return "UTC";
+  if (tz === DEFAULT_CREDITS_RESET_IANA) return "IST";
+  return tz;
 }

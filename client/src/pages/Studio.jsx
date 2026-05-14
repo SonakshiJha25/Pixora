@@ -250,12 +250,16 @@ export default function Studio() {
                   </time>
                   <span className="text-slate-600">
                     {" "}
-                    ({dailyCreditSchedule.timezone === "UTC" ? "UTC calendar day" : dailyCreditSchedule.timezone})
+                    (
+                    {dailyCreditSchedule.timezone === "UTC"
+                      ? "UTC calendar day"
+                      : `${dailyCreditSchedule.timezone} calendar day`}
+                    )
                   </span>
                 </>
               ) : (
                 <span className="text-slate-600">
-                  Next refill time loads with your credits (UTC calendar day unless the API sets CREDITS_RESET_TIMEZONE).
+                  Next refill time loads with your credits (IST by default · set CREDITS_RESET_TIMEZONE=UTC on the server for UTC days).
                 </span>
               )}
             </span>
@@ -491,7 +495,7 @@ export default function Studio() {
         dailyResetTimezone={
           limitModal.dailyResetTimezone ??
           dailyCreditSchedule?.timezone ??
-          "UTC"
+          "IST"
         }
         onClose={() =>
           setLimitModal({ open: false, resetAt: null, dailyResetTimezone: null })

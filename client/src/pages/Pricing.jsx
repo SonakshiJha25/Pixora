@@ -43,7 +43,7 @@ export default function Pricing() {
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-emerald-500">✓</span>
-              <span>Auto-refreshes at midnight UTC</span>
+              <span>Auto-refreshes at midnight IST (India)</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-emerald-500">✓</span>

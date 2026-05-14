@@ -8,7 +8,7 @@ import { motion } from "motion/react";
  *   open                 - boolean
  *   onClose              - () => void
  *   resetAt              - ISO date string of when the daily limit refreshes (optional)
- *   dailyResetTimezone   - IANA label from API, e.g. "UTC" or "Asia/Kolkata" (optional)
+ *   dailyResetTimezone   - label from API, e.g. "IST", "UTC", or another zone id (optional)
  */
 export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTimezone }) {
   useEffect(() => {

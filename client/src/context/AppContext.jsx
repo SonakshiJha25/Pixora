@@ -14,7 +14,7 @@ const AppContextProvider = ({ children }) => {
   const [credit, setCredit] = useState(0);
   const [history, setHistory] = useState([]);
   const [dailyCreditSchedule, setDailyCreditSchedule] = useState({
-    timezone: "UTC",
+    timezone: "IST",
     nextResetAtIso: null,
   });
 
@@ -24,7 +24,7 @@ const AppContextProvider = ({ children }) => {
     setUser(null);
     setCredit(0);
     setHistory([]);
-    setDailyCreditSchedule({ timezone: "UTC", nextResetAtIso: null });
+    setDailyCreditSchedule({ timezone: "IST", nextResetAtIso: null });
   }, []);
 
   const api = useMemo(() => {
@@ -74,7 +74,7 @@ const AppContextProvider = ({ children }) => {
       setUser(u ? { ...u, creditBalance: pts } : null);
       setCredit(pts);
       setDailyCreditSchedule({
-        timezone: creditsRes.data?.dailyResetTimezone ?? "UTC",
+        timezone: creditsRes.data?.dailyResetTimezone ?? "IST",
         nextResetAtIso: creditsRes.data?.nextResetAt ?? null,
       });
     } catch (error) {
