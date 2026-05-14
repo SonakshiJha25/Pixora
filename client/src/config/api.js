@@ -54,8 +54,7 @@ if (import.meta.env.PROD && typeof window !== "undefined") {
   queueMicrotask(() => {
     if (!getApiBase()) {
       console.warn(
-        "[Pixora] Backend URL is unset (same-origin /api). Works when the Node server serves this SPA from client/dist; " +
-          "if frontend and API are on different domains, build with VITE_BACKEND_URL set or inject <meta name=\"pixora-api-base\" …>."
+        "[Pixora] API base URL is not set for this build. If images or login fail, check hosting configuration."
       );
     }
   });

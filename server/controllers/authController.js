@@ -15,19 +15,23 @@ const sanitizeUser = (user) => ({
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { token, user } = await register(req.body);
+  const fresh = await User.findById(user._id);
+  if (fresh) await ensureDailyCredits(fresh);
   return res.status(201).json({
     success: true,
     token,
-    user: sanitizeUser(user),
+    user: sanitizeUser(fresh || user),
   });
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { token, user } = await login(req.body);
+  const fresh = await User.findById(user._id);
+  if (fresh) await ensureDailyCredits(fresh);
   return res.status(200).json({
     success: true,
     token,
-    user: sanitizeUser(user),
+    user: sanitizeUser(fresh || user),
   });
 });
 

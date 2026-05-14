@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { getApiBase } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
+import { getNextCalendarBoundaryIso } from "../lib/nextDailyReset.js";
 
 export const AppContext = createContext();
 
@@ -73,9 +74,13 @@ const AppContextProvider = ({ children }) => {
       const u = meRes.data?.user ?? null;
       setUser(u ? { ...u, creditBalance: pts } : null);
       setCredit(pts);
+      const nextApi = creditsRes.data?.nextResetAt;
+      const nextIso =
+        (typeof nextApi === "string" && nextApi.trim() !== "" ? nextApi.trim() : null) ??
+        getNextCalendarBoundaryIso();
       setDailyCreditSchedule({
         timezone: creditsRes.data?.dailyResetTimezone ?? "IST",
-        nextResetAtIso: creditsRes.data?.nextResetAt ?? null,
+        nextResetAtIso: nextIso,
       });
     } catch (error) {
       logout();
@@ -101,6 +106,17 @@ const AppContextProvider = ({ children }) => {
       fetchHistory();
     }
   }, [token, fetchUserData, fetchHistory]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        fetchUserData();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [token, fetchUserData]);
 
   const value = {
     user,

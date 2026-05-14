@@ -10,6 +10,7 @@ import LimitReachedModal from "../components/LimitReachedModal";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints, DAILY_CREDITS_LIMIT, CREDITS_PER_IMAGE } from "../lib/credits.js";
+import { getNextCalendarBoundaryIso } from "../lib/nextDailyReset.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 
@@ -37,6 +38,9 @@ export default function Studio() {
 
   const recognitionRef = useRef(null);
   const autoStopTimerRef = useRef(null);
+
+  const nextRefillIso =
+    dailyCreditSchedule?.nextResetAtIso ?? getNextCalendarBoundaryIso() ?? undefined;
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
 
@@ -196,7 +200,7 @@ export default function Studio() {
         });
       } else if (error?.response?.status === 404) {
         toast.error(
-          "Image API 404 — the page’s host has no /api routes. Prefer one URL where Node serves Studio + API, set VITE_BACKEND_URL on frontend build to your API origin, or meta pixora-api-base / localStorage key pixora_api_base."
+          "We couldn't reach Pixorify from this page — try refreshing, or opening the link your host gave you."
         );
       } else {
         toast.error(message);
@@ -235,12 +239,12 @@ export default function Studio() {
               <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
               <span className="font-bold text-slate-900">{DAILY_CREDITS_LIMIT}</span>/day ·{" "}
               <span className="font-bold text-slate-900">{CREDITS_PER_IMAGE}</span> per image.
-              {dailyCreditSchedule?.nextResetAtIso ? (
+              {nextRefillIso ? (
                 <>
                   {" "}
                   Next refill:{" "}
-                  <time dateTime={dailyCreditSchedule.nextResetAtIso} className="font-semibold text-slate-800">
-                    {new Date(dailyCreditSchedule.nextResetAtIso).toLocaleString(undefined, {
+                  <time dateTime={nextRefillIso} className="font-semibold text-slate-800">
+                    {new Date(nextRefillIso).toLocaleString(undefined, {
                       weekday: "short",
                       month: "short",
                       day: "numeric",
@@ -248,20 +252,9 @@ export default function Studio() {
                       minute: "2-digit",
                     })}
                   </time>
-                  <span className="text-slate-600">
-                    {" "}
-                    (
-                    {dailyCreditSchedule.timezone === "UTC"
-                      ? "UTC calendar day"
-                      : `${dailyCreditSchedule.timezone} calendar day`}
-                    )
-                  </span>
+                  <span className="text-slate-600"> ({dailyCreditSchedule?.timezone ?? "IST"})</span>
                 </>
-              ) : (
-                <span className="text-slate-600">
-                  Next refill time loads with your credits (IST by default · set CREDITS_RESET_TIMEZONE=UTC on the server for UTC days).
-                </span>
-              )}
+              ) : null}
             </span>
           ) : (
             <span>
