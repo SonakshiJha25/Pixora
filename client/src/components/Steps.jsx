@@ -1,7 +1,6 @@
 import { stepsData } from "../assets/assets";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
 
 export default function Steps() {
   return (
@@ -38,7 +37,7 @@ export default function Steps() {
         to="/studio"
         className="btn-primary mt-12 inline-flex rounded-full px-8 py-3 text-sm font-semibold shadow-md transition hover:opacity-95"
       >
-        Try {GUEST_FREE_IMAGE_LIMIT} images free — no sign-in required
+        Open studio — sign in when you're ready to generate
       </Link>
     </motion.section>
   );

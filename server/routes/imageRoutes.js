@@ -1,10 +1,8 @@
 import express from 'express'
 import { body } from "express-validator";
-import rateLimit from "express-rate-limit";
 import {
   cleanupBrokenImages,
   deleteImage,
-  generateGuestImage,
   generateImage,
   getMyImages,
   getPromptStyles,
@@ -18,26 +16,6 @@ import userAuth from '../middlewares/auth.js'
 import validate from '../middlewares/validate.js';
 
 const imageRouter = express.Router()
-
-// Guests share a per-IP daily budget (override with GUEST_IP_MAX_PER_DAY). The
-// browser still caps anonymous previews separately via localStorage.
-const guestIpMaxRaw = Number.parseInt(process.env.GUEST_IP_MAX_PER_DAY ?? "120", 10);
-const guestIpMaxPerDay = Number.isFinite(guestIpMaxRaw) && guestIpMaxRaw >= 5 ? guestIpMaxRaw : 120;
-
-const guestGenerateLimiter = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000,
-  max: guestIpMaxPerDay,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    error: {
-      code: "GUEST_DAILY_LIMIT",
-      message:
-        "This connection has reached today's guest preview limit. Sign in for your own daily quota, or try again tomorrow.",
-    },
-  },
-});
 
 imageRouter.post(
   "/generate-image",
@@ -63,16 +41,6 @@ imageRouter.post(
     validate,
   ],
   generateImage
-);
-imageRouter.post(
-  "/guest/generate",
-  guestGenerateLimiter,
-  [
-    body("prompt").isLength({ min: 3, max: 1000 }),
-    body("style").optional().isString(),
-    validate,
-  ],
-  generateGuestImage
 );
 imageRouter.get('/history', userAuth, getMyImages)
 imageRouter.post('/cleanup-broken', userAuth, cleanupBrokenImages)

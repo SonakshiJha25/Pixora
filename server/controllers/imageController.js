@@ -228,27 +228,3 @@ export const cleanupBrokenImages = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Guest image generation — no auth required, no DB persistence, no credit
- * accounting on the server. The frontend enforces a per-browser cap of 5
- * generations via localStorage; once that's reached the UI forces a login.
- *
- * This route is intentionally lightweight: it lets visitors try Pixorify
- * before signing up. It IS rate-limited per IP at the router layer to
- * defend against the localStorage cap being bypassed.
- */
-export const generateGuestImage = asyncHandler(async (req, res) => {
-  const { prompt, style } = req.body;
-
-  const promptEnhanced = enhancePrompt(prompt, style);
-  const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced }, { ephemeralOk: true });
-  const fullUrl = absoluteImageUrl(relativeImageUrl, req);
-
-  return res.status(200).json({
-    success: true,
-    message: "Image generated (guest)",
-    imageUrl: fullUrl,
-    resultImage: fullUrl,
-    guest: true,
-  });
-});

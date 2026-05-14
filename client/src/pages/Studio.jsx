@@ -7,15 +7,11 @@ import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
 import LimitReachedModal from "../components/LimitReachedModal";
-import GuestTrialEndedModal from "../components/GuestTrialEndedModal";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
-import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
 import { normalizeCreditsPoints, DAILY_CREDITS_LIMIT, CREDITS_PER_IMAGE } from "../lib/credits.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
-/** Bump key to reset everyone's trial counter without clearing all localStorage. */
-const GUEST_GEN_KEY = "pixorify_guest_gens_v4";
 
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
@@ -27,7 +23,7 @@ export default function Studio() {
     useContext(AppContext);
 
   const authToken = getToken()?.trim() ?? "";
-  const isGuestUser = !authToken;
+  const isSignedIn = Boolean(authToken);
   const [image, setImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,10 +34,6 @@ export default function Studio() {
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
   const [limitModal, setLimitModal] = useState({ open: false, resetAt: null });
-  const [guestTrialModal, setGuestTrialModal] = useState({ open: false, variant: "browser" });
-  const [guestGensUsed, setGuestGensUsed] = useState(() =>
-    Number(localStorage.getItem(GUEST_GEN_KEY) || 0)
-  );
 
   const recognitionRef = useRef(null);
   const autoStopTimerRef = useRef(null);
@@ -147,26 +139,20 @@ export default function Studio() {
       return;
     }
 
-    const isGuest = !(getToken()?.trim());
-
-    if (isGuest) {
-      const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
-      if (used >= GUEST_FREE_IMAGE_LIMIT) {
-        setGuestTrialModal({ open: true, variant: "browser" });
-        return;
-      }
+    if (!authToken) {
+      toast.info("Sign in to generate images.");
+      setShowLogin(true);
+      return;
     }
 
     try {
       setLoading(true);
 
-      const endpoint = isGuest ? "/api/images/guest/generate" : "/api/images/generate";
-      const payload = isGuest
-        ? { prompt: input.trim(), style }
-        : { prompt: input.trim(), style, isPublic: false };
-      const config = isGuest ? { skipAuth: true } : {};
-
-      const { data: response } = await api.post(endpoint, payload, config);
+      const { data: response } = await api.post("/api/images/generate", {
+        prompt: input.trim(),
+        style,
+        isPublic: false,
+      });
 
       if (!response.success) {
         toast.error(response?.error?.message || response.message || "Generation failed");
@@ -184,31 +170,15 @@ export default function Studio() {
       }
       setIsImageLoaded(true);
 
-      if (isGuest) {
-        const used = Number(localStorage.getItem(GUEST_GEN_KEY) || 0);
-        const next = used + 1;
-        localStorage.setItem(GUEST_GEN_KEY, String(next));
-        setGuestGensUsed(next);
-        const remaining = Math.max(0, GUEST_FREE_IMAGE_LIMIT - next);
-        toast.success(
-          remaining === 0
-            ? "Here's your last free image — we'd love you to stay when you're ready."
-            : `Image ready — ${remaining} free ${remaining === 1 ? "image" : "images"} left before sign-in.`
-        );
-        if (remaining === 0) {
-          setGuestTrialModal({ open: true, variant: "browser" });
-        }
-      } else {
-        if (response.image) {
-          setHistory((prev) => [
-            response.image,
-            ...prev.filter((h) => String(h?._id) !== String(response.image?._id)),
-          ]);
-        }
-        await fetchHistory();
-        await fetchUserData();
-        toast.success("Image generated successfully");
+      if (response.image) {
+        setHistory((prev) => [
+          response.image,
+          ...prev.filter((h) => String(h?._id) !== String(response.image?._id)),
+        ]);
       }
+      await fetchHistory();
+      await fetchUserData();
+      toast.success("Image generated successfully");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
       const message =
@@ -219,8 +189,6 @@ export default function Studio() {
 
       if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
         setLimitModal({ open: true, resetAt: error?.response?.data?.error?.nextResetAt || null });
-      } else if (code === "GUEST_DAILY_LIMIT") {
-        setGuestTrialModal({ open: true, variant: "network" });
       } else if (error?.response?.status === 404) {
         toast.error(
           "Image API 404 — the page’s host has no /api routes. Prefer one URL where Node serves Studio + API, set VITE_BACKEND_URL on frontend build to your API origin, or meta pixora-api-base / localStorage key pixora_api_base."
@@ -247,18 +215,16 @@ export default function Studio() {
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
           Describe your scene, pick a style, and generate.
-          {isGuestUser ? (
+          {!isSignedIn ? (
             <>
               {" "}
-              <span className="font-semibold text-slate-800">
-                {GUEST_FREE_IMAGE_LIMIT} tries are free without an account.
-              </span>
+              <span className="font-semibold text-slate-800">Sign in to generate — credits reset daily.</span>
             </>
           ) : null}
         </p>
         <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-          {!isGuestUser ? (
+          {isSignedIn ? (
             <span>
               You have{" "}
               <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
@@ -267,11 +233,7 @@ export default function Studio() {
             </span>
           ) : (
             <span>
-              <span className="font-bold text-slate-900">
-                {Math.max(0, GUEST_FREE_IMAGE_LIMIT - guestGensUsed)} free{" "}
-                {Math.max(0, GUEST_FREE_IMAGE_LIMIT - guestGensUsed) === 1 ? "image" : "images"}
-              </span>{" "}
-              left without signing in · sign in after that for daily credits & gallery
+              <span className="font-bold text-slate-900">Sign in</span> for daily credits and a saved gallery
             </span>
           )}
         </div>
@@ -453,9 +415,7 @@ export default function Studio() {
         </div>
         {history.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-slate-300 bg-white/50 py-12 text-center text-sm text-slate-500">
-            {!isGuestUser
-              ? "No images yet"
-              : "Sign in to save generations here — as a guest, use Download on each image while you're trying Pixorify."}
+            {!isSignedIn ? "Sign in to see generations saved here." : "No images yet"}
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
@@ -501,13 +461,6 @@ export default function Studio() {
         open={limitModal.open}
         resetAt={limitModal.resetAt}
         onClose={() => setLimitModal({ open: false, resetAt: null })}
-      />
-
-      <GuestTrialEndedModal
-        open={guestTrialModal.open}
-        variant={guestTrialModal.variant}
-        onClose={() => setGuestTrialModal((s) => ({ ...s, open: false }))}
-        onSignIn={() => setShowLogin(true)}
       />
     </div>
   );

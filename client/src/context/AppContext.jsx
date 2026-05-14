@@ -26,10 +26,6 @@ const AppContextProvider = ({ children }) => {
     const instance = axios.create({ baseURL: "" });
     instance.interceptors.request.use((config) => {
       config.baseURL = getApiBase() || "";
-      if (config.skipAuth) {
-        delete config.headers.Authorization;
-        return config;
-      }
       const t = getToken();
       if (t) {
         config.headers.Authorization = `Bearer ${t}`;
