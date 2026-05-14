@@ -7,7 +7,6 @@ const FEATURES = [
   { label: "Images per day", free: "10", pro: "100" },
   { label: "Credits per image", free: "10", pro: "10" },
   { label: "Resolution", free: "Standard", pro: "HD (1024px+)" },
-  { label: "Watermark", free: "—", pro: "Removed" },
   { label: "Priority queue", free: "—", pro: "Yes" },
   { label: "Commercial usage", free: "Personal only", pro: "Allowed" },
   { label: "Gallery history", free: "Yes", pro: "Yes" },

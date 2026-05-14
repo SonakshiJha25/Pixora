@@ -94,7 +94,7 @@ export default function Pricing() {
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-brand-cyan">✓</span>
-              <span>HD output, no watermark</span>
+              <span>HD output</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-brand-cyan">✓</span>
