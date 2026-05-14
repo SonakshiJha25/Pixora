@@ -2,6 +2,7 @@ import express from 'express'
 import { body } from "express-validator";
 import rateLimit from "express-rate-limit";
 import {
+  cleanupBrokenImages,
   deleteImage,
   generateGuestImage,
   generateImage,
@@ -71,6 +72,7 @@ imageRouter.post(
   generateGuestImage
 );
 imageRouter.get('/history', userAuth, getMyImages)
+imageRouter.post('/cleanup-broken', userAuth, cleanupBrokenImages)
 imageRouter.delete('/:imageId', userAuth, deleteImage)
 imageRouter.patch('/:imageId/favorite', userAuth, toggleFavoriteImage)
 imageRouter.patch('/:imageId/visibility', userAuth, toggleImagePublic)

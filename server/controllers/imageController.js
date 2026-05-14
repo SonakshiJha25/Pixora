@@ -1,3 +1,4 @@
+import axios from "axios";
 import Image from "../models/Image.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
@@ -151,6 +152,80 @@ export const getPromptStyles = asyncHandler(async (req, res) => {
 export const previewEnhancedPrompt = asyncHandler(async (req, res) => {
   const { prompt, style } = req.body;
   return res.status(200).json({ success: true, promptEnhanced: enhancePrompt(prompt, style) });
+});
+
+/**
+ * Cleanup helper: scans the caller's images and soft-deletes records whose
+ * imageUrl points to a file that no longer exists. This is the recovery
+ * path after Render redeploys wipe ephemeral /public/generated — we can't
+ * restore the bytes, but we can purge the dead records so the gallery
+ * looks consistent across accounts and devices.
+ *
+ * Optimization: any URL on res.cloudinary.com is trusted without a HEAD
+ * request, both because Cloudinary is durable and because their endpoint
+ * blocks unauthenticated HEAD on some plans.
+ *
+ * Returns { cleaned, checked, total }.
+ */
+const HEAD_TIMEOUT_MS = 6000;
+const HEAD_CONCURRENCY = 6;
+
+const isProbablyDurable = (url) => {
+  if (typeof url !== "string") return false;
+  return /\bres\.cloudinary\.com\b/i.test(url);
+};
+
+async function probeUrl(url) {
+  try {
+    const res = await axios.head(url, {
+      timeout: HEAD_TIMEOUT_MS,
+      validateStatus: () => true,
+      maxRedirects: 3,
+    });
+    return res.status >= 200 && res.status < 400;
+  } catch {
+    return false;
+  }
+}
+
+async function pMapLimited(items, limit, mapper) {
+  const out = new Array(items.length);
+  let cursor = 0;
+  const workers = new Array(Math.min(limit, items.length)).fill(0).map(async () => {
+    while (true) {
+      const i = cursor++;
+      if (i >= items.length) return;
+      out[i] = await mapper(items[i], i);
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+
+export const cleanupBrokenImages = asyncHandler(async (req, res) => {
+  const images = await Image.find({ userId: req.user.id, deletedAt: null });
+
+  const decisions = await pMapLimited(images, HEAD_CONCURRENCY, async (img) => {
+    const url = absoluteImageUrl(img.imageUrl, req);
+    if (isProbablyDurable(url)) return { img, broken: false, checked: false };
+    const ok = await probeUrl(url);
+    return { img, broken: !ok, checked: true };
+  });
+
+  const toDelete = decisions.filter((d) => d.broken).map((d) => d.img._id);
+  if (toDelete.length) {
+    await Image.updateMany(
+      { _id: { $in: toDelete }, userId: req.user.id, deletedAt: null },
+      { $set: { deletedAt: new Date() } }
+    );
+  }
+
+  return res.status(200).json({
+    success: true,
+    total: images.length,
+    checked: decisions.filter((d) => d.checked).length,
+    cleaned: toDelete.length,
+  });
 });
 
 /**

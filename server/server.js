@@ -10,6 +10,7 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 import connectDB from "./config/db.js";
+import { isCloudinaryConfigured } from "./services/cloudinaryService.js";
 import authRouter from "./routes/authRoutes.js";
 import creditRouter from "./routes/creditRoutes.js";
 import userRouter from "./routes/userRoutes.js";
@@ -90,6 +91,7 @@ app.get("/health", (req, res) => {
     status: dbOk ? "ok" : "degraded",
     database: dbOk ? "connected" : "disconnected",
     databaseName: mongoose.connection?.db?.databaseName ?? null,
+    cloudinary: isCloudinaryConfigured() ? "configured" : "missing",
   });
 });
 
