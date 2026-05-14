@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../config/api.js";
 import { getToken } from "../utils/token.js";
+import { normalizeCreditsPoints } from "../lib/credits.js";
 
 export const AppContext = createContext();
 
@@ -55,8 +56,17 @@ const AppContextProvider = ({ children }) => {
         api.get("/api/user/me"),
         api.get("/api/user/credits"),
       ]);
-      setUser(meRes.data.user);
-      setCredit(creditsRes.data.credits || 0);
+      const raw =
+        creditsRes.data?.credits ??
+        creditsRes.data?.remainingCredits ??
+        creditsRes.data?.creditBalance ??
+        creditsRes.data?.user?.creditBalance ??
+        creditsRes.data?.user?.credits ??
+        0;
+      const pts = normalizeCreditsPoints(raw);
+      const u = meRes.data?.user ?? null;
+      setUser(u ? { ...u, creditBalance: pts } : null);
+      setCredit(pts);
     } catch (error) {
       logout();
     }

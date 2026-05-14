@@ -15,16 +15,10 @@ export async function ensureDailyCredits(user, { session } = {}) {
     user.credits = user.creditBalance;
   }
 
-  // Legacy / corrupted balances: balances of 1–9 can't happen when subtracting
-  // CREDITS_PER_IMAGE from DAILY_CREDITS — they meant “generations left” scale.
-  const c = user.credits;
-  const ambiguousSmallGenerationCount =
-    typeof c === "number" &&
-    Number.isInteger(c) &&
-    c > 0 &&
-    c < CREDITS_PER_IMAGE;
+  let c = Math.round(Number(user.credits));
+  if (!Number.isFinite(c)) c = 0;
 
-  if (ambiguousSmallGenerationCount) {
+  if (c > 0 && c < CREDITS_PER_IMAGE) {
     user.credits = c * CREDITS_PER_IMAGE;
     await user.save({ session });
   }

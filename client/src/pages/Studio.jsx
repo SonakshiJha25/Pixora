@@ -11,6 +11,7 @@ import GuestTrialEndedModal from "../components/GuestTrialEndedModal";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { GUEST_FREE_IMAGE_LIMIT } from "../lib/guestTrial.js";
+import { normalizeCreditsPoints, DAILY_CREDITS_LIMIT, CREDITS_PER_IMAGE } from "../lib/credits.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 /** Bump key to reset everyone's trial counter without clearing all localStorage. */
@@ -22,7 +23,8 @@ function getSpeechRecognitionCtor() {
 }
 
 export default function Studio() {
-  const { api, token, setShowLogin, fetchHistory, history, setHistory, setCredit } = useContext(AppContext);
+  const { api, token, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit } =
+    useContext(AppContext);
   const [image, setImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -172,10 +174,12 @@ export default function Studio() {
       const previewSrc = resolveImageUrl(
         response.resultImage ?? response.imageUrl ?? response.image?.imageUrl
       );
-      const credits = response.creditBalance;
+      const credits = response.creditBalance ?? response.remainingCredits;
 
       setImage(previewSrc);
-      if (credits !== undefined) setCredit(credits);
+      if (credits !== undefined && credits !== null) {
+        setCredit(normalizeCreditsPoints(credits));
+      }
       setIsImageLoaded(true);
 
       if (isGuest) {
@@ -200,6 +204,7 @@ export default function Studio() {
           ]);
         }
         await fetchHistory();
+        await fetchUserData();
         toast.success("Image generated successfully");
       }
     } catch (error) {
@@ -253,9 +258,10 @@ export default function Studio() {
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
           {token ? (
             <span>
-              <span className="font-bold text-slate-900">100 free credits</span> daily ·{" "}
-              <span className="font-bold text-slate-900">10 credits</span> per image ·{" "}
-              refreshes midnight UTC
+              You have{" "}
+              <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
+              <span className="font-bold text-slate-900">{DAILY_CREDITS_LIMIT}</span>/day ·{" "}
+              <span className="font-bold text-slate-900">{CREDITS_PER_IMAGE}</span> per image · midnight UTC
             </span>
           ) : (
             <span>
