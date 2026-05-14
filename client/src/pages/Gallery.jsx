@@ -151,7 +151,7 @@ export default function Gallery() {
       <ConfirmModal
         open={pendingDeleteItem !== null}
         title="Delete this image?"
-        description="You can’t undo this. It will be removed from your gallery."
+        description="You can't undo this. It will be removed from your gallery."
         confirmLabel="Delete"
         cancelLabel="Keep"
         danger
