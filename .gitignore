@@ -16,4 +16,7 @@ server/dist/
 .DS_Store
 Thumbs.db
 
+# Local drops in repo root — ship art from client/src/assets instead
+/pixorify logo.png
+
 server/public/generated/*.png
