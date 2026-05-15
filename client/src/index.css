@@ -12,12 +12,99 @@
     @apply bg-slate-50 text-slate-900 antialiased;
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
+  /** Immersive workspace shell (Studio + signed-in Gallery) — single product, cyan accent only */
+  .bg-studio-app {
+    background-color: #070b14;
+    background-image:
+      radial-gradient(ellipse 120% 70% at 50% -15%, rgba(6, 182, 212, 0.11), transparent 52%),
+      radial-gradient(ellipse 55% 45% at 100% 100%, rgba(56, 189, 248, 0.05), transparent 50%);
+  }
   ::selection {
     @apply bg-brand-cyan/25 text-brand-navy;
   }
 }
 
 @layer components {
+  /* Marketing typography scale — headings, eyebrows, body, links (Plus Jakarta Sans) */
+  .type-eyebrow-brand {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky;
+  }
+  .type-eyebrow-muted {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500;
+  }
+  .type-hero-chip {
+    @apply text-xs font-semibold uppercase tracking-widest text-brand-sky;
+  }
+  .type-hero-title {
+    @apply text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl;
+  }
+  .type-page-title {
+    @apply text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl;
+  }
+  .type-section-title {
+    @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl;
+  }
+  .type-section-accent {
+    @apply text-xl font-bold tracking-tight text-slate-900 sm:text-2xl;
+  }
+  .type-subsection-title {
+    @apply text-lg font-bold text-slate-900 sm:text-xl;
+  }
+  .type-card-heading {
+    @apply text-lg font-semibold text-slate-900 sm:text-xl;
+  }
+  .type-card-title-sm {
+    @apply text-base font-bold text-slate-900 sm:text-lg;
+  }
+  .type-tile-title {
+    @apply text-sm font-bold text-slate-900 sm:text-base;
+  }
+  .type-tile-title-lg {
+    @apply text-base font-bold text-slate-900 sm:text-lg;
+  }
+  .type-price-tier {
+    @apply text-base font-bold text-slate-900 sm:text-lg;
+  }
+  .type-body {
+    @apply text-[13px] leading-relaxed text-slate-600 sm:text-sm;
+  }
+  .type-body-tight {
+    @apply text-[13px] leading-snug text-slate-600 sm:text-sm;
+  }
+  .type-meta {
+    @apply text-xs text-slate-500;
+  }
+  .type-micro {
+    @apply text-[11px] leading-snug text-slate-400;
+  }
+  .type-emphasis {
+    @apply font-semibold text-slate-900;
+  }
+  .type-pill-muted {
+    @apply text-xs font-semibold text-slate-700;
+  }
+  .type-link-brand {
+    @apply font-semibold text-brand-cyan underline-offset-4 hover:underline;
+  }
+  .type-link-muted {
+    @apply text-xs font-semibold text-slate-600 underline-offset-4 transition hover:text-brand-cyan hover:underline sm:text-sm;
+  }
+  .type-field-label {
+    @apply text-sm font-semibold text-slate-900;
+  }
+  .type-promo-caption {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-white;
+  }
+  .type-body-dim {
+    @apply text-[13px] leading-relaxed text-slate-400 sm:text-sm;
+  }
+  .type-studio-eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400;
+  }
+  .type-faq-question {
+    @apply text-[13px] font-semibold leading-snug text-slate-900 sm:text-sm;
+  }
+
   .glass {
     @apply border border-white/70 bg-white/75 shadow-card backdrop-blur-xl;
   }
@@ -30,11 +117,23 @@
   .nav-link-active {
     @apply bg-slate-900 text-white shadow-md hover:bg-slate-900 hover:text-white;
   }
+  .nav-link-studio {
+    @apply rounded-full px-3 py-2 text-sm font-medium text-slate-400 transition hover:bg-white/[0.07] hover:text-slate-100;
+  }
+  .nav-link-studio-active {
+    @apply bg-white/[0.1] text-white shadow-none ring-1 ring-white/15 hover:bg-white/[0.12] hover:text-white;
+  }
   .studio-shell {
     @apply border border-white/[0.09] bg-slate-950/[0.72] shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_80px_-32px_rgba(0,0,0,0.75)] backdrop-blur-2xl;
   }
   .studio-glow {
     box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12), 0 0 64px -8px rgba(34, 211, 238, 0.28);
+  }
+  .studio-prompt-shell {
+    @apply rounded-[1.35rem] border border-white/[0.1] bg-white/[0.05] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-sm;
+  }
+  .marketing-surface-hover {
+    @apply transition-[box-shadow,transform,border-color] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg;
   }
 }
 

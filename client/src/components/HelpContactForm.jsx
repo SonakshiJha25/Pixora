@@ -49,8 +49,8 @@ export default function HelpContactForm({ id }) {
     <section id={id} className="scroll-mt-28">
       <div className="rounded-[1.5rem] border border-slate-200/80 bg-gradient-to-br from-white via-cyan-50/30 to-violet-50/25 p-[1px] shadow-lg shadow-slate-900/10">
         <div className="rounded-[1.43rem] bg-white/90 px-5 py-6 sm:px-8 sm:py-7">
-          <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">Talk to a person</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          <h2 className="type-subsection-title">Talk to a person</h2>
+          <p className="type-body mt-2">
             Bug, billing hiccup, idea you can&apos;t shoehorn into a ticket — write what happened. Rough notes are OK;
             we stitch the story together on our side.
           </p>
@@ -59,7 +59,7 @@ export default function HelpContactForm({ id }) {
       <form onSubmit={submit} className="glass relative -mt-px mx-auto rounded-b-[1.5rem] border border-t-0 border-slate-200/65 p-6 text-left sm:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700">Name</span>
+            <span className="type-field-label">Name</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -69,7 +69,7 @@ export default function HelpContactForm({ id }) {
             />
           </label>
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700">Email</span>
+            <span className="type-field-label">Email</span>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,7 @@ export default function HelpContactForm({ id }) {
           </label>
         </div>
         <label className="mt-4 block space-y-2">
-          <span className="text-sm font-semibold text-slate-700">Message</span>
+          <span className="type-field-label">Message</span>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}

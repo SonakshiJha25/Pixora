@@ -57,8 +57,8 @@ export default function Gallery() {
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-cyan/20 to-brand-sky/15 text-brand-cyan ring-1 ring-white/80">
               <LayoutGrid className="h-6 w-6" strokeWidth={2} aria-hidden />
             </span>
-            <h1 className="mt-5 text-2xl font-extrabold text-slate-900">Your gallery lives behind a login</h1>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            <h1 className="type-page-title mt-5">Your gallery lives behind a login</h1>
+            <p className="type-body mt-3">
               Sign in and we&apos;ll show every thread you&apos;ve run—original render plus refinements in one stack.
             </p>
             <button
@@ -68,7 +68,7 @@ export default function Gallery() {
             >
               Sign in
             </button>
-            <Link to="/" className="mt-4 block text-sm font-medium text-brand-cyan underline-offset-4 hover:underline">
+            <Link to="/" className="type-link-brand mt-4 block">
               Back to home
             </Link>
           </motion.div>
@@ -81,44 +81,41 @@ export default function Gallery() {
   const showEmptyGrid = !showSkeleton && visibleGroups.length === 0;
 
   return (
-    <MarketingPageShell className="pb-28 pt-8 sm:pt-10">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="relative w-full pb-28 pt-8 sm:pt-10">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-5">
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mx-auto mb-10 max-w-3xl text-center"
+          className="mx-auto mb-10 max-w-2xl text-center sm:mb-12"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky">Gallery</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Your threads</h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p className="type-eyebrow-brand">Gallery</p>
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Your threads</h1>
+          <p className="mt-3 text-[13px] leading-relaxed text-slate-400 sm:text-sm">
             Each card is one idea: the newest picture is on the cover, refinements sit behind{" "}
-            <span className="font-medium text-slate-700">Open thread</span>. Heart something and it shows up under Saved.
+            <span className="font-semibold text-slate-200">Open thread</span>. Heart something and it shows up under Saved.
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/studio"
-              className="text-sm font-semibold text-brand-cyan underline-offset-4 hover:underline"
-            >
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
+            <Link to="/studio" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
               ← Studio
             </Link>
-            <span className="text-slate-300" aria-hidden>
+            <span className="text-slate-600" aria-hidden>
               ·
             </span>
-            <Link to="/help" className="text-sm font-semibold text-slate-600 underline-offset-4 hover:text-brand-cyan hover:underline">
+            <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 transition hover:text-cyan-300 hover:underline">
               How credits work
             </Link>
           </div>
         </motion.header>
 
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
+        <div className="mb-10 flex flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => setView("all")}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
+            className={`rounded-full px-5 py-2 text-sm font-semibold transition duration-300 ${
               view === "all"
-                ? "bg-slate-900 text-white shadow-md"
-                : "border border-slate-200/90 bg-white/80 text-slate-700 shadow-sm hover:border-brand-cyan/35"
+                ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
+                : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
             }`}
           >
             All threads
@@ -126,14 +123,14 @@ export default function Gallery() {
           <button
             type="button"
             onClick={() => setView("favorites")}
-            className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition ${
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition duration-300 ${
               view === "favorites"
-                ? "bg-slate-900 text-white shadow-md"
-                : "border border-slate-200/90 bg-white/80 text-slate-700 shadow-sm hover:border-rose-200/90"
+                ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
+                : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
             }`}
           >
             <Heart
-              className={`h-3.5 w-3.5 ${view === "favorites" ? "fill-red-400 text-red-400" : "text-rose-400"}`}
+              className={`h-3.5 w-3.5 ${view === "favorites" ? "fill-cyan-400 text-cyan-300" : "text-cyan-400/70"}`}
               strokeWidth={2}
               aria-hidden
             />
@@ -142,54 +139,62 @@ export default function Gallery() {
         </div>
 
         {showSkeleton ? (
-          <GalleryGridSkeleton className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3" count={6} />
+          <GalleryGridSkeleton
+            workspace
+            className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+            count={6}
+          />
         ) : showEmptyGrid ? (
-          <div className="rounded-[2rem] border border-dashed border-slate-300/90 bg-white/55 px-6 py-16 text-center backdrop-blur-md">
+          <div className="rounded-[1.85rem] border border-dashed border-white/12 bg-white/[0.03] px-6 py-16 text-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
             {historyStatus === "error" && history.length === 0 ? (
               <div className="mx-auto max-w-sm">
-                <p className="text-sm leading-relaxed text-slate-600">
-                  Couldn&apos;t reach your gallery — connection hiccup on our side or yours.
+                <p className="text-sm leading-relaxed text-slate-400">
+                  We couldn&apos;t load your gallery right now. Your work is still safe — try again in a moment.
                 </p>
                 <button
                   type="button"
                   onClick={() => fetchHistory()}
-                  className="mt-5 text-sm font-semibold text-brand-cyan underline-offset-4 hover:underline"
+                  className="mt-5 text-sm font-semibold text-cyan-300 underline-offset-4 hover:underline"
                 >
-                  Try loading again
+                  Refresh
                 </button>
               </div>
             ) : view === "favorites" ? (
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-600">
-                Nothing starred yet. Switch to{" "}
+              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-400">
+                Nothing saved yet. Switch to{" "}
                 <button
                   type="button"
                   onClick={() => setView("all")}
-                  className="font-semibold text-slate-800 underline underline-offset-2 hover:text-brand-cyan"
+                  className="font-semibold text-slate-200 underline underline-offset-2 hover:text-cyan-300"
                 >
                   All threads
                 </button>{" "}
                 and tap the heart on a cover card.
               </p>
             ) : (
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-600">
+              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-400">
                 Quiet in here. When you&apos;re ready,{" "}
-                <Link className="font-semibold text-brand-cyan underline-offset-4 hover:underline" to="/studio">
-                  make something in Studio
+                <Link className="font-semibold text-cyan-300 underline-offset-4 hover:underline" to="/studio">
+                  open Studio
                 </Link>{" "}
-                and it&apos;ll land here.
+                — new threads appear here automatically.
               </p>
             )}
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {visibleGroups.map((group) => (
-              <li
+              <motion.li
+                layout
                 key={group.key}
-                className="flex flex-col items-center gap-4 rounded-[1.85rem] border border-white/70 bg-white/55 p-4 shadow-xl shadow-slate-900/[0.04] backdrop-blur-xl ring-1 ring-slate-200/45"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="studio-shell flex flex-col items-center gap-5 rounded-[1.85rem] p-5 ring-1 ring-white/[0.05]"
               >
                 <div className="relative w-full max-w-[280px]">
                   {group.refinements > 0 ? (
-                    <span className="absolute left-3 top-3 z-10 rounded-full bg-slate-900/88 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow backdrop-blur-sm">
+                    <span className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-slate-950/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-200 shadow-lg backdrop-blur-md">
                       +{group.refinements} refine{group.refinements === 1 ? "" : "s"}
                     </span>
                   ) : null}
@@ -197,6 +202,7 @@ export default function Gallery() {
                     item={group.latest}
                     onOpen={() => setThreadBrowseId(String(group.latest._id))}
                     showFavoritePip={false}
+                    surface="workspace"
                   />
                   <button
                     type="button"
@@ -204,10 +210,10 @@ export default function Gallery() {
                       e.stopPropagation();
                       toggleFavorite(group.latest);
                     }}
-                    className={`absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white/20 text-lg shadow backdrop-blur-md transition active:scale-95 ${
+                    className={`absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
                       group.latest.isFavorite
-                        ? "border-rose-300/90 text-rose-500"
-                        : "border-white/50 text-white hover:bg-white/25"
+                        ? "border-cyan-400/45 bg-slate-950/75 text-cyan-300"
+                        : "border-white/15 bg-slate-950/55 text-slate-300 hover:border-cyan-400/35 hover:bg-slate-900/65 hover:text-white"
                     }`}
                     aria-label={group.latest.isFavorite ? "Remove from saved" : "Save to favorites"}
                     title={group.latest.isFavorite ? "Saved" : "Save"}
@@ -219,7 +225,7 @@ export default function Gallery() {
                 <button
                   type="button"
                   onClick={() => setThreadBrowseId(String(group.latest._id))}
-                  className="w-full max-w-[280px] rounded-full border border-slate-200/90 bg-white/90 py-2.5 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/45 hover:text-slate-900"
+                  className="btn-primary studio-glow w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
                 >
                   Open thread
                 </button>
@@ -228,20 +234,20 @@ export default function Gallery() {
                   <a
                     href={resolveImageUrl(group.latest.imageUrl)}
                     download={`pixorify-${group.latest._id}.png`}
-                    className="rounded-full border border-slate-200/90 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/35"
+                    className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-slate-100 shadow-sm transition duration-300 hover:border-cyan-400/35 hover:bg-white/[0.09]"
                   >
                     Download PNG
                   </a>
                   <button
                     type="button"
                     disabled={busyId === group.latest._id}
-                    className="rounded-full border border-slate-200/90 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-rose-200/80 hover:text-rose-700 disabled:opacity-50"
+                    className="rounded-full border border-white/10 bg-transparent px-3 py-2 text-xs font-semibold text-slate-400 shadow-sm transition duration-300 hover:border-slate-500/45 hover:bg-white/[0.04] hover:text-slate-200 disabled:opacity-50"
                     onClick={() => setPendingDeleteItem(group.latest)}
                   >
                     Remove
                   </button>
                 </div>
-              </li>
+              </motion.li>
             ))}
           </ul>
         )}
@@ -268,6 +274,6 @@ export default function Gallery() {
           onClose={() => setThreadBrowseId(null)}
         />
       </div>
-    </MarketingPageShell>
+    </div>
   );
 }

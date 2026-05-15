@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import { AppContext } from "../context/AppContext";
 import { getToken } from "../utils/token.js";
 
 export default function Feedback() {
@@ -54,17 +55,17 @@ export default function Feedback() {
 
   return (
     <MarketingPageShell className="pb-28 pt-8 sm:pt-11">
-      <div className="mx-auto w-full max-w-lg px-4 sm:px-6">
+      <div className="mx-auto w-full">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky">
+        <p className="type-eyebrow-brand text-center">
           Feedback
         </p>
-        <h1 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-slate-900">We actually read these</h1>
-        <p className="mx-auto mt-3 max-w-md text-center text-sm leading-relaxed text-slate-600">
+        <h1 className="type-page-title mt-2 text-center">We actually read these</h1>
+        <p className="type-body mx-auto mt-3 max-w-md text-center">
           Rant, rave, typo report — whatever helps you feel heard. Anonymous-ish: add a rating if you want, skip it if
           you don&apos;t.
         </p>
@@ -85,7 +86,7 @@ export default function Feedback() {
           ) : null}
 
           <div>
-            <label htmlFor="feedback-message" className="mb-1 block text-sm font-semibold text-slate-800">
+            <label htmlFor="feedback-message" className="type-field-label mb-1 block">
               Message <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -100,7 +101,7 @@ export default function Feedback() {
           </div>
 
           <div>
-            <label htmlFor="feedback-rating" className="mb-1 block text-sm font-semibold text-slate-800">
+            <label htmlFor="feedback-rating" className="type-field-label mb-1 block">
               Rating (optional)
             </label>
             <select
@@ -128,7 +129,7 @@ export default function Feedback() {
           </button>
 
           <p className="text-center text-sm">
-            <Link to="/studio" className="font-semibold text-brand-cyan underline-offset-4 hover:underline">
+            <Link to="/studio" className="type-link-brand">
               ← Studio
             </Link>
           </p>

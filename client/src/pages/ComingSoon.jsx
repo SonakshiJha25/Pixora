@@ -60,14 +60,12 @@ export default function ComingSoon() {
       className="flex w-full max-w-lg flex-col items-center px-4 pb-24 pt-16 text-center"
     >
       <img src={assets.brandMark} alt="" className="h-14 w-14 opacity-90" />
-      <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-brand-sky">{SITE.name}</p>
+      <p className="type-eyebrow-brand mt-6">{SITE.name}</p>
       {variant ? (
-        <p className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          {CHANNEL_LABEL[variant.channel]}
-        </p>
+        <p className="type-eyebrow-muted mt-3">{CHANNEL_LABEL[variant.channel]}</p>
       ) : null}
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
-      <p className="mt-4 text-sm leading-relaxed text-slate-600">{body}</p>
+      <h1 className="type-page-title mt-3">{title}</h1>
+      <p className="type-body mt-4">{body}</p>
       <Link
         to="/"
         className="btn-primary mt-10 rounded-full px-10 py-3 text-sm font-semibold"

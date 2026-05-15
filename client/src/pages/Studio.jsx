@@ -281,7 +281,7 @@ export default function Studio() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-[-8%] right-[-14%] h-[min(360px,45vh)] w-[min(520px,85vw)] rounded-full bg-violet-500/[0.1] blur-[105px]"
+        className="pointer-events-none absolute bottom-[-8%] right-[-14%] h-[min(360px,45vh)] w-[min(520px,85vw)] rounded-full bg-cyan-500/[0.08] blur-[105px]"
         aria-hidden
       />
       <div
@@ -298,7 +298,7 @@ export default function Studio() {
         >
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/85">Workspace</p>
           <h1 className="mt-2.5 text-3xl font-bold tracking-tight text-white sm:text-4xl">Studio</h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 sm:text-[15px]">
+          <p className="type-body-dim mx-auto mt-3 max-w-2xl">
             Full-width layout, fewer stock photos. Tap a style hint below, write the scene, generate — your real output
             shows up where the big frame is now.
             {!isSignedIn ? (
@@ -449,7 +449,7 @@ export default function Studio() {
 
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
                 <div className="min-w-0 flex-1 lg:max-w-xl">
-                  <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Styles</p>
+                  <p className="type-studio-eyebrow mb-3">Styles</p>
                   <div className="flex flex-wrap gap-2 sm:gap-2.5">
                     {styles.map((item) => {
                       const thumb = STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === item)?.image;
@@ -484,8 +484,8 @@ export default function Studio() {
                 </div>
 
                 <div className="min-w-0 flex-1 lg:pt-0">
-                  <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Prompt</p>
-                  <div className="studio-shell rounded-[1.35rem] p-3 shadow-inner">
+                  <p className="type-studio-eyebrow mb-3">Prompt</p>
+                  <div className="studio-prompt-shell p-4 sm:p-4">
                     <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                       <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2">
                         <input
@@ -510,7 +510,7 @@ export default function Studio() {
                           aria-pressed={isListening}
                           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:cursor-not-allowed disabled:opacity-40 ${
                             isListening
-                              ? "scale-[1.02] animate-pulse border-red-400/65 bg-red-950/55 text-red-200"
+                              ? "scale-[1.02] border-cyan-400/55 bg-cyan-950/40 text-cyan-100 shadow-[0_0_24px_-4px_rgba(34,211,238,0.35)]"
                               : "border-white/15 bg-white/[0.07] text-slate-300 hover:border-white/25 hover:bg-white/10"
                           }`}
                         >
@@ -520,7 +520,7 @@ export default function Studio() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3"
+                        className={`btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3 ${loading ? "" : "studio-glow"}`}
                       >
                         {loading ? "Working…" : "Generate"}
                       </button>
@@ -530,7 +530,7 @@ export default function Studio() {
                     <p className="mt-2 text-center text-xs text-amber-200/85 sm:text-left">Mic won&apos;t fly in this browser.</p>
                   ) : null}
                   {speechError ? (
-                    <p className="mt-2 text-center text-xs text-rose-300 sm:text-left">{speechError}</p>
+                    <p className="mt-2 text-center text-xs text-amber-200/90 sm:text-left">{speechError}</p>
                   ) : null}
                   {isListening ? (
                     <p className="mt-2 text-center text-xs font-medium text-cyan-200 sm:text-left">
@@ -583,7 +583,11 @@ export default function Studio() {
           </div>
         </div>
         {historyStatus === "loading" && history.length === 0 ? (
-          <GalleryGridSkeleton className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" count={8} />
+          <GalleryGridSkeleton
+            workspace
+            className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+            count={8}
+          />
         ) : history.length === 0 ? (
           <div className="rounded-[1.25rem] border border-dashed border-white/15 bg-white/[0.03] py-12 text-center text-sm text-slate-400 backdrop-blur-sm">
             {!isSignedIn ? (
@@ -606,7 +610,7 @@ export default function Studio() {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {history.slice(0, 12).map((item) => (
-              <HistoryImageCard key={item._id} item={item} onOpen={setLightbox} />
+              <HistoryImageCard key={item._id} item={item} onOpen={setLightbox} surface="workspace" />
             ))}
           </div>
         )}

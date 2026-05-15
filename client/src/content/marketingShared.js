@@ -1,6 +1,14 @@
 import { CircleHelp, LayoutGrid, Sparkles, Wand2 } from "lucide-react";
 import { assets } from "../assets/assets";
 
+/**
+ * Primary marketing column width (Tailwind `max-w-4xl` / 56rem) — matches the Steps section
+ * (“The bit that matters”). Non-Studio app shell uses this so every page shares the same rail.
+ */
+export const MARKETING_CONTENT_MAX_WIDTH_CLASS = "max-w-4xl";
+
+/** Page typography: use `type-*` classes from `index.css` (@layer components) for consistent scale. */
+
 /** Style strip on Home + Help (marketing context). Studio uses gradients + tiny chips instead. */
 export const MARKETING_STYLE_TILES = [
   { img: assets.style_realistic, label: "Realistic" },

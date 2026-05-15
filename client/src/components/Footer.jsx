@@ -16,7 +16,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-auto border-t border-slate-200/70 bg-white/60 py-4 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl flex-col items-stretch justify-between gap-3 px-0 sm:flex-row sm:items-center sm:gap-4">
+      <div className="mx-auto flex w-full flex-col items-stretch justify-between gap-3 px-1 sm:flex-row sm:items-center sm:gap-4 sm:px-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-2.5">
           {[
             {
@@ -106,7 +106,9 @@ export default function Footer() {
               Pricing
             </Link>
           </div>
-          <p className="mt-0.5 text-[11px] text-slate-400">© {new Date().getFullYear()} {SITE.name}</p>
+          <p className="type-micro mt-0.5">
+            © {new Date().getFullYear()} {SITE.name}
+          </p>
         </div>
       </div>
     </footer>

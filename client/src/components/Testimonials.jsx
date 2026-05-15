@@ -8,25 +8,25 @@ export default function Testimonials() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.55 }}
-      className="mx-auto flex w-full max-w-5xl flex-col items-center py-20 text-center"
+      className="mx-auto flex w-full flex-col items-center py-14 text-center sm:py-16"
     >
-      <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Loved by makers</h2>
-      <p className="mt-3 text-slate-600">Social proof, polished presentation — swap quotes anytime.</p>
-      <div className="mt-10 grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <h2 className="type-section-title">Loved by makers</h2>
+      <p className="type-body mx-auto mt-3 max-w-2xl">Social proof, polished presentation — swap quotes anytime.</p>
+      <div className="mt-7 grid w-full gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
         {testimonialsData.map((t, index) => (
           <div
             key={`${t.name}-${index}`}
-            className="glass flex flex-col items-center rounded-3xl p-8 text-center shadow-card"
+            className="glass flex flex-col items-center rounded-2xl p-6 text-center shadow-card sm:p-7"
           >
-            <img src={t.image} alt="" className="h-14 w-14 rounded-full object-cover ring-2 ring-white" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">{t.name}</h3>
-            <p className="text-sm text-slate-500">{t.role}</p>
+            <img src={t.image} alt="" className="h-11 w-11 rounded-full object-cover ring-2 ring-white" />
+            <h3 className="type-tile-title-lg mt-4">{t.name}</h3>
+            <p className="type-meta mt-px">{t.role}</p>
             <div className="mt-3 flex justify-center gap-0.5">
               {Array.from({ length: t.stars }).map((_, i) => (
                 <img key={i} src={assets.rating_star} alt="" className="h-4 w-4" />
               ))}
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-slate-600">{t.text}</p>
+            <p className="type-body mt-4">{t.text}</p>
           </div>
         ))}
       </div>

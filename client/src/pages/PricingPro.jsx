@@ -20,18 +20,18 @@ export default function PricingPro() {
 
   return (
     <MarketingPageShell className="pb-28 pt-8 sm:pt-12">
-      <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="text-center"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky">Pixorify Pro</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+          <p className="type-eyebrow-brand">Pixorify Pro</p>
+          <h1 className="type-page-title mt-2">
             Free beside Pro — no mystery columns
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p className="type-body mx-auto mt-3 max-w-xl">
             Same product, bigger daily budget. Billing isn&apos;t switched on yet; the table&apos;s here so you know what
             you&apos;re walking into later.
           </p>
@@ -87,7 +87,7 @@ export default function PricingPro() {
           </button>
           <Link
             to="/pricing"
-            className="text-sm font-medium text-slate-600 underline-offset-4 hover:text-brand-cyan hover:underline"
+            className="type-link-muted"
           >
             ← Simpler plan view
           </Link>
@@ -133,8 +133,8 @@ export default function PricingPro() {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <h2 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-900">Checkout isn&apos;t live yet</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              <h2 className="type-section-accent mt-5">Checkout isn&apos;t live yet</h2>
+              <p className="type-body mt-3">
                 We&apos;re finishing payments and receipts. Until then your free tier is the full playground — poke
                 around, break things, tell us what you need.
               </p>
