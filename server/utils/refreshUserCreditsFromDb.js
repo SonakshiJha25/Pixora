@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/User.js";
 import { ensureDailyCredits } from "../services/dailyCreditsService.js";
 
@@ -6,6 +7,9 @@ import { ensureDailyCredits } from "../services/dailyCreditsService.js";
  * persist if needed, reload user from MongoDB so responses show the canonical balance.
  */
 export default async function refreshUserCreditsFromDb(userId, { session } = {}) {
+  if (userId == null || userId === "") return null;
+  if (!mongoose.isValidObjectId(userId)) return null;
+
   let user = session
     ? await User.findById(userId).session(session)
     : await User.findById(userId);

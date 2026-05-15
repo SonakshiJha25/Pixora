@@ -35,6 +35,9 @@ function formatCreditLogUser(user) {
 /**
  * Ensures daily pool matches IST midnight cutover and credits snap to ledger.
  * `dailyCreditResetAt` holds the UTC instant of the upcoming IST midnight when credits reset.
+ *
+ * Refills when `now >= dailyCreditResetAt` (missed rollovers converge in one refill to the daily pool), and repairs
+ * schedules that drift days into the future (common cause of “timer rolled but balance stayed 0”).
  */
 export async function ensureDailyCredits(user, { session } = {}) {
   const saveOpts = session ? { session } : {};
@@ -54,14 +57,37 @@ export async function ensureDailyCredits(user, { session } = {}) {
   if (!Number.isFinite(nextMs)) {
     user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
     dirty = true;
-  } else if (nowMs >= nextMs) {
-    const oldCredits = snapCreditsToLedger(user.credits);
-    user.credits = DAILY_CREDITS;
-    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
-    dirty = true;
-    logInfo(
-      `[Credit Reset]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
-    );
+  } else {
+    const canonicalNext = getNextIstMidnightUtcMs(nowMs);
+    /** Stuck-at-zero UX: tolerate only sub-minute skew vs the true next IST boundary. Anything further ahead is repaired. */
+    const STUCK_ZERO_SCHEDULE_EPS_MS = 60 * 1000;
+
+    if (
+      snapCreditsToLedger(user.credits) === 0 &&
+      nextMs > canonicalNext + STUCK_ZERO_SCHEDULE_EPS_MS
+    ) {
+      user.dailyCreditResetAt = new Date(canonicalNext);
+      user.credits = DAILY_CREDITS;
+      nextMs = canonicalNext;
+      dirty = true;
+      logInfo(
+        `[Credit Reset — schedule repair]\nUser: ${who}\nReason: 0 credits but dailyCreditResetAt was not the next IST midnight; realigned\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
+      );
+    }
+
+    let guard = 0;
+    while (nowMs >= nextMs && guard < 16) {
+      guard += 1;
+      const oldCredits = snapCreditsToLedger(user.credits);
+      user.credits = DAILY_CREDITS;
+      const following = getNextIstMidnightUtcMs(nowMs);
+      user.dailyCreditResetAt = new Date(following);
+      nextMs = following;
+      dirty = true;
+      logInfo(
+        `[Credit Reset]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
+      );
+    }
   }
 
   if (dirty) {
