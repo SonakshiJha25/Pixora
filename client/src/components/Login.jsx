@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
-import { AppContext } from '../context/AppContext'
+import { SITE } from '../lib/site.js'
 import { normalizeCreditsPoints } from '../lib/credits.js'
+import { AppContext } from '../context/AppContext'
 import { motion } from 'motion/react'
 import { toast } from 'react-toastify'
 
@@ -90,7 +91,11 @@ const Login = () => {
 
         className='relative bg-white/95 border border-white p-10 rounded-2xl text-slate-500 shadow-2xl max-w-md w-[92vw]'>
             <h1 className='text-center text-2xl text-neutral-700 font-medium'>{state}</h1>
-            <p className='text-sm'>Welcome back! Please sign in to continue</p>
+            <p className='text-sm'>
+              {state === 'Login'
+                ? `Welcome back — sign in to continue using ${SITE.name}.`
+                : `Create your ${SITE.name} account to save credits and work.`}
+            </p>
 
             {state !=='Login' && (
                 <div className ='border px-6 py-2 flex items-center gap-2 rounded-full mt-5'>

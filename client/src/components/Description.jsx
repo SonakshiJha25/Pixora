@@ -1,5 +1,6 @@
 import { assets } from "../assets/assets";
 import { motion } from "motion/react";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Description() {
   return (
@@ -18,7 +19,7 @@ export default function Description() {
       <div className="max-w-md text-center md:text-left">
         <h2 className="type-section-title">Built for real workflows</h2>
         <p className="type-body mt-3">
-          Credits, gallery, and a studio layout that feels like a real product—without the weekend-demo clutter.
+          Credits, gallery, and {WORKSPACE_NAME}, laid out like a real product—without the weekend-demo clutter.
         </p>
         <p className="type-body mt-3">
           Portraits to mood boards, kept tidy with favourites—not lost in random filenames.

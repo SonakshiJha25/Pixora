@@ -1,6 +1,7 @@
 import { stepsData } from "../assets/assets";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Steps() {
   return (
@@ -34,9 +35,10 @@ export default function Steps() {
       </div>
       <Link
         to="/studio"
+        title={`Open ${WORKSPACE_NAME}`}
         className="btn-primary mt-9 inline-flex rounded-full px-7 py-2.5 text-sm font-semibold shadow-md transition hover:opacity-95"
       >
-        Go try it
+        Open {WORKSPACE_NAME}
       </Link>
       <p className="type-body mt-4">
         Need the credit timeline or IST reset spelled out slowly?{" "}

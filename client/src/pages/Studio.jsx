@@ -11,7 +11,7 @@ import RefineImagePanel from "../components/RefineImagePanel.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
-import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES } from "../lib/site.js";
+import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 
@@ -296,11 +296,15 @@ export default function Studio() {
           transition={{ duration: 0.45 }}
           className="mb-7 text-center sm:mb-9"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/85">Workspace</p>
-          <h1 className="mt-2.5 text-3xl font-bold tracking-tight text-white sm:text-4xl">Studio</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/85">
+            Creative workspace
+          </p>
+          <h1 className="mt-2.5 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Welcome to {WORKSPACE_NAME}
+          </h1>
           <p className="type-body-dim mx-auto mt-3 max-w-2xl">
-            Full-width layout, fewer stock photos. Tap a style hint below, write the scene, generate — your real output
-            shows up where the big frame is now.
+            Create inside {WORKSPACE_NAME} — describe the scene, pick a look, and generate. Your latest render lands in
+            the main preview once it&apos;s ready.
             {!isSignedIn ? (
               <span className="mt-2 block border-t border-white/10 pt-3 text-slate-400">
                 Sign in to render. Credits refill at midnight IST.
@@ -442,7 +446,7 @@ export default function Studio() {
                   </div>
                   <p className="max-w-2xl text-left text-[13px] leading-relaxed text-white/60 sm:text-sm lg:max-w-xl lg:text-right">
                     {activeStyleSample?.caption ??
-                      "Colours shift with the style you pick — the big marketing stills stay on Home / Help."}
+                      `Colours shift with your style in ${WORKSPACE_NAME} — hero stills stay on Home and Help.`}
                   </p>
                 </div>
               </div>
@@ -553,7 +557,7 @@ export default function Studio() {
               {loading ? (
                 <div className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-4 text-sm text-slate-400">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-brand-cyan" />
-                  Generating…
+                  Generating in {WORKSPACE_NAME}…
                 </div>
               ) : null}
             </div>
@@ -564,7 +568,9 @@ export default function Studio() {
         <div className="studio-shell mb-6 flex flex-col gap-4 rounded-[1.5rem] p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-left">
             <h2 className="text-lg font-bold text-white sm:text-xl">Recent renders</h2>
-            <p className="text-sm text-slate-400">Hover tiles for date / style. Full view lives in Gallery.</p>
+            <p className="text-sm text-slate-400">
+              Recent work from {WORKSPACE_NAME}. Open My gallery in Pixorify for the full archive.
+            </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
             <button

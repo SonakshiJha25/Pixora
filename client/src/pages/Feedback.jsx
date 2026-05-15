@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { AppContext } from "../context/AppContext";
 import { getToken } from "../utils/token.js";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Feedback() {
   const { api } = useContext(AppContext);
@@ -129,8 +130,8 @@ export default function Feedback() {
           </button>
 
           <p className="text-center text-sm">
-            <Link to="/studio" className="type-link-brand">
-              ← Studio
+            <Link to="/studio" title={`Open ${WORKSPACE_NAME}`} className="type-link-brand">
+              ← {WORKSPACE_NAME}
             </Link>
           </p>
         </form>

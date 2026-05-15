@@ -62,7 +62,7 @@ export const stepsData = [
   {
     title: "Pick a style, hit generate",
     description:
-      "Realistic, anime, cyberpunk — pick one and go. Changing your mind afterwards is fine too. Tweaks inside the thread use Refine, not another full charge.",
+      "Realistic, anime, cyberpunk — pick one in Pixora Studio and go. Changing your mind afterwards is fine too. Tweaks inside the thread use Refine, not another full charge.",
     icon: step_icon_2,
   },
   {

@@ -10,6 +10,7 @@ import GalleryThreadModal from "../components/GalleryThreadModal.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { groupGalleryItems, threadMatchesFavoriteFilter } from "../lib/groupGalleryThreads.js";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
@@ -59,7 +60,8 @@ export default function Gallery() {
             </span>
             <h1 className="type-page-title mt-5">Your gallery lives behind a login</h1>
             <p className="type-body mt-3">
-              Sign in and we&apos;ll show every thread you&apos;ve run—original render plus refinements in one stack.
+              Sign in and we&apos;ll show every thread you&apos;ve run in {WORKSPACE_NAME} — original render plus
+              refinements in one stack.
             </p>
             <button
               type="button"
@@ -90,14 +92,16 @@ export default function Gallery() {
           className="mx-auto mb-10 max-w-2xl text-center sm:mb-12"
         >
           <p className="type-eyebrow-brand">Gallery</p>
-          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Your threads</h1>
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+            Your creations in {WORKSPACE_NAME}
+          </h1>
           <p className="mt-3 text-[13px] leading-relaxed text-slate-400 sm:text-sm">
-            Each card is one idea: the newest picture is on the cover, refinements sit behind{" "}
+            Each card is one idea from {WORKSPACE_NAME}: the newest picture is on the cover, refinements sit behind{" "}
             <span className="font-semibold text-slate-200">Open thread</span>. Heart something and it shows up under Saved.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
             <Link to="/studio" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
-              ← Studio
+              ← {WORKSPACE_NAME}
             </Link>
             <span className="text-slate-600" aria-hidden>
               ·
@@ -175,7 +179,7 @@ export default function Gallery() {
               <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-400">
                 Quiet in here. When you&apos;re ready,{" "}
                 <Link className="font-semibold text-cyan-300 underline-offset-4 hover:underline" to="/studio">
-                  open Studio
+                  Open {WORKSPACE_NAME}
                 </Link>{" "}
                 — new threads appear here automatically.
               </p>

@@ -1,5 +1,6 @@
 import { CircleHelp, LayoutGrid, Sparkles, Wand2 } from "lucide-react";
 import { assets } from "../assets/assets";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 /**
  * Primary marketing column width (Tailwind `max-w-4xl` / 56rem) — matches the Steps section
@@ -22,7 +23,7 @@ export const MARKETING_STYLE_TILES = [
 export const HOME_SHORTCUT_TILES = [
   {
     to: "/studio",
-    title: "Studio",
+    title: WORKSPACE_NAME,
     desc: "Prompt, pick a look, generate.",
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",

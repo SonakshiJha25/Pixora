@@ -11,6 +11,7 @@ import {
   generationsRemaining,
   normalizeCreditsPoints,
 } from "../lib/credits.js";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 /** Matches product copy: ⚡ NN left — `credit` is canonical points after normalizeCreditsPoints. */
 function CreditsNavbarBadge({ points, zapSizeClassName, numberClassName, metaClassName }) {
@@ -111,7 +112,7 @@ export default function NavBar() {
           </NavLink>
           {user ? (
             <>
-              <NavLink to="/studio" className={navLink}>
+              <NavLink to="/studio" title={`Open ${WORKSPACE_NAME}`} className={navLink}>
                 Studio
               </NavLink>
               <NavLink to="/gallery" className={navLink}>
@@ -314,7 +315,7 @@ export default function NavBar() {
             </NavLink>
             {user ? (
               <>
-                <NavLink to="/studio" className={navLink} onClick={closeMobile}>
+                <NavLink to="/studio" title={`Open ${WORKSPACE_NAME}`} className={navLink} onClick={closeMobile}>
                   Studio
                 </NavLink>
                 <NavLink to="/gallery" className={navLink} onClick={closeMobile}>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Pricing() {
   return (
@@ -142,8 +143,8 @@ export default function Pricing() {
         </div>
 
         <p className="type-body mt-12 text-center">
-          <Link to="/studio" className="type-link-brand">
-            ← Studio
+          <Link to="/studio" title={`Open ${WORKSPACE_NAME}`} className="type-link-brand">
+            ← {WORKSPACE_NAME}
           </Link>
           <span className="mx-2 text-slate-300" aria-hidden>
             ·

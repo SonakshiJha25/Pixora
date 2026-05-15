@@ -11,6 +11,12 @@ export const SITE = {
   discord: "https://example.com/pixorify-discord",
 };
 
+/** Creative workspace inside Pixorify (route `/studio`). Not the product name; not an image model. */
+export const WORKSPACE_NAME = "Pixora Studio";
+
+/** Subtle attribution for footer or helpers — renders use Clipdrop APIs. */
+export const CLIPDROP_ATTRIBUTION = "Powered by Clipdrop AI";
+
 /**
  * Studio placeholder samples (captions, optional image references).
  * Carousel-style previews are intentionally avoided in Studio UI — use MOODS for idle state.
@@ -58,15 +64,15 @@ export const HERO_SLIDES = [
     image:
       "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=85&auto=format&fit=crop",
     kicker: "What is Pixorify",
-    title: "A studio for text-to-image creation",
-    sub: "Type a prompt, choose a look, and generate. Your work stays in one place: Studio and My gallery.",
+    title: "Create images from text",
+    sub: `Pixora Studio is where prompts and styles live. Your threads stay organized in ${SITE.name}’s gallery.`,
   },
   {
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=85&auto=format&fit=crop",
     kicker: "Credits & limits",
     title: "10 credits refresh every day on Free",
-    sub: "Use them in the Studio, track the balance in your profile, and top up with Pro when you are ready to scale.",
+    sub: "Use them in Pixora Studio, track the balance in your profile, and top up with Pro when you’re ready to scale.",
   },
   {
     image:

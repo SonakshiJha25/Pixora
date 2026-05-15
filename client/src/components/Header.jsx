@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import { scrollPageTop } from "../lib/navigation";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Header() {
   const { user } = useContext(AppContext);
@@ -77,7 +78,7 @@ export default function Header() {
           onClick={goStudio}
           className="btn-primary rounded-full px-8 py-2.5 text-sm font-semibold"
         >
-          Open studio
+          Open {WORKSPACE_NAME}
         </button>
       </motion.div>
 
@@ -90,13 +91,15 @@ export default function Header() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
             <p className="type-eyebrow-brand">Inside the box</p>
-            <h2 className="type-subsection-title mt-2">Studio for making, Gallery for keeping</h2>
+            <h2 className="type-subsection-title mt-2">{WORKSPACE_NAME} for making, Gallery for keeping</h2>
             <p className="type-body mt-1.5">
               Toggle styles anytime, tuck favourites aside, PNGs when something feels done—threads stay in order without
               mystery filenames.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Studio</span>
+              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">
+                {WORKSPACE_NAME}
+              </span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Styles</span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">My gallery</span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Downloads</span>

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { SITE } from "../lib/site";
+import { SITE, CLIPDROP_ATTRIBUTION } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
 export default function Footer() {
@@ -110,9 +110,10 @@ export default function Footer() {
               Pricing
             </Link>
           </div>
-          <p className="type-micro mt-0.5">
+          <p className="type-micro mt-0.5 text-slate-500">
             © {new Date().getFullYear()} {SITE.name}
           </p>
+          <p className="type-micro mt-1 text-slate-400">{CLIPDROP_ATTRIBUTION}</p>
         </div>
       </div>
     </footer>

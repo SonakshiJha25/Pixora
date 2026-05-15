@@ -15,14 +15,14 @@ import {
 import HelpContactForm from "../components/HelpContactForm.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
-import { SITE } from "../lib/site.js";
+import { SITE, WORKSPACE_NAME } from "../lib/site.js";
 import { assets } from "../assets/assets.js";
 
 const quickLinks = [
   {
     to: "/studio",
-    title: "Studio",
-    desc: "Prompts, styles, downloads — main workspace.",
+    title: WORKSPACE_NAME,
+    desc: `Prompts, styles, downloads — ${WORKSPACE_NAME}.`,
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
     border: "border-cyan-200/70",
@@ -67,8 +67,8 @@ const journey = [
   },
   {
     n: "2",
-    title: "Work in Studio",
-    body: "Pick a look — realistic, anime, and the rest — write what you want, tap generate. Most images arrive in maybe ten or twenty seconds.",
+    title: `Work in ${WORKSPACE_NAME}`,
+    body: `${WORKSPACE_NAME}: pick a look — realistic, anime, and the rest — write what you want, tap generate. Most images arrive in maybe ten or twenty seconds.`,
     chip: "~15 s",
     img: assets.sample_img_2,
   },
@@ -137,7 +137,7 @@ const funFacts = [
   },
   {
     emoji: "🧊",
-    text: "Refine is for the picture already in front of you. A brand-new prompt in Studio starts a new line and uses credits like any other fresh run.",
+    text: `Refine is for the picture already in front of you. A brand-new prompt in ${WORKSPACE_NAME} starts a new line and uses credits like any other fresh run.`,
   },
   {
     emoji: "✨",
@@ -155,8 +155,8 @@ const faqs = [
     a: "Midnight India time. Closing the tab doesn’t reset a timer in the background — you wake up (or stay up) into a new IST day and the number tops up.",
   },
   {
-    q: "What counts as refine versus hitting generate?",
-    a: "Refine is the small-step flow on something you’ve already made on that thread. Typing a brand-new idea and running it as a new image is a separate start, and that’s what spends another chunk of credits.",
+    q: `What counts as refine versus hitting generate in ${WORKSPACE_NAME}?`,
+    a: `Refine is the small-step flow on something you’ve already made on that thread. Typing a brand-new idea and running it in ${WORKSPACE_NAME} as a new image is a separate start, and that’s what spends another chunk of credits.`,
   },
   {
     q: "Older thumbs suddenly look broken?",
@@ -227,8 +227,9 @@ export default function Help() {
             <Link
               to="/studio"
               className="inline-flex rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-slate-800"
+              title={`Open ${WORKSPACE_NAME}`}
             >
-              Open Studio
+              Open {WORKSPACE_NAME}
             </Link>
             <a
               href="#contact"
@@ -319,7 +320,7 @@ export default function Help() {
       {/* Journey */}
       <section className="relative mt-12">
         <p className="type-eyebrow-muted">The usual flow</p>
-        <h2 className="type-subsection-title mt-2">Account → Studio → tweaks</h2>
+        <h2 className="type-subsection-title mt-2">Account → {WORKSPACE_NAME} → tweaks</h2>
         <p className="type-body mt-2 max-w-2xl">
           Same three steps nearly everyone lands on once they’re past Hello world.
         </p>

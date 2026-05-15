@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { Zap } from "lucide-react";
 import { HOME_SHORTCUT_TILES, MARKETING_STYLE_TILES } from "../content/marketingShared";
 import { assets } from "../assets/assets";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 /** Illustration-heavy shots for 1–2; mascot for step 3 so nothing feels “random icon next to renders”. */
 const flowSteps = [
@@ -41,7 +42,7 @@ export default function HomeMiniFlow() {
       >
         <div className="px-0 sm:px-1">
           <p className="type-eyebrow-muted">Shortcuts</p>
-          <h2 className="type-subsection-title mt-3">Jump to Studio, Gallery, or FAQs</h2>
+          <h2 className="type-subsection-title mt-3">Jump to {WORKSPACE_NAME}, Gallery, or FAQs</h2>
         </div>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-5">
           {HOME_SHORTCUT_TILES.map((link, idx) => {
