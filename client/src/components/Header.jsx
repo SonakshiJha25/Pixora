@@ -1,145 +1,102 @@
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { MessageCircleHeart, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
-import { scrollPageTop } from "../lib/navigation";
+import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Header() {
   const { user } = useContext(AppContext);
-  const navigate = useNavigate();
-
-  const goStudio = () => {
-    navigate("/studio");
-  };
-
-  const goHomeTop = () => {
-    navigate({ pathname: "/", hash: "", search: "" });
-    requestAnimationFrame(() => scrollPageTop(true));
-    setTimeout(() => scrollPageTop(true), 80);
-    setTimeout(() => scrollPageTop(true), 280);
-  };
 
   return (
-    <section className="mx-auto w-full pt-7 text-center sm:pt-9">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="mx-auto flex flex-col items-center"
-      >
-        <div className="relative">
-          <div
-            className="absolute -inset-3 rounded-[2.25rem] bg-gradient-to-tr from-cyan-400/35 via-violet-500/25 to-fuchsia-500/40 blur-2xl"
-            aria-hidden
-          />
-          <div className="relative rounded-[1.85rem] bg-gradient-to-br from-cyan-400/90 via-fuchsia-500/75 to-violet-600/85 p-[3px] shadow-[0_20px_50px_-12px_rgba(236,72,153,0.35)]">
+    <motion.section
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
+      className="relative mx-auto w-full grid gap-6 rounded-[1.65rem] border border-white/65 bg-white/60 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:grid-cols-[1.08fr_minmax(0,0.95fr)] sm:items-center sm:gap-8 sm:p-8"
+    >
+      <div className="text-left sm:text-left">
+        <p className="type-eyebrow-brand inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1">
+          <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Home
+        </p>
+        <h1 className="type-page-title mt-3 sm:mt-4">Ideas in, pixels out</h1>
+        <p className="type-body mt-2 max-w-lg sm:mt-3">
+          {user ? (
+            <>
+              Daily credits refill at midnight IST. Jump into {WORKSPACE_NAME}, then nudge the same thread with
+              refinements that don&apos;t eat a full new run.
+            </>
+          ) : (
+            <>
+              Sign in for credits, a private gallery, and same-thread refinements — pick a look below and open the
+              workspace in one tap.
+            </>
+          )}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
+          <Link
+            to="/studio"
+            className="inline-flex rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-slate-800"
+            title={`Open ${WORKSPACE_NAME}`}
+          >
+            Open {WORKSPACE_NAME}
+          </Link>
+          <Link
+            to="/help#contact"
+            className="group inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400/55 hover:bg-white hover:text-slate-900 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+          >
+            <MessageCircleHeart className="h-4 w-4 shrink-0 text-rose-400 transition group-hover:scale-[1.05]" aria-hidden />
+            Message us
+          </Link>
+        </div>
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-2 sm:mt-5 sm:gap-3">
+          {styleTiles.map((t) => (
+            <Link
+              key={t.label}
+              to={`/studio?style=${encodeURIComponent(t.studioStyle)}`}
+              title={`Open ${WORKSPACE_NAME} with ${t.label} selected`}
+              className="group relative shrink-0 overflow-hidden rounded-2xl border border-white shadow-md ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-lg hover:ring-2 hover:ring-cyan-400/35"
+            >
+              <img
+                src={t.img}
+                alt=""
+                className="h-[76px] w-[102px] object-cover transition duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[118px]"
+                draggable={false}
+              />
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-2 pb-2 pt-6 text-[10px] font-semibold text-white shadow-inner">
+                {t.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative flex justify-center sm:justify-end">
+        <div className="flex w-full max-w-[min(100%,300px)] flex-col items-stretch sm:max-w-none">
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+            className="relative mx-auto w-full sm:ml-auto sm:mr-0 sm:w-auto"
+          >
             <img
-              src={assets.brandMark}
-              alt="Pixorify"
-              className="h-36 w-36 rounded-[1.65rem] bg-slate-950 object-cover sm:h-44 sm:w-44"
+              src={assets.home_mascot}
+              alt="Pixorify mascot"
+              className="mx-auto max-h-[220px] w-auto max-w-full rounded-[1.5rem] object-contain shadow-2xl ring-6 ring-white/80 sm:max-h-[260px]"
               loading="eager"
               decoding="async"
               draggable={false}
             />
-          </div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.08 }}
-          className="type-hero-chip mt-5 inline-flex items-center gap-2 rounded-full border border-fuchsia-200/60 bg-white/85 px-4 py-1.5 shadow-sm"
-        >
-          <button
-            type="button"
-            onClick={goHomeTop}
-            className="type-hero-chip rounded-full transition hover:text-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/60"
+          </motion.div>
+          <Link
+            to="/help#contact"
+            className="type-promo-caption mt-5 block w-full cursor-pointer rounded-2xl bg-gradient-to-r from-cyan-400/72 via-fuchsia-500/72 to-violet-500/70 px-5 py-2.5 text-center shadow-lg shadow-slate-900/15 transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/45"
           >
-            Pixorify
-          </button>
-          <img src={assets.star_icon} alt="" className="h-4 w-4 opacity-80" />
-        </motion.div>
-      </motion.div>
-
-      <motion.h1
-        className="type-hero-title mt-4 w-full sm:mx-auto"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.04 }}
-      >
-        Ideas in, pixels out
-      </motion.h1>
-
-      <motion.p
-        className="type-body mx-auto mt-2 max-w-xl sm:max-w-2xl"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-      >
-        {user ? (
-          <>
-            Your credits refresh every morning (IST). Spend them on brand-new images — then nudge the same scene with
-            refinements that behave a little differently than a fresh run.
-          </>
-        ) : (
-          <>
-            Sign in for daily credits, a private gallery, threaded history, and the option to refine images you&apos;ve
-            already created.
-          </>
-        )}
-      </motion.p>
-
-      <motion.div
-        className="mt-5 text-center sm:mt-6"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.14 }}
-      >
-        <button
-          type="button"
-          onClick={goStudio}
-          className="btn-primary rounded-full px-8 py-2.5 text-sm font-semibold"
-        >
-          Open {WORKSPACE_NAME}
-        </button>
-      </motion.div>
-
-      <motion.div
-        className="mx-auto mt-7 w-full rounded-[2rem] border border-white/65 bg-white/60 p-4 text-left shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:mt-9 sm:p-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.18 }}
-      >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0 flex-1">
-            <h2 className="type-subsection-title">Studio + gallery</h2>
-            <p className="type-body mt-1.5 text-slate-600">
-              Create in {WORKSPACE_NAME}, keep everything inside your Pixorify gallery — styles, favourites, and PNG
-              downloads stay ordered in one thread per idea.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Styles</span>
-              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">My gallery</span>
-              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Downloads</span>
-            </div>
-          </div>
-
-          <div className="shrink-0 sm:pl-2">
-            <div className="rounded-3xl bg-gradient-to-br from-cyan-400/25 via-fuchsia-400/20 to-violet-500/30 p-[2px] shadow-lg shadow-fuchsia-500/10">
-              <img
-                src={assets.brandMark}
-                alt=""
-                className="h-[156px] w-[156px] rounded-[1.35rem] object-cover sm:h-[176px] sm:w-[176px]"
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-              />
-            </div>
-          </div>
+            Someone actually reads messages
+          </Link>
         </div>
-      </motion.div>
-    </section>
+      </div>
+    </motion.section>
   );
 }

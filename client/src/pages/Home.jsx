@@ -5,7 +5,7 @@ import Steps from "../components/Steps";
 
 export default function Home() {
   return (
-    <MarketingPageShell className="pb-12 sm:pb-16">
+    <MarketingPageShell className="pb-12 pt-6 sm:pb-16 sm:pt-8">
       <Header />
       <HomeMiniFlow />
       <Steps />

@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Zap } from "lucide-react";
-import { HOME_SHORTCUT_TILES, MARKETING_STYLE_TILES } from "../content/marketingShared";
-import { WORKSPACE_NAME } from "../lib/site.js";
+import { HOME_SHORTCUT_TILES } from "../content/marketingShared";
 import { assets } from "../assets/assets";
 
 /** Illustration-heavy shots for 1–2; mascot for step 3 so nothing feels “random icon next to renders”. */
@@ -131,35 +130,6 @@ export default function HomeMiniFlow() {
                 <p className="type-body mt-1.5">{line}</p>
               </div>
             </motion.article>
-          ))}
-        </div>
-
-        <p className="type-eyebrow-muted relative mt-8 text-center">
-          Looks you can start from
-        </p>
-        <div className="relative mt-2.5 flex justify-center gap-1.5 overflow-x-auto pb-1 sm:gap-2 md:gap-3">
-          {MARKETING_STYLE_TILES.map((tile) => (
-            <Link
-              key={tile.label}
-              to={`/studio?style=${encodeURIComponent(tile.studioStyle)}`}
-              title={`Open ${WORKSPACE_NAME} with ${tile.label} selected`}
-              className="block shrink-0"
-            >
-              <motion.div
-                whileHover={{ y: -2 }}
-                className="relative overflow-hidden rounded-xl border border-slate-200/80 shadow-sm ring-1 ring-slate-100/80"
-              >
-                <img
-                  src={tile.img}
-                  alt=""
-                  className="h-[44px] w-[58px] object-cover opacity-[0.92] saturate-[0.88] sm:h-[50px] sm:w-[68px]"
-                  draggable={false}
-                />
-                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/82 to-transparent px-1 pb-1 pt-4 text-center text-[9px] font-semibold text-white">
-                  {tile.label}
-                </span>
-              </motion.div>
-            </Link>
           ))}
         </div>
 
