@@ -28,6 +28,21 @@ function getSpeechRecognitionCtor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
+/** Dual-ring cyan orbit — workspace loading (not generic browser spinner text). */
+function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
+  return (
+    <div className={`relative shrink-0 ${sizeClass}`} aria-hidden="true">
+      <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg" />
+      <div className="absolute inset-[3px] rounded-full border-[2.5px] border-white/10" />
+      <div className="absolute inset-[3px] animate-spin rounded-full border-[2.5px] border-transparent border-t-cyan-400 border-r-cyan-400/55 [animation-duration:900ms]" />
+      <div className="absolute inset-[9px] animate-spin rounded-full border-2 border-transparent border-b-sky-400 border-l-sky-300/50 [animation-duration:620ms] [animation-direction:reverse]" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="size-2 rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.95)]" />
+      </div>
+    </div>
+  );
+}
+
 export default function Studio() {
   const {
     api,
@@ -348,8 +363,14 @@ export default function Studio() {
                           }`}
                         />
                         {(loading || refineSubmitting) && isLatest ? (
-                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/45 backdrop-blur-sm">
-                            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-brand-cyan" />
+                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/55 backdrop-blur-[2px]">
+                            <motion.div
+                              initial={{ opacity: 0.85, scale: 0.96 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.35, ease: "easeOut" }}
+                            >
+                              <StudioOrbitSpinner sizeClass="h-14 w-14 sm:h-[4.25rem] sm:w-[4.25rem]" />
+                            </motion.div>
                           </div>
                         ) : null}
                       </motion.div>
@@ -546,10 +567,18 @@ export default function Studio() {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-4 text-sm text-slate-400">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-brand-cyan" />
-                  Rendering…
-                </div>
+                <motion.div
+                  role="status"
+                  aria-live="polite"
+                  aria-label="Generating image"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="studio-glow mx-auto flex max-w-md items-center justify-center gap-4 rounded-2xl border border-cyan-400/28 bg-slate-950/55 px-6 py-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+                >
+                  <StudioOrbitSpinner />
+                  <p className="text-sm font-semibold tracking-tight text-cyan-50">Generating…</p>
+                </motion.div>
               ) : null}
             </div>
           )}
