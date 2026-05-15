@@ -12,11 +12,11 @@ export const MARKETING_CONTENT_MAX_WIDTH_CLASS = "max-w-4xl";
 
 /** Style strip on Home + Help (marketing context). Studio uses gradients + tiny chips instead. */
 export const MARKETING_STYLE_TILES = [
-  { img: assets.style_realistic, label: "Realistic" },
-  { img: assets.style_anime, label: "Anime" },
-  { img: assets.style_cyberpunk, label: "Cyberpunk" },
-  { img: assets.style_fantasy, label: "Fantasy" },
-  { img: assets.style_minimal, label: "Minimal" },
+  { img: assets.style_realistic, label: "Realistic", studioStyle: "realistic" },
+  { img: assets.style_anime, label: "Anime", studioStyle: "anime" },
+  { img: assets.style_cyberpunk, label: "Cyberpunk", studioStyle: "cyberpunk" },
+  { img: assets.style_fantasy, label: "Fantasy", studioStyle: "fantasy" },
+  { img: assets.style_minimal, label: "Minimal", studioStyle: "minimal" },
 ];
 
 /** Home-only shortcuts (overlap with Help, tighter copy). */

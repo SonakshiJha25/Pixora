@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowDown, Mic } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "react-toastify";
@@ -130,6 +130,12 @@ export default function Studio() {
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
 
   const styles = useMemo(() => ["realistic", "anime", "cyberpunk", "fantasy", "minimal"], []);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const requested = searchParams.get("style")?.toLowerCase()?.trim();
+    if (requested && styles.includes(requested)) setStyle(requested);
+  }, [searchParams, styles]);
 
   const activeStyleSample = useMemo(
     () => STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === style),

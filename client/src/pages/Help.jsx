@@ -215,7 +215,7 @@ export default function Help() {
         className="relative grid gap-6 rounded-[1.65rem] border border-white/65 bg-white/60 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:grid-cols-[1.08fr_minmax(0,0.95fr)] sm:items-center sm:gap-8 sm:p-8"
       >
         <div>
-          <p className="type-eyebrow-brand inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1">
+          <p className="font-display inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-600">
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
           <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
@@ -232,23 +232,30 @@ export default function Help() {
             </Link>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-brand-cyan/50 hover:text-brand-cyan"
+              className="group inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400/55 hover:bg-white hover:text-slate-900 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
             >
-              <MessageCircleHeart className="h-4 w-4 text-rose-400" aria-hidden /> Message us
+              <MessageCircleHeart className="h-4 w-4 shrink-0 text-rose-400 transition group-hover:scale-[1.05]" aria-hidden />
+              Message us
             </a>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-2 sm:mt-5 sm:gap-3">
             {styleTiles.map((t) => (
-              <motion.div
-                whileHover={{ y: -3 }}
+              <Link
                 key={t.label}
-                className="relative shrink-0 overflow-hidden rounded-2xl border border-white shadow-md ring-1 ring-slate-200/70"
+                to={`/studio?style=${encodeURIComponent(t.studioStyle)}`}
+                title={`Open ${WORKSPACE_NAME} with ${t.label} selected`}
+                className="group relative shrink-0 overflow-hidden rounded-2xl border border-white shadow-md ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-lg hover:ring-2 hover:ring-cyan-400/35"
               >
-                <img src={t.img} alt="" className="h-[76px] w-[102px] object-cover sm:h-[84px] sm:w-[118px]" />
+                <img
+                  src={t.img}
+                  alt=""
+                  className="h-[76px] w-[102px] object-cover transition duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[118px]"
+                  draggable={false}
+                />
                 <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-2 pb-2 pt-6 text-[10px] font-semibold text-white shadow-inner">
                   {t.label}
                 </span>
-              </motion.div>
+              </Link>
             ))}
           </div>
         </div>
