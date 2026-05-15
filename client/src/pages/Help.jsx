@@ -112,50 +112,59 @@ const creditCards = [
 const tipCards = [
   {
     emoji: "🎬",
-    title: "Name the lens, not just the vibe",
-    text: "Say ‘wide dusk road with wet asphalt’ rather than ‘cool drive’. Helps the style land where you pictured it.",
+    title: "Say what you’d point a camera at",
+    text: '“Low angle, wet road, orange streetlights” beats “cool vibe.” A few concrete words usually get you closer than a mood word.',
     tone: "from-sky-50 to-blue-50/80",
   },
   {
     emoji: "✍️",
-    title: "Change one thing, then tweak again",
-    text: 'Hair texture now, skyline later. Smaller edits stack into a big swing without muddying every lever at once.',
+    title: "One fix, then the next",
+    text: "Changing hair, then the sky, then the outfit in separate refines works better than asking for everything at once.",
     tone: "from-fuchsia-50 to-violet-50/70",
   },
   {
     emoji: "📂",
-    title: "Use ‘View thread’ in Gallery",
-    text: "You’ll see versions in order instead of hunting which render belongs to which idea.",
+    title: "Gallery keeps the order",
+    text: "Inside a thread you’ll see versions top to bottom — first image, then each tweak — so you’re not matching files in your head.",
     tone: "from-lime-50 to-teal-50/70",
   },
 ];
 
 const funFacts = [
-  { emoji: "🌙", text: "Daily reset is midnight IST for everyone; it’s not a rolling timer from your last session." },
-  { emoji: "🧊", text: "Refine nudges what you already made. Generate starts a new line from your prompt." },
-  { emoji: "✨", text: "Credits pull from your balance for brand-new runs; refines on that line stay off the meter." },
+  {
+    emoji: "🌙",
+    text: "Credits refill at midnight IST for everyone. We don’t count 24 hours from your last visit — it’s just the next calendar day in India time.",
+  },
+  {
+    emoji: "🧊",
+    text: "Refine is for the picture already in front of you. A brand-new prompt in Studio starts a new line and uses credits like any other fresh run.",
+  },
+  {
+    emoji: "✨",
+    text: "Totally new compositions spend from your daily balance. Follow-up refinements on that same thread generally don’t.",
+  },
 ];
 
 const faqs = [
   {
     q: "How many new images can I actually finish in a day?",
-    a: "Think about ten if you only start fresh ideas (100 credits ÷ 10 each). After that you can still refine what you’ve got without burning more credits.",
+    a: "On the usual free pool, about ten brand-new images if each costs 10 credits out of 100. When you’re out for the day you can still refine what you already generated — that bit doesn’t chew through credits the same way.",
   },
   {
     q: "When do my credits come back?",
-    a: 'At midnight India time. Not “24 hours after you closed the tab” — just the next calendar day in IST.',
+    a: "Midnight India time. Closing the tab doesn’t reset a timer in the background — you wake up (or stay up) into a new IST day and the number tops up.",
   },
   {
     q: "What counts as refine versus hitting generate?",
-    a: 'Refine is for the preview already on screen inside that workflow — little fixes. A fresh prompt counts as starting over with credits.',
+    a: "Refine is the small-step flow on something you’ve already made on that thread. Typing a brand-new idea and running it as a new image is a separate start, and that’s what spends another chunk of credits.",
   },
   {
     q: "Older thumbs suddenly look broken?",
-    a: 'Sometimes deployments wipe temporary file storage while the gallery row still sits there. The fix is moving images to persistent storage — your dev can wire that.',
+    a: "Sometimes a deploy clears temp storage but the gallery rows are still there — links go nowhere. Your team needs persistent file hosting; we can point them in the right direction if they’re stuck.",
   },
   {
     q: "Do I need to sign in?",
-    a: 'You can read the pages, but making images + saving galleries needs an account. Keeps quotas honest.',
+    a: "Browsing the site works either way. Saving work, credits, and a real gallery needs an account — mostly so the product doesn’t get shredded by bots.",
   },
 ];
 
@@ -386,8 +395,8 @@ export default function Help() {
         <div className="flex items-start gap-2 px-1">
           <Lightbulb className="mt-1 h-5 w-5 text-amber-400" aria-hidden />
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Small habits</p>
-            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Three things folks wish they knew earlier</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Quick tips</p>
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Stuff that quietly helps</h2>
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -411,8 +420,8 @@ export default function Help() {
       {/* FAQ */}
       <section className="relative mt-14">
         <div className="px-1 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">FAQ</p>
-          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Common questions</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Questions</p>
+          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">People ask us this a lot</h2>
         </div>
         <div className="mt-6 space-y-3">
           {faqs.map((item, i) => (
