@@ -86,11 +86,13 @@ export default function Footer() {
             onClick={goHomeTop}
             className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan sm:justify-end"
           >
-            <img
-              src={assets.brandMark}
-              alt="Pixorify"
-              className="h-9 w-9 rounded-2xl object-cover ring-1 ring-black/[0.08]"
-            />
+            <span className="rounded-2xl bg-gradient-to-br from-cyan-400 via-fuchsia-500 to-violet-600 p-[2px] shadow-md shadow-fuchsia-500/15">
+              <img
+                src={assets.brandMark}
+                alt="Pixorify"
+                className="h-9 w-9 rounded-[13px] object-cover ring-1 ring-white/80"
+              />
+            </span>
             <span className="text-sm font-extrabold text-slate-900 sm:text-[15px]">{SITE.name}</span>
           </button>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 sm:justify-end">

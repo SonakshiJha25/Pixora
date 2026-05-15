@@ -1,4 +1,4 @@
-import brandMark from './pixorify-mark.png'
+import brandMark from './pixorify-brand-mark.png'
 import logo_icon from './logo_icon.svg'
 import facebook_icon from './facebook_icon.svg'
 import instagram_icon from './instagram_icon.svg'

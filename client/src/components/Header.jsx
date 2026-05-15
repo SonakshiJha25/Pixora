@@ -24,19 +24,43 @@ export default function Header() {
   return (
     <section className="mx-auto w-full pt-7 text-center sm:pt-9">
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="type-hero-chip inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-1.5 shadow-sm"
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto flex flex-col items-center"
       >
-        <button
-          type="button"
-          onClick={goHomeTop}
-          className="type-hero-chip rounded-full transition hover:text-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
+        <div className="relative">
+          <div
+            className="absolute -inset-3 rounded-[2.25rem] bg-gradient-to-tr from-cyan-400/35 via-violet-500/25 to-fuchsia-500/40 blur-2xl"
+            aria-hidden
+          />
+          <div className="relative rounded-[1.85rem] bg-gradient-to-br from-cyan-400/90 via-fuchsia-500/75 to-violet-600/85 p-[3px] shadow-[0_20px_50px_-12px_rgba(236,72,153,0.35)]">
+            <img
+              src={assets.brandMark}
+              alt="Pixorify"
+              className="h-36 w-36 rounded-[1.65rem] bg-slate-950 object-cover sm:h-44 sm:w-44"
+              loading="eager"
+              decoding="async"
+              draggable={false}
+            />
+          </div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.08 }}
+          className="type-hero-chip mt-5 inline-flex items-center gap-2 rounded-full border border-fuchsia-200/60 bg-white/85 px-4 py-1.5 shadow-sm"
         >
-          Pixorify
-        </button>
-        <img src={assets.star_icon} alt="" className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={goHomeTop}
+            className="type-hero-chip rounded-full transition hover:text-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/60"
+          >
+            Pixorify
+          </button>
+          <img src={assets.star_icon} alt="" className="h-4 w-4 opacity-80" />
+        </motion.div>
       </motion.div>
 
       <motion.h1
@@ -96,14 +120,16 @@ export default function Header() {
           </div>
 
           <div className="shrink-0 sm:pl-2">
-            <img
-              src={assets.home_mascot}
-              alt="Friendly Pixorify mascot painting magic on a tablet"
-              className="h-[168px] w-[220px] rounded-2xl bg-gradient-to-br from-sky-100/60 to-cyan-100/40 object-cover shadow-sm sm:h-[188px] sm:w-[252px]"
-              loading="eager"
-              decoding="async"
-              draggable="false"
-            />
+            <div className="rounded-3xl bg-gradient-to-br from-cyan-400/25 via-fuchsia-400/20 to-violet-500/30 p-[2px] shadow-lg shadow-fuchsia-500/10">
+              <img
+                src={assets.brandMark}
+                alt=""
+                className="h-[156px] w-[156px] rounded-[1.35rem] object-cover sm:h-[176px] sm:w-[176px]"
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+              />
+            </div>
           </div>
         </div>
       </motion.div>

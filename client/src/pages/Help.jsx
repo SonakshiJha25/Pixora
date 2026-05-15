@@ -264,7 +264,7 @@ export default function Help() {
             <a
               href="#contact"
               aria-label="Jump to the message form at the bottom of this page"
-              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-2xl bg-gradient-to-r from-cyan-400/65 to-violet-400/65 px-5 py-2.5 text-center shadow-lg shadow-slate-900/15 transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan/40"
+              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-2xl bg-gradient-to-r from-cyan-400/72 via-fuchsia-500/72 to-violet-500/70 px-5 py-2.5 text-center shadow-lg shadow-slate-900/15 transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/45"
             >
               Someone actually reads messages
             </a>

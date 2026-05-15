@@ -87,13 +87,19 @@ export default function NavBar() {
           }`}
           onClick={goHomeTop}
         >
-          <img
-            src={assets.brandMark}
-            alt="Pixorify"
-            className={`h-9 w-9 shrink-0 rounded-2xl object-cover ring-1 sm:h-10 sm:w-10 ${
-              isWorkspaceNav ? "ring-white/15" : "ring-black/[0.08]"
+          <span
+            className={`shrink-0 rounded-2xl bg-gradient-to-br from-cyan-400 via-fuchsia-500 to-violet-600 p-[2px] shadow-md sm:rounded-[0.875rem] ${
+              isWorkspaceNav ? "shadow-fuchsia-500/15" : "shadow-fuchsia-500/20"
             }`}
-          />
+          >
+            <img
+              src={assets.brandMark}
+              alt="Pixorify"
+              className={`h-9 w-9 rounded-[13px] object-cover ring-1 sm:h-10 sm:w-10 sm:rounded-[14px] ${
+                isWorkspaceNav ? "ring-black/40" : "ring-white/70"
+              }`}
+            />
+          </span>
           <span
             className={`truncate text-base font-extrabold tracking-tight sm:text-lg ${
               isWorkspaceNav ? "text-white" : "text-slate-900"

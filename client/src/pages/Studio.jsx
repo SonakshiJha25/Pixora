@@ -12,6 +12,7 @@ import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
+import { assets } from "../assets/assets.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 
@@ -310,13 +311,17 @@ export default function Studio() {
 
   return (
     <div className="relative w-full overflow-hidden pb-28 pt-5 sm:pt-8">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[#050910]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[#06030e]" aria-hidden />
       <div
-        className="pointer-events-none absolute left-[-18%] top-[-6%] h-[min(380px,50vh)] w-[min(620px,90vw)] rounded-full bg-cyan-400/[0.07] blur-[110px]"
+        className="pointer-events-none absolute left-[-18%] top-[-6%] h-[min(380px,50vh)] w-[min(620px,90vw)] rounded-full bg-fuchsia-600/[0.07] blur-[110px]"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute bottom-[-8%] right-[-14%] h-[min(360px,45vh)] w-[min(520px,85vw)] rounded-full bg-cyan-500/[0.08] blur-[105px]"
+        className="pointer-events-none absolute bottom-[-8%] right-[-14%] h-[min(360px,45vh)] w-[min(520px,85vw)] rounded-full bg-cyan-400/[0.09] blur-[105px]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute right-[-12%] top-[20%] h-[min(280px,35vh)] w-[min(420px,70vw)] rounded-full bg-violet-600/[0.06] blur-[100px]"
         aria-hidden
       />
       <div
@@ -329,15 +334,27 @@ export default function Studio() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-6 text-center sm:mb-8"
+          className="mb-6 flex flex-col items-center gap-3 text-center sm:mb-8 sm:flex-row sm:justify-center sm:gap-5"
         >
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
-          <p className="type-body-dim mx-auto mt-1.5 max-w-md">
-            Prompt + style → preview.
-            {!isSignedIn ? (
-              <span className="mt-1 block text-slate-500">Sign in to render · credits reset midnight IST</span>
-            ) : null}
-          </p>
+          <div className="shrink-0 rounded-2xl bg-gradient-to-br from-cyan-400/55 via-fuchsia-500/45 to-violet-600/55 p-[2px] shadow-[0_12px_40px_-8px_rgba(236,72,153,0.35)]">
+            <img
+              src={assets.brandMark}
+              alt=""
+              className="h-14 w-14 rounded-[13px] bg-slate-950 object-cover sm:h-[4.25rem] sm:w-[4.25rem] sm:rounded-[15px]"
+              width={68}
+              height={68}
+              draggable={false}
+            />
+          </div>
+          <div className="min-w-0">
+            <h1 className="mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
+            <p className="type-body-dim mx-auto mt-1 max-w-md sm:mx-0">
+              Prompt + style → preview.
+              {!isSignedIn ? (
+                <span className="mt-1 block text-slate-500">Sign in to render · credits reset midnight IST</span>
+              ) : null}
+            </p>
+          </div>
         </motion.div>
 
         <motion.form
