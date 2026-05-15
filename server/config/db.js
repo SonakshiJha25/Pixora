@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { logError, logInfo } from "../utils/logger.js";
 import { runUserCreditLedgerMigrationOnce } from "../migrations/userCreditLedgerMigration.js";
+import { runImageThreadRootBackfillOnce } from "../migrations/imageThreadMigration.js";
 
 async function connectDB() {
   logInfo("MongoDB: connecting");
@@ -10,6 +11,7 @@ async function connectDB() {
     const dbName = mongoose.connection?.db?.databaseName ?? "unknown";
     logInfo(`MongoDB connected (database: ${dbName})`);
     await runUserCreditLedgerMigrationOnce();
+    await runImageThreadRootBackfillOnce();
   } catch (error) {
     logError("MongoDB connection failed", error);
     throw error;

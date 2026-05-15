@@ -63,10 +63,16 @@ export async function deductCreditAndSaveImage({
           isPublic: Boolean(isPublic),
           imageUrl,
           provider,
+          parentImageId: null,
+          isEdit: false,
+          editPrompt: null,
+          originalPrompt: prompt.trim(),
         },
       ],
       { session }
     );
+
+    await Image.findByIdAndUpdate(image._id, { $set: { threadRootId: image._id } }, { session });
 
     await session.commitTransaction();
 

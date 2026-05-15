@@ -1,9 +1,11 @@
-import express from 'express'
-import { body } from "express-validator";
+import express from "express";
+import { body, param } from "express-validator";
 import {
   cleanupBrokenImages,
   deleteImage,
+  editImage,
   generateImage,
+  getImageThread,
   getMyImages,
   getPromptStyles,
   getPublicGallery,
@@ -11,11 +13,11 @@ import {
   previewEnhancedPrompt,
   toggleFavoriteImage,
   toggleImagePublic,
-} from '../controllers/imageController.js'
-import userAuth from '../middlewares/auth.js'
-import validate from '../middlewares/validate.js';
+} from "../controllers/imageController.js";
+import userAuth from "../middlewares/auth.js";
+import validate from "../middlewares/validate.js";
 
-const imageRouter = express.Router()
+const imageRouter = express.Router();
 
 imageRouter.post(
   "/generate-image",
@@ -42,16 +44,35 @@ imageRouter.post(
   ],
   generateImage
 );
-imageRouter.get('/history', userAuth, getMyImages)
-/** Alias for gallery clients — same handler as /history, newest first for logged-in user only. */
-imageRouter.get('/my-images', userAuth, getMyImages)
-imageRouter.post('/cleanup-broken', userAuth, cleanupBrokenImages)
-imageRouter.delete('/:imageId', userAuth, deleteImage)
-imageRouter.patch('/:imageId/favorite', userAuth, toggleFavoriteImage)
-imageRouter.patch('/:imageId/visibility', userAuth, toggleImagePublic)
-imageRouter.get('/gallery/public', getPublicGallery)
-imageRouter.post('/gallery/:imageId/like', userAuth, likePublicImage)
-imageRouter.get('/prompt/styles', getPromptStyles)
-imageRouter.post('/prompt/enhance', userAuth, [body("prompt").isLength({ min: 3, max: 1000 }), validate], previewEnhancedPrompt)
 
-export default imageRouter
+imageRouter.post(
+  "/edit",
+  userAuth,
+  [
+    body("imageId").isMongoId(),
+    body("editPrompt").isLength({ min: 3, max: 1000 }),
+    validate,
+  ],
+  editImage
+);
+
+imageRouter.get(
+  "/thread/:imageId",
+  userAuth,
+  [param("imageId").isMongoId(), validate],
+  getImageThread
+);
+
+imageRouter.get("/history", userAuth, getMyImages);
+/** Alias for gallery clients — same handler as /history, newest first for logged-in user only. */
+imageRouter.get("/my-images", userAuth, getMyImages);
+imageRouter.post("/cleanup-broken", userAuth, cleanupBrokenImages);
+imageRouter.delete("/:imageId", userAuth, deleteImage);
+imageRouter.patch("/:imageId/favorite", userAuth, toggleFavoriteImage);
+imageRouter.patch("/:imageId/visibility", userAuth, toggleImagePublic);
+imageRouter.get("/gallery/public", getPublicGallery);
+imageRouter.post("/gallery/:imageId/like", userAuth, likePublicImage);
+imageRouter.get("/prompt/styles", getPromptStyles);
+imageRouter.post("/prompt/enhance", userAuth, [body("prompt").isLength({ min: 3, max: 1000 }), validate], previewEnhancedPrompt);
+
+export default imageRouter;

@@ -1,17 +1,25 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import ConfirmModal from "../components/ConfirmModal";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
+import GalleryThreadModal from "../components/GalleryThreadModal.jsx";
 import { resolveImageUrl } from "../config/api.js";
+import { groupGalleryItems, threadMatchesFavoriteFilter } from "../lib/groupGalleryThreads.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
   const [busyId, setBusyId] = useState(null);
-  const [lightbox, setLightbox] = useState(null);
+  const [threadBrowseId, setThreadBrowseId] = useState(null);
   const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
   const [view, setView] = useState("all"); // all | favorites
+
+  const groups = useMemo(() => groupGalleryItems(history), [history]);
+  const visibleGroups = useMemo(() => {
+    if (view === "favorites") return groups.filter(threadMatchesFavoriteFilter);
+    return groups;
+  }, [groups, view]);
 
   const run = async (id, fn) => {
     setBusyId(id);
@@ -54,14 +62,15 @@ export default function Gallery() {
   }
 
   const showSkeleton = historyStatus === "loading" && history.length === 0;
-  const list = view === "favorites" ? history.filter((x) => x.isFavorite) : history;
-  const showEmptyGrid = !showSkeleton && list.length === 0;
+  const showEmptyGrid = !showSkeleton && visibleGroups.length === 0;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-2 pb-24 pt-10 sm:px-4">
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">My gallery</h1>
-        <p className="mt-2 text-slate-600">Your generations live here. Heart what you want to find fast.</p>
+        <p className="mt-2 text-slate-600">
+          Your generations live here. Threads group each original with its free refinements.
+        </p>
         <Link
           to="/studio"
           className="mt-4 inline-block text-sm font-semibold text-brand-cyan underline-offset-4 hover:underline"
@@ -121,21 +130,30 @@ export default function Gallery() {
         </div>
       ) : (
         <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((item) => (
+          {visibleGroups.map((group) => (
             <li
-              key={item._id}
+              key={group.key}
               className="flex flex-col items-center gap-4 rounded-3xl border border-white/60 bg-white/50 p-4 shadow-lg backdrop-blur"
             >
               <div className="relative w-full max-w-[280px]">
-                <HistoryImageCard item={item} onOpen={setLightbox} showFavoritePip={false} />
+                {group.refinements > 0 ? (
+                  <span className="absolute left-3 top-3 z-10 rounded-full bg-slate-900/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow backdrop-blur-sm">
+                    {group.refinements} refinement{group.refinements === 1 ? "" : "s"}
+                  </span>
+                ) : null}
+                <HistoryImageCard
+                  item={group.latest}
+                  onOpen={() => setThreadBrowseId(String(group.latest._id))}
+                  showFavoritePip={false}
+                />
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleFavorite(item);
+                    toggleFavorite(group.latest);
                   }}
-                  className={`absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white/15 text-xl shadow backdrop-blur transition active:scale-95 ${
-                    item.isFavorite
+                  className={`absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white/15 text-xl shadow backdrop-blur transition active:scale-95 ${
+                    group.latest.isFavorite
                       ? "border-red-400/80 text-red-500"
                       : "border-white/40 text-white/90 hover:bg-white/20"
                   }`}
@@ -146,19 +164,27 @@ export default function Gallery() {
                 </button>
               </div>
 
+              <button
+                type="button"
+                onClick={() => setThreadBrowseId(String(group.latest._id))}
+                className="w-full max-w-[280px] rounded-full border border-slate-200 bg-white/90 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/40"
+              >
+                View thread
+              </button>
+
               <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
                 <a
-                  href={resolveImageUrl(item.imageUrl)}
-                  download={`pixorify-${item._id}.png`}
+                  href={resolveImageUrl(group.latest.imageUrl)}
+                  download={`pixorify-${group.latest._id}.png`}
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
                 >
                   Download
                 </a>
                 <button
                   type="button"
-                  disabled={busyId === item._id}
+                  disabled={busyId === group.latest._id}
                   className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800"
-                  onClick={() => setPendingDeleteItem(item)}
+                  onClick={() => setPendingDeleteItem(group.latest)}
                 >
                   Delete
                 </button>
@@ -183,31 +209,12 @@ export default function Gallery() {
         }}
       />
 
-      {lightbox ? (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-        >
-          <button type="button" className="absolute inset-0" aria-label="Close" onClick={() => setLightbox(null)} />
-          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-3xl border border-white/20 bg-slate-900 shadow-2xl">
-            <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
-            <div className="p-5 text-left text-sm text-white/90">
-              <p className="font-medium text-white">{lightbox.promptRaw}</p>
-              <p className="mt-2 text-xs text-white/60">
-                {new Date(lightbox.createdAt).toLocaleString()} · Style: {lightbox.style} · Pixorify
-              </p>
-              <button
-                type="button"
-                onClick={() => setLightbox(null)}
-                className="mt-4 w-full rounded-xl bg-white/10 py-2 text-sm font-semibold text-white"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <GalleryThreadModal
+        open={Boolean(threadBrowseId)}
+        imageId={threadBrowseId}
+        api={api}
+        onClose={() => setThreadBrowseId(null)}
+      />
     </div>
   );
 }

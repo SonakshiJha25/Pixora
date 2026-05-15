@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 
 /**
@@ -64,38 +65,27 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
           </svg>
         </div>
         <h2 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-900">
-          Oops — you're all out for today!
+          Oops — you&apos;re all out for today!
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          You've used up your daily image credits. Your pool refills at the next calendar{" "}
+          You&apos;ve used up your daily image credits. Your pool refills at the next calendar{" "}
           <strong>{tzPhrase}</strong> (00:00).
         </p>
         <div className="mt-5 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-cyan-100">
           You get <span className="font-bold text-slate-900">100 credits</span> per day.
           Each image costs <span className="font-bold text-slate-900">10 credits</span> —
-          that's <span className="font-bold text-slate-900">10 free images</span> daily.
+          that&apos;s <span className="font-bold text-slate-900">10 free images</span> daily.
         </div>
-        <button
-          type="button"
+        <Link
+          to="/pricing"
           onClick={onClose}
           className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-sky px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-105"
         >
           Upgrade
-        </button>
-        <div className="mt-3 flex flex-col items-center gap-1.5">
-          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">or</span>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stay curious till tomorrow — close"
-            className="inline-flex items-center gap-1 text-xs text-slate-500 underline decoration-slate-400 underline-offset-4 transition hover:text-slate-700 hover:decoration-slate-500"
-          >
-            <span>Stay curious till tomorrow ✨</span>
-            <span className="font-normal text-slate-900" aria-hidden="true">
-              →
-            </span>
-          </button>
-        </div>
+        </Link>
+        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+          Stay curious. More inspiration arrives tomorrow ✨
+        </p>
       </motion.div>
     </div>
   );

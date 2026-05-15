@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 /**
- * Gallery row persisted in MongoDB. Core fields for URL-based persistence:
- * `userId`, `imageUrl`, `prompt`, and `createdAt` (via timestamps).
+ * Gallery row: URLs and metadata only (no binary payloads).
+ * Thread: `threadRootId` groups refinements; `parentImageId` links each edit to its source.
  */
 const imageSchema = new mongoose.Schema(
   {
@@ -23,12 +23,29 @@ const imageSchema = new mongoose.Schema(
     viewsCount: { type: Number, default: 0, min: 0 },
     deletedAt: { type: Date, default: null },
     provider: { type: String, default: "mock" },
+    parentImageId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Image",
+      default: null,
+      index: true,
+    },
+    threadRootId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Image",
+      default: null,
+      index: true,
+    },
+    isEdit: { type: Boolean, default: false },
+    /** User instruction for this refinement (edits only). */
+    editPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
+    /** Root generation prompt for the whole thread (copied on each edit). */
+    originalPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
   },
   { timestamps: true }
 );
 
 imageSchema.virtual("promptRaw").get(function () {
-  return this.prompt;
+  return this.isEdit && this.editPrompt ? this.editPrompt : this.prompt;
 });
 
 imageSchema.set("toJSON", {
@@ -41,6 +58,7 @@ imageSchema.set("toJSON", {
 
 imageSchema.index({ userId: 1, createdAt: -1 });
 imageSchema.index({ isPublic: 1, createdAt: -1 });
+imageSchema.index({ userId: 1, threadRootId: 1, createdAt: 1 });
 
 const Image = mongoose.models.Image || mongoose.model("Image", imageSchema);
 

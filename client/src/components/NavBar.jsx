@@ -8,7 +8,6 @@ import { Zap } from "lucide-react";
 import {
   CREDITS_PER_IMAGE,
   DAILY_CREDITS_LIMIT,
-  formatCreditsLeftLabel,
   generationsRemaining,
   normalizeCreditsPoints,
 } from "../lib/credits.js";
@@ -19,13 +18,16 @@ function CreditsEnergyBadge({ points, zapSizeClassName, numberClassName }) {
   const zapCls = zapSizeClassName ?? "size-3 shrink-0 sm:size-3.5";
   const numCls = numberClassName ?? "font-bold text-slate-900";
   return (
-    <span className="inline-flex items-center gap-0.5 leading-none sm:gap-1">
+    <span className="inline-flex items-center gap-0.5 leading-none sm:gap-1.5">
       <Zap
         className={`${zapCls} fill-brand-cyan/20 stroke-brand-cyan`}
         aria-hidden="true"
         strokeWidth={2}
       />
       <span className={`tabular-nums tracking-tight ${numCls}`.trim()}>{pts}</span>
+      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-slate-600 sm:text-[11px]">
+        Credits
+      </span>
     </span>
   );
 }
@@ -119,8 +121,8 @@ export default function NavBar() {
             <button
               type="button"
               className="inline-flex flex-col items-center gap-px rounded-full border border-slate-200 bg-gradient-to-r from-sky-50 to-cyan-50 px-2 py-1 text-[11px] shadow-sm ring-1 ring-cyan-100/70 transition hover:brightness-[1.03] hover:ring-brand-cyan/35 sm:gap-0.5 sm:px-3 sm:text-xs"
-              title={`${formatCreditsLeftLabel(credit)} · refills at midnight IST`}
-              aria-label={`${formatCreditsLeftLabel(credit)}, opens account menu`}
+              title={`${normalizeCreditsPoints(credit)} credits · refills at midnight IST`}
+              aria-label={`${normalizeCreditsPoints(credit)} credits, opens account menu`}
               onClick={() => setProfileOpen(true)}
             >
               <CreditsEnergyBadge points={credit} />

@@ -1,18 +1,12 @@
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
-import crypto from "crypto";
 import axios from "axios";
 import FormData from "form-data";
+import crypto from "crypto";
 import AppError from "../utils/appError.js";
-import { isCloudinaryConfigured, uploadGeneratedImage } from "./cloudinaryService.js";
-import { logError, logInfo, logWarn } from "../utils/logger.js";
+import { logInfo } from "../utils/logger.js";
+import { persistImageBuffer } from "./imageStorageService.js";
 
 const CLIPDROP_ENDPOINT = "https://clipdrop-api.co/text-to-image/v1";
 const MAX_PROMPT_LEN = 1000;
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
 
 function buildClipDropPrompt({ prompt, promptEnhanced }) {
   const base = (promptEnhanced || prompt || "").trim();
@@ -52,28 +46,8 @@ async function fetchClipDropBuffer(text, apiKey) {
   }
 }
 
-async function saveLocallyAsFallback(buffer, filename) {
-  await fs.mkdir(GENERATED_DIR, { recursive: true });
-  const filepath = path.join(GENERATED_DIR, filename);
-  await fs.writeFile(filepath, buffer);
-  return `/generated/${filename}`;
-}
-
 /**
- * Calls ClipDrop text-to-image and persists the result.
- *
- * Storage strategy:
- *   - If Cloudinary env vars are configured, upload there and return the
- *     secure_url. This is the production path — Cloudinary persists across
- *     Render redeploys, whereas Render's filesystem does not.
- *   - Otherwise fall back to writing under server/public/generated for local
- *     dev. This URL will not survive a redeploy on ephemeral hosts.
- *
- * The Image.imageUrl column is now expected to hold either a full https URL
- * (Cloudinary) or a relative /generated/... path (local fallback). The
- * absoluteImageUrl helper in utils/imageUrl.js handles both transparently.
- *
- * In NODE_ENV=production, Cloudinary must be configured (or upload must succeed).
+ * Calls ClipDrop text-to-image and persists the result (Cloudinary or local).
  */
 export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   const apiKey = process.env.CLIPDROP_API?.trim();
@@ -89,36 +63,7 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   }
 
   const baseName = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
-  const isProd = process.env.NODE_ENV === "production";
-
-  if (isCloudinaryConfigured()) {
-    try {
-      const cloudUrl = await uploadGeneratedImage(buffer, { publicId: baseName });
-      logInfo(`Cloudinary upload completed (asset: ${baseName})`);
-      return cloudUrl;
-    } catch (err) {
-      logError("Cloudinary upload failed", err);
-      if (isProd) {
-        throw new AppError(
-          `Image storage failed (Cloudinary): ${err.message}`,
-          502,
-          "STORAGE_UPLOAD_FAILED"
-        );
-      }
-    }
-  } else if (isProd) {
-    throw new AppError(
-      "Image storage is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.",
-      500,
-      "STORAGE_NOT_CONFIGURED"
-    );
-  } else {
-    logWarn(
-      "Cloudinary not configured (set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET). Saving to local disk only (development)."
-    );
-  }
-
-  const relativeUrl = await saveLocallyAsFallback(buffer, `${baseName}.png`);
-  logInfo(`Image stored locally (${baseName}.png, dev fallback)`);
-  return relativeUrl;
+  const url = await persistImageBuffer(buffer, { publicId: baseName });
+  logInfo(`ClipDrop image persisted (${baseName})`);
+  return url;
 }

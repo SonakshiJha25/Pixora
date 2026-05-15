@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getNextIstMidnightUtcMs } from "../services/dailyCreditsService.js";
+import { getNextIstMidnightUtcMs, snapCreditsToLedger } from "../services/dailyCreditsService.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,6 +27,13 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre("save", function creditsLedgerPreSave(next) {
+  if (this.isModified("credits")) {
+    this.credits = snapCreditsToLedger(this.credits);
+  }
+  next();
+});
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 

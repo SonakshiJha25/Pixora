@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Mic } from "lucide-react";
+import { ArrowDown, Mic } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
@@ -8,6 +8,7 @@ import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import LimitReachedModal from "../components/LimitReachedModal";
+import RefineImagePanel from "../components/RefineImagePanel.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
@@ -44,8 +45,22 @@ export default function Studio() {
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
   const [limitModal, setLimitModal] = useState({ open: false, dailyResetTimezone: null });
+  /** Refinement chain for current session (oldest → newest); API returns absolute imageUrl where applicable */
+  const [refinementThread, setRefinementThread] = useState([]);
+  const [refinePanelOpen, setRefinePanelOpen] = useState(false);
+  const [refineSubmitting, setRefineSubmitting] = useState(false);
 
   const recognitionRef = useRef(null);
+
+  const sortedThread = useMemo(
+    () =>
+      [...refinementThread].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      ),
+    [refinementThread]
+  );
+
+  const latestThreadImageId = sortedThread.at(-1)?._id;
   const autoStopTimerRef = useRef(null);
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
@@ -165,16 +180,14 @@ export default function Studio() {
       });
 
       if (!response.success) {
-        toast.error(response?.error?.message || response.message || "Generation failed");
+        toast.error("Couldn't generate image. Please try again.");
         return;
       }
 
-      const previewSrc = resolveImageUrl(
-        response.resultImage ?? response.imageUrl ?? response.image?.imageUrl
-      );
       const credits = response.credits ?? response.creditBalance ?? response.remainingCredits;
 
-      setImage(previewSrc);
+      setImage(resolveImageUrl(response.image?.imageUrl ?? response.resultImage ?? response.imageUrl));
+      setRefinementThread([response.image]);
       if (credits !== undefined && credits !== null) {
         setCredit(normalizeCreditsPoints(credits));
       }
@@ -191,11 +204,6 @@ export default function Studio() {
       toast.success("Image generated successfully");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
-      const message =
-        error?.response?.data?.error?.message ||
-        error?.response?.data?.message ||
-        error?.message ||
-        "Generation failed";
 
       if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
         const err = error?.response?.data?.error;
@@ -208,12 +216,47 @@ export default function Studio() {
           "We couldn't reach Pixorify from this page — try refreshing, or opening the link your host gave you."
         );
       } else {
-        toast.error(message);
+        toast.error("Couldn't generate image. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
+
+  const applyRefinement = async (editPrompt) => {
+    if (!latestThreadImageId) {
+      toast.error("Something went wrong. Please try again.");
+      return;
+    }
+    try {
+      setRefineSubmitting(true);
+      const { data } = await api.post("/api/images/edit", {
+        imageId: latestThreadImageId,
+        editPrompt,
+      });
+      if (!data?.success || !data?.image) {
+        toast.error("Couldn't apply that edit right now.");
+        return;
+      }
+      const nextImg = data.image;
+      setRefinementThread((prev) =>
+        [...prev, nextImg].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      );
+      setImage(resolveImageUrl(nextImg.imageUrl));
+      await fetchHistory();
+      setRefinePanelOpen(false);
+      toast.success("Refinement saved");
+    } catch {
+      toast.error("Couldn't apply that edit right now.");
+    } finally {
+      setRefineSubmitting(false);
+    }
+  };
+
+  const downloadHref =
+    sortedThread.length > 0
+      ? resolveImageUrl(sortedThread[sortedThread.length - 1]?.imageUrl)
+      : image;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-2 pb-24 pt-8 sm:px-4">
@@ -246,41 +289,100 @@ export default function Studio() {
         transition={{ duration: 0.5 }}
       >
         <div className="relative mx-auto flex w-full flex-col items-center justify-center px-1">
-          {isImageLoaded && image ? (
+          {isImageLoaded && sortedThread.length > 0 ? (
             <>
-              <div className="glass relative inline-block w-fit overflow-hidden rounded-3xl p-2 shadow-glow">
-                <img
-                  src={image}
-                  alt="Preview"
-                  className="block max-h-[min(52vh,520px)] w-auto max-w-[min(92vw,520px)] rounded-2xl object-contain"
-                />
-                {loading ? (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/35 backdrop-blur-sm">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-brand-cyan" />
-                  </div>
-                ) : null}
+              <div className="flex w-full max-w-xl flex-col items-center gap-1">
+                {sortedThread.map((slot, idx) => {
+                  const isLatest = idx === sortedThread.length - 1;
+                  return (
+                    <div key={String(slot._id)} className="flex w-full flex-col items-center">
+                      {idx > 0 ? (
+                        <div
+                          className="flex justify-center py-2 text-brand-cyan/90"
+                          aria-hidden
+                        >
+                          <ArrowDown className="h-5 w-5" strokeWidth={2} />
+                        </div>
+                      ) : null}
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className={`glass relative inline-block w-full max-w-fit overflow-hidden rounded-3xl p-2 shadow-glow ${
+                          isLatest ? "ring-2 ring-brand-cyan/45" : "opacity-[0.92]"
+                        }`}
+                      >
+                        <img
+                          src={resolveImageUrl(slot.imageUrl)}
+                          alt=""
+                          className={`block w-auto rounded-2xl object-contain ${
+                            isLatest
+                              ? "max-h-[min(52vh,520px)] max-w-[min(92vw,520px)]"
+                              : "max-h-[min(30vh,300px)] max-w-[min(88vw,420px)] mx-auto"
+                          }`}
+                        />
+                        {(loading || refineSubmitting) && isLatest ? (
+                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/35 backdrop-blur-sm">
+                            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-brand-cyan" />
+                          </div>
+                        ) : null}
+                      </motion.div>
+                      <p className="mt-2 max-w-md px-2 text-center text-xs leading-relaxed text-slate-600">
+                        <span className="font-semibold text-slate-800">
+                          {idx === 0 ? "Original" : `Edit ${idx}`}:
+                        </span>{" "}
+                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 220)}
+                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 220
+                          ? "…"
+                          : ""}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mt-12 flex w-full max-w-lg flex-col items-center gap-10 px-2">
-                <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
+                <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
                   <button
                     type="button"
                     className="btn-primary rounded-full px-8 py-3 text-center text-sm font-semibold shadow-md transition hover:opacity-95"
+                    disabled={loading || refineSubmitting}
                     onClick={() => {
                       setIsImageLoaded(false);
                       setInput("");
                       setImage(null);
+                      setRefinementThread([]);
+                      setRefinePanelOpen(false);
                     }}
                   >
                     Generate another
                   </button>
                   <a
-                    href={image}
+                    href={downloadHref || "#"}
                     download="pixorify-image.png"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-center text-sm font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/50 hover:bg-slate-50"
+                    className={`inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3 text-center text-sm font-semibold text-slate-800 shadow-sm transition hover:border-brand-cyan/50 hover:bg-slate-50 ${
+                      !downloadHref ? "pointer-events-none opacity-40" : ""
+                    }`}
                   >
                     Download
                   </a>
+                  <button
+                    type="button"
+                    disabled={loading || refineSubmitting}
+                    onClick={() => setRefinePanelOpen(true)}
+                    className="inline-flex items-center justify-center rounded-full border border-brand-cyan/40 bg-gradient-to-r from-sky-50 to-cyan-50 px-8 py-3 text-center text-sm font-semibold text-slate-900 shadow-sm transition hover:brightness-[1.02]"
+                  >
+                    Refine image
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loading || refineSubmitting}
+                    onClick={() => setRefinePanelOpen(true)}
+                    className="inline-flex items-center justify-center rounded-full border border-transparent px-8 py-2 text-center text-sm font-semibold text-brand-cyan underline-offset-4 hover:underline disabled:opacity-50"
+                  >
+                    Continue refining
+                  </button>
                 </div>
 
                 <div className="w-full border-t border-slate-200/80 pt-10 text-center">
@@ -472,6 +574,14 @@ export default function Studio() {
           </div>
         </div>
       ) : null}
+
+      <RefineImagePanel
+        open={refinePanelOpen}
+        previewSrc={downloadHref}
+        onClose={() => !refineSubmitting && setRefinePanelOpen(false)}
+        onApply={applyRefinement}
+        submitting={refineSubmitting}
+      />
 
       <LimitReachedModal
         open={limitModal.open}
