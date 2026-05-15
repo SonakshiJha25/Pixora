@@ -2,7 +2,8 @@ import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 
-export default function HomeHelpSection() {
+/** Support message form (posted to feedback API — same behaviour as legacy home Help block). */
+export default function HelpContactForm({ id }) {
   const { api } = useContext(AppContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function HomeHelpSection() {
       setLoading(true);
       const { data } = await api.post("/api/feedback", { message: composed });
       if (data.success) {
-        toast.success("Feedback submitted successfully");
+        toast.success("Thanks — we got your message.");
         setName("");
         setEmail("");
         setMessage("");
@@ -45,10 +46,12 @@ export default function HomeHelpSection() {
   };
 
   return (
-    <section id="help" className="mx-auto w-full max-w-3xl scroll-mt-24 py-20">
-      <h2 className="text-center text-2xl font-extrabold text-slate-900 sm:text-3xl">Help</h2>
-      <p className="mt-2 text-center text-sm text-slate-600">Quick form — we’ll read every message.</p>
-      <form onSubmit={submit} className="glass mx-auto mt-8 rounded-3xl p-6 text-left sm:p-8">
+    <section id={id} className="scroll-mt-24">
+      <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">Contact us</h2>
+      <p className="mt-1 text-sm text-slate-600">
+        Questions, bugs, or ideas — we read every message.
+      </p>
+      <form onSubmit={submit} className="glass mx-auto mt-6 rounded-3xl p-6 text-left sm:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-semibold text-slate-700">Name</span>
@@ -78,8 +81,8 @@ export default function HomeHelpSection() {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="min-h-[120px] w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-cyan/60"
-            placeholder="What do you need?"
+            className="min-h-[140px] w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-cyan/60"
+            placeholder="What do you need help with?"
             required
             disabled={loading}
           />
@@ -89,7 +92,7 @@ export default function HomeHelpSection() {
           disabled={loading}
           className="btn-primary mt-6 w-full rounded-2xl py-3 text-sm font-semibold disabled:opacity-60"
         >
-          {loading ? "Sending…" : "Send"}
+          {loading ? "Sending…" : "Send message"}
         </button>
       </form>
     </section>

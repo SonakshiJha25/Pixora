@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import Home from "./pages/Home";
+import Help from "./pages/Help";
 import BuyCredits from "./pages/BuyCredits";
 import ComingSoon from "./pages/ComingSoon";
 import Studio from "./pages/Studio";
@@ -29,6 +30,7 @@ const App = () => {
         <main className={`flex flex-1 flex-col ${isHome ? "" : "items-center"}`}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/help" element={<Help />} />
             <Route path="/studio" element={<Studio />} />
             <Route path="/result" element={<Studio />} />
             <Route path="/gallery" element={<Gallery />} />

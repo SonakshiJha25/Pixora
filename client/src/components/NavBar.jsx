@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import CreditsResetCountdown from "./CreditsResetCountdown.jsx";
@@ -31,18 +31,9 @@ function CreditsNavbarBadge({ points, zapSizeClassName, numberClassName }) {
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
 
-const scrollToHelp = (navigate, pathname) => {
-  if (pathname === "/") {
-    document.getElementById("help")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  } else {
-    navigate({ pathname: "/", hash: "help" });
-  }
-};
-
 export default function NavBar() {
   const { user, setShowLogin, credit, logout } = useContext(AppContext);
   const navigate = useNavigate();
-  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -101,15 +92,9 @@ export default function NavBar() {
               </NavLink>
             </>
           ) : null}
-          <button
-            type="button"
-            className="nav-link"
-            onClick={() => {
-              scrollToHelp(navigate, location.pathname);
-            }}
-          >
+          <NavLink to="/help" className={linkClass}>
             Help
-          </button>
+          </NavLink>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -267,16 +252,9 @@ export default function NavBar() {
                 </button>
               </>
             ) : null}
-            <button
-              type="button"
-              className="nav-link text-left"
-              onClick={() => {
-                scrollToHelp(navigate, location.pathname);
-                closeMobile();
-              }}
-            >
+            <NavLink to="/help" className={linkClass} onClick={closeMobile}>
               Help
-            </button>
+            </NavLink>
           </div>
         </div>
       ) : null}

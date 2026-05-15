@@ -3,14 +3,6 @@ import { assets } from "../assets/assets";
 import { SITE } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
-const goHelp = (navigate, pathname) => {
-  if (pathname === "/") {
-    document.getElementById("help")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  } else {
-    navigate({ pathname: "/", hash: "help" });
-  }
-};
-
 export default function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -102,13 +94,9 @@ export default function Footer() {
               {SITE.helpEmail}
             </a>
             <span className="text-slate-300">·</span>
-            <button
-              type="button"
-              className="font-semibold text-slate-600 hover:text-brand-cyan"
-              onClick={() => goHelp(navigate, location.pathname)}
-            >
+            <Link className="font-semibold text-slate-600 hover:text-brand-cyan" to="/help">
               Help
-            </button>
+            </Link>
             <span className="text-slate-300">·</span>
             <Link className="font-semibold text-slate-600 hover:text-brand-cyan" to="/gallery">
               Gallery

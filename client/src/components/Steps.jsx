@@ -39,6 +39,12 @@ export default function Steps() {
       >
         Open studio — sign in when you're ready to generate
       </Link>
+      <p className="mt-5 text-sm text-slate-600">
+        Questions about credits or refinements?{" "}
+        <Link to="/help" className="font-semibold text-brand-cyan underline-offset-4 hover:underline">
+          Visit the help center
+        </Link>
+      </p>
     </motion.section>
   );
 }
