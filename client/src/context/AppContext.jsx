@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { getApiBase } from "../config/api.js";
 import { getToken } from "../utils/token.js";
@@ -94,6 +94,37 @@ const AppContextProvider = ({ children }) => {
       logout();
     }
   }, [api, logout]);
+
+  const scheduleRef = useRef(dailyCreditSchedule);
+  scheduleRef.current = dailyCreditSchedule;
+
+  /** Server applies daily refill when GET /api/user/credits runs after IST midnight — refresh ASAP (within a few seconds). */
+  const rolloverPrefetchRef = useRef({ iso: null, attempts: 0 });
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const tick = () => {
+      const iso = scheduleRef.current?.nextResetAtIso;
+      if (!iso || typeof iso !== "string") return;
+      const resetMs = Date.parse(iso);
+      if (!Number.isFinite(resetMs)) return;
+
+      const now = Date.now();
+      if (rolloverPrefetchRef.current.iso !== iso) {
+        rolloverPrefetchRef.current = { iso, attempts: 0 };
+      }
+      const st = rolloverPrefetchRef.current;
+      if (now >= resetMs && st.attempts < 5) {
+        st.attempts += 1;
+        fetchUserData();
+      }
+    };
+
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [token, fetchUserData]);
 
   const fetchHistory = useCallback(async (opts = {}) => {
     const silent = opts.silent === true;

@@ -35,7 +35,7 @@ const studioLinkClass = ({ isActive }) =>
   `nav-link-studio ${isActive ? "nav-link-studio-active" : ""}`.trim();
 
 export default function NavBar() {
-  const { user, setShowLogin, credit, logout, token } = useContext(AppContext);
+  const { user, setShowLogin, credit, logout, token, dailyCreditSchedule } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -149,6 +149,7 @@ export default function NavBar() {
               />
               <span className="hidden max-w-[5.75rem] truncate text-center sm:block">
                 <CreditsResetCountdown
+                  nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
                   showIstSuffix={false}
                   className={
                     isWorkspaceNav

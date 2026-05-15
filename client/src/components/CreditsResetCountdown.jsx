@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
 import { formatResetsInCountdown, getNextIstMidnightUtcMs } from "../lib/nextDailyReset.js";
 
-function computeLabel() {
+/** Use API `nextResetAt` when still in the future; if it is stale (midnight passed, refetch pending), show “Resets soon”. */
+function computeLabel(nextResetAtIso) {
+  const now = Date.now();
+  if (nextResetAtIso && typeof nextResetAtIso === "string") {
+    const parsed = Date.parse(nextResetAtIso);
+    if (Number.isFinite(parsed)) {
+      if (now < parsed) {
+        return formatResetsInCountdown(parsed - now);
+      }
+      return "Resets soon";
+    }
+  }
   const target = getNextIstMidnightUtcMs();
-  const diff = target - Date.now();
-  return formatResetsInCountdown(diff);
+  return formatResetsInCountdown(target - now);
 }
 
 /**
@@ -14,15 +24,16 @@ export default function CreditsResetCountdown({
   className = "",
   as: Tag = "span",
   showIstSuffix = true,
+  nextResetAtIso = null,
 }) {
-  const [label, setLabel] = useState(computeLabel);
+  const [label, setLabel] = useState(() => computeLabel(nextResetAtIso));
 
   useEffect(() => {
-    const tick = () => setLabel(computeLabel());
+    const tick = () => setLabel(computeLabel(nextResetAtIso));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [nextResetAtIso]);
 
   return (
     <Tag
