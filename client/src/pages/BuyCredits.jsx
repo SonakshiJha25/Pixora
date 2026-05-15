@@ -62,7 +62,7 @@ export default function BuyCredits() {
             <img
               src={assets.brandMark}
               alt=""
-              className="mx-auto mt-2 h-8 w-8 rounded-xl object-cover opacity-40 ring-1 ring-black/[0.08]"
+              className="mx-auto mt-2 h-8 w-8 rounded-xl object-cover opacity-40"
             />
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function BuyCredits() {
           <div className="p-4 text-center">
             <p className="type-tile-title mb-px">Pro</p>
             <p className="type-meta">$9 / mo (placeholder)</p>
-            <img src={assets.brandMark} alt="" className="mx-auto mt-2 h-8 w-8 rounded-xl object-cover ring-1 ring-black/[0.08]" />
+            <img src={assets.brandMark} alt="" className="mx-auto mt-2 h-8 w-8 rounded-xl object-cover" />
           </div>
         </div>
       </div>

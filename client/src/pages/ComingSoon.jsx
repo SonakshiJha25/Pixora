@@ -62,7 +62,7 @@ export default function ComingSoon() {
       <img
         src={assets.brandMark}
         alt="Pixorify"
-        className="h-14 w-14 rounded-2xl object-cover opacity-90 ring-1 ring-black/[0.1]"
+        className="h-14 w-14 rounded-2xl object-cover opacity-90"
       />
       <p className="type-eyebrow-brand mt-6">{SITE.name}</p>
       {variant ? (

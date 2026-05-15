@@ -372,7 +372,7 @@ export default function Studio() {
           transition={{ duration: 0.45 }}
           className="mb-6 flex flex-col items-center gap-3 text-center sm:mb-8 sm:flex-row sm:justify-center sm:gap-5"
         >
-          <div className="shrink-0 rounded-2xl bg-gradient-to-br from-cyan-400/55 via-fuchsia-500/45 to-violet-600/55 p-[2px] shadow-[0_12px_40px_-8px_rgba(236,72,153,0.35)]">
+          <div className="shrink-0 rounded-2xl">
             <img
               src={assets.brandMark}
               alt=""
