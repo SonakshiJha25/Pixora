@@ -27,8 +27,8 @@ const App = () => {
     <div className="min-h-screen overflow-x-hidden bg-mesh">
       <ToastContainer position="bottom-right" theme="colored" />
       <div
-        className={`mx-auto flex min-h-screen w-full flex-col px-4 sm:px-6 lg:px-8 ${
-          isStudioRoute ? "max-w-none" : "max-w-6xl"
+        className={`mx-auto flex min-h-screen w-full flex-col ${
+          isStudioRoute ? "max-w-none px-0" : "max-w-6xl px-4 sm:px-6 lg:px-8"
         }`}
       >
         <NavBar />
@@ -52,7 +52,7 @@ const App = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
-        <Footer />
+        {!isStudioRoute ? <Footer /> : null}
       </div>
     </div>
   );

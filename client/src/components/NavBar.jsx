@@ -62,8 +62,8 @@ export default function NavBar() {
   const avatarSrc = assets.avatarDefault;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/80 shadow-sm backdrop-blur-xl">
-      <div className="flex items-center justify-between gap-3 py-2.5">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/80 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1920px] items-center justify-between gap-3 px-4 py-2.5 sm:px-8 lg:px-12">
         <button
           type="button"
           className="flex min-w-0 cursor-pointer items-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
@@ -215,8 +215,8 @@ export default function NavBar() {
       </div>
 
       {menuOpen ? (
-        <div className="border-t border-slate-100 bg-white/98 px-2 py-3 shadow-inner md:hidden">
-          <div className="flex flex-col gap-1">
+        <div className="border-t border-slate-100 bg-white/98 py-3 shadow-inner md:hidden">
+          <div className="mx-auto flex max-w-[1920px] flex-col gap-1 px-4 sm:px-8 lg:px-12">
             <NavLink to="/" end className={linkClass} onClick={closeMobile}>
               Home
             </NavLink>

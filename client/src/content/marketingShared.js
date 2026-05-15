@@ -1,7 +1,7 @@
 import { CircleHelp, LayoutGrid, Sparkles, Wand2 } from "lucide-react";
 import { assets } from "../assets/assets";
 
-/** Same thumbnails everywhere (Help, Home, Studio cues). */
+/** Style strip on Home + Help (marketing context). Studio uses gradients + tiny chips instead. */
 export const MARKETING_STYLE_TILES = [
   { img: assets.style_realistic, label: "Realistic" },
   { img: assets.style_anime, label: "Anime" },
@@ -9,15 +9,6 @@ export const MARKETING_STYLE_TILES = [
   { img: assets.style_fantasy, label: "Fantasy" },
   { img: assets.style_minimal, label: "Minimal" },
 ];
-
-/** Style key → preview image (Studio picker). */
-export const STUDIO_STYLE_THUMB_BY_KEY = {
-  realistic: assets.style_realistic,
-  anime: assets.style_anime,
-  cyberpunk: assets.style_cyberpunk,
-  fantasy: assets.style_fantasy,
-  minimal: assets.style_minimal,
-};
 
 /** Home-only shortcuts (overlap with Help, tighter copy). */
 export const HOME_SHORTCUT_TILES = [

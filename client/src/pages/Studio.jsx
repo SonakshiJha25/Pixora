@@ -5,16 +5,23 @@ import { motion } from "motion/react";
 import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
-import StylePreviewCarousel from "../components/StylePreviewCarousel";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import LimitReachedModal from "../components/LimitReachedModal";
 import RefineImagePanel from "../components/RefineImagePanel.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
-import { STUDIO_STYLE_THUMB_BY_KEY } from "../content/marketingShared.js";
+import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES } from "../lib/site.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
+
+const STYLE_SHORT_LABEL = {
+  realistic: "Photo",
+  anime: "Anime",
+  cyberpunk: "Neon",
+  fantasy: "Fantasy",
+  minimal: "Clean",
+};
 
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
@@ -67,6 +74,13 @@ export default function Studio() {
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
 
   const styles = useMemo(() => ["realistic", "anime", "cyberpunk", "fantasy", "minimal"], []);
+
+  const activeStyleSample = useMemo(
+    () => STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === style),
+    [style]
+  );
+
+  const moodGrad = STUDIO_STYLE_MOODS[style] ?? STUDIO_STYLE_MOODS.realistic;
 
   const stopListening = useCallback(() => {
     clearTimeout(autoStopTimerRef.current);
@@ -275,21 +289,21 @@ export default function Studio() {
         aria-hidden
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-3 sm:px-5 lg:px-6">
+      <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-24">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-8 text-center sm:mb-10"
+          className="mb-7 text-center sm:mb-9"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/85">Workspace</p>
           <h1 className="mt-2.5 text-3xl font-bold tracking-tight text-white sm:text-4xl">Studio</h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-400 sm:text-[15px]">
-            Dim lights, louder focus — same Pixorify, just without the brochure voice. Pick a preview on the side, steer
-            the prompt centre stage.
+            Full-width layout, fewer stock photos. Tap a style hint below, write the scene, generate — your real output
+            shows up where the big frame is now.
             {!isSignedIn ? (
               <span className="mt-2 block border-t border-white/10 pt-3 text-slate-400">
-                You&apos;ll need to sign in to render. Credits refill at midnight IST.
+                Sign in to render. Credits refill at midnight IST.
               </span>
             ) : null}
           </p>
@@ -415,118 +429,133 @@ export default function Studio() {
               </div>
             </div>
           ) : (
-            <div className="grid w-full items-start gap-8 lg:grid-cols-12 lg:gap-x-10">
-              <div className="relative flex justify-center lg:col-span-7">
-                <div className="relative w-full max-w-[min(92vw,560px)]">
-                  <div className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-gradient-to-r from-cyan-500/10 via-transparent to-violet-500/10 blur-2xl" />
-                  <StylePreviewCarousel className="relative z-[1]" />
-                  {loading ? (
-                    <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center rounded-3xl bg-slate-950/45 backdrop-blur-sm">
-                      <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/25 border-t-brand-cyan" />
-                    </div>
-                  ) : null}
+            <div className="w-full space-y-7">
+              <div
+                className={`relative isolate min-h-[132px] overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br p-5 sm:min-h-[150px] sm:p-7 lg:aspect-[24/5] lg:min-h-0 ${moodGrad}`}
+              >
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_35%,rgba(255,255,255,0.09),transparent_50%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_92%_78%,rgba(34,211,238,0.08),transparent_45%)]" />
+                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:items-center">
+                  <div className="text-left">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">Idle canvas</p>
+                    <p className="mt-1.5 text-xl font-bold capitalize tracking-tight text-white sm:text-2xl">{style}</p>
+                  </div>
+                  <p className="max-w-2xl text-left text-[13px] leading-relaxed text-white/60 sm:text-sm lg:max-w-xl lg:text-right">
+                    {activeStyleSample?.caption ??
+                      "Colours shift with the style you pick — the big marketing stills stay on Home / Help."}
+                  </p>
                 </div>
               </div>
 
-              <div className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
-                <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Look</p>
-                <div className="grid grid-cols-5 gap-2 sm:gap-2.5">
-                  {styles.map((item) => {
-                    const thumb = STUDIO_STYLE_THUMB_BY_KEY[item];
-                    return (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => setStyle(item)}
-                        aria-pressed={style === item}
-                        className={`group relative overflow-hidden rounded-2xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/55 ${
-                          style === item
-                            ? "border-cyan-400/70 ring-2 ring-cyan-400/35"
-                            : "border-white/12 opacity-85 hover:border-white/25 hover:opacity-100"
-                        }`}
-                      >
-                        <img
-                          src={thumb}
-                          alt=""
-                          className="aspect-[5/6] h-auto w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                          draggable={false}
-                        />
-                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/82 to-transparent px-1 pb-1.5 pt-5 text-center text-[10px] font-semibold capitalize text-white">
-                          {item}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Prompt</p>
-                <div className="studio-shell rounded-[1.35rem] p-3 shadow-inner">
-                  <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
-                    <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2">
-                      <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        type="text"
-                        placeholder="Tokyo alley, drizzle, vending machine glow..."
-                        className="min-h-[48px] min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-[15px] text-slate-100 placeholder:text-slate-500 focus:border-cyan-400/35 focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={toggleVoiceInput}
-                        disabled={loading || !speechSupported}
-                        title={
-                          speechSupported
-                            ? isListening
-                              ? "Stop"
-                              : "Speak"
-                            : "Not available here"
-                        }
-                        aria-label={isListening ? "Stop voice input" : "Start voice input"}
-                        aria-pressed={isListening}
-                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:cursor-not-allowed disabled:opacity-40 ${
-                          isListening
-                            ? "scale-[1.02] animate-pulse border-red-400/65 bg-red-950/55 text-red-200"
-                            : "border-white/15 bg-white/[0.07] text-slate-300 hover:border-white/25 hover:bg-white/10"
-                        }`}
-                      >
-                        <Mic className="h-5 w-5" strokeWidth={2} aria-hidden />
-                      </button>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3"
-                    >
-                      {loading ? "Working…" : "Generate"}
-                    </button>
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
+                <div className="min-w-0 flex-1 lg:max-w-xl">
+                  <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Styles</p>
+                  <div className="flex flex-wrap gap-2 sm:gap-2.5">
+                    {styles.map((item) => {
+                      const thumb = STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === item)?.image;
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => setStyle(item)}
+                          aria-pressed={style === item}
+                          title={item}
+                          className={`group relative h-[3.25rem] w-[2.75rem] shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/55 sm:h-16 sm:w-[3.35rem] ${
+                            style === item
+                              ? "border-cyan-400/75 ring-2 ring-cyan-400/30"
+                              : "border-white/10 opacity-80 hover:border-white/25 hover:opacity-100"
+                          }`}
+                        >
+                          {thumb ? (
+                            <img
+                              src={thumb}
+                              alt=""
+                              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                              draggable={false}
+                            />
+                          ) : null}
+                          <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pb-0.5 pt-3 text-center text-[8px] font-semibold capitalize text-white sm:text-[9px]">
+                            {STYLE_SHORT_LABEL[item]}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                {!speechSupported ? (
-                  <p className="mt-2 text-center text-xs text-amber-200/85">Mic won&apos;t fly in this browser.</p>
-                ) : null}
-                {speechError ? (
-                  <p className="mt-2 text-center text-xs text-rose-300">{speechError}</p>
-                ) : null}
-                {isListening ? (
-                  <p className="mt-2 text-center text-xs font-medium text-cyan-200">
-                    Listening…
-                    {transcript ? (
-                      <span className="mt-1 block font-normal text-slate-400">&ldquo;{transcript}&rdquo;</span>
-                    ) : null}
+
+                <div className="min-w-0 flex-1 lg:pt-0">
+                  <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">Prompt</p>
+                  <div className="studio-shell rounded-[1.35rem] p-3 shadow-inner">
+                    <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2">
+                        <input
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          type="text"
+                          placeholder="Tokyo alley, drizzle, vending machine glow..."
+                          className="min-h-[48px] min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-[15px] text-slate-100 placeholder:text-slate-500 focus:border-cyan-400/35 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={toggleVoiceInput}
+                          disabled={loading || !speechSupported}
+                          title={
+                            speechSupported
+                              ? isListening
+                                ? "Stop"
+                                : "Speak"
+                              : "Not available here"
+                          }
+                          aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                          aria-pressed={isListening}
+                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:cursor-not-allowed disabled:opacity-40 ${
+                            isListening
+                              ? "scale-[1.02] animate-pulse border-red-400/65 bg-red-950/55 text-red-200"
+                              : "border-white/15 bg-white/[0.07] text-slate-300 hover:border-white/25 hover:bg-white/10"
+                          }`}
+                        >
+                          <Mic className="h-5 w-5" strokeWidth={2} aria-hidden />
+                        </button>
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3"
+                      >
+                        {loading ? "Working…" : "Generate"}
+                      </button>
+                    </div>
+                  </div>
+                  {!speechSupported ? (
+                    <p className="mt-2 text-center text-xs text-amber-200/85 sm:text-left">Mic won&apos;t fly in this browser.</p>
+                  ) : null}
+                  {speechError ? (
+                    <p className="mt-2 text-center text-xs text-rose-300 sm:text-left">{speechError}</p>
+                  ) : null}
+                  {isListening ? (
+                    <p className="mt-2 text-center text-xs font-medium text-cyan-200 sm:text-left">
+                      Listening…
+                      {transcript ? (
+                        <span className="mt-1 block font-normal text-slate-400">&ldquo;{transcript}&rdquo;</span>
+                      ) : null}
+                    </p>
+                  ) : null}
+                  <p className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-3 text-[13px] leading-relaxed text-slate-500">
+                    New renders use credits; nudges afterward go through{" "}
+                    <span className="font-semibold text-slate-400">Refine</span> on the same picture.{" "}
+                    <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
+                      How credits work
+                    </Link>
                   </p>
-                ) : null}
-                <p className="mt-4 border-t border-white/[0.08] pt-4 text-[13px] leading-relaxed text-slate-500">
-                  Heads-up: wholly new renders spend credits every time — little fixes on something you&apos;ve already
-                  made tap <span className="font-semibold text-slate-300">Refine</span> afterward.
-                  <Link
-                    to="/help"
-                    className="mt-3 block font-semibold text-cyan-300 underline-offset-4 hover:underline"
-                  >
-                    Numbers on Help
-                  </Link>
-                  .
-                </p>
+                </div>
               </div>
+
+              {loading ? (
+                <div className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-4 text-sm text-slate-400">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-brand-cyan" />
+                  Generating…
+                </div>
+              ) : null}
             </div>
           )}
         </motion.form>
@@ -554,7 +583,7 @@ export default function Studio() {
           </div>
         </div>
         {historyStatus === "loading" && history.length === 0 ? (
-          <GalleryGridSkeleton className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" count={8} />
+          <GalleryGridSkeleton className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" count={8} />
         ) : history.length === 0 ? (
           <div className="rounded-[1.25rem] border border-dashed border-white/15 bg-white/[0.03] py-12 text-center text-sm text-slate-400 backdrop-blur-sm">
             {!isSignedIn ? (
@@ -575,7 +604,7 @@ export default function Studio() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {history.slice(0, 12).map((item) => (
               <HistoryImageCard key={item._id} item={item} onOpen={setLightbox} />
             ))}

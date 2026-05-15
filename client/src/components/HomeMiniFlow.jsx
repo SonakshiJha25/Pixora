@@ -141,13 +141,13 @@ export default function HomeMiniFlow() {
             <motion.div
               key={tile.label}
               whileHover={{ y: -2 }}
-              className="relative shrink-0 overflow-hidden rounded-2xl border border-white shadow-md ring-1 ring-slate-200/70"
+              className="relative shrink-0 overflow-hidden rounded-xl border border-slate-200/80 shadow-sm ring-1 ring-slate-100/80"
               title={tile.label}
             >
               <img
                 src={tile.img}
                 alt=""
-                className="h-[72px] w-[94px] object-cover sm:h-[78px] sm:w-[106px]"
+                className="h-[52px] w-[68px] object-cover opacity-[0.92] saturate-[0.88] sm:h-[58px] sm:w-[78px]"
                 draggable={false}
               />
               <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/82 to-transparent px-1 pb-1.5 pt-5 text-center text-[10px] font-semibold text-white">

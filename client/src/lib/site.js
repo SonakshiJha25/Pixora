@@ -12,8 +12,8 @@ export const SITE = {
 };
 
 /**
- * Studio placeholder: real photos illustrating each look (not “AI” promo art).
- * Shown before the first generation in the same layout size as the preview area.
+ * Studio placeholder samples (captions, optional image references).
+ * Carousel-style previews are intentionally avoided in Studio UI — use MOODS for idle state.
  */
 export const STUDIO_STYLE_SAMPLES = [
   {
@@ -42,6 +42,15 @@ export const STUDIO_STYLE_SAMPLES = [
     image: assets.style_minimal,
   },
 ];
+
+/** Subtle idle-state gradients in Studio (no big shared marketing PNGs). */
+export const STUDIO_STYLE_MOODS = {
+  realistic: "from-slate-600/35 via-slate-950/95 to-[#020510]",
+  anime: "from-rose-500/20 via-indigo-950/90 to-[#0a0614]",
+  cyberpunk: "from-cyan-500/20 via-fuchsia-950/45 to-[#03080f]",
+  fantasy: "from-amber-400/12 via-emerald-950/35 to-[#040b0e]",
+  minimal: "from-slate-400/15 via-slate-900/95 to-[#060608]",
+};
 
 /** Home hero: what Pixorify offers (product-focused copy). */
 export const HERO_SLIDES = [
