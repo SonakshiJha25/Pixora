@@ -30,26 +30,32 @@ export default function Header() {
         className="mx-auto flex flex-col items-center"
       >
         <div className="relative">
-          <img
-            src={assets.brandMark}
-            alt="Pixorify"
-            className="h-36 w-36 rounded-[1.65rem] bg-slate-50 object-cover sm:h-44 sm:w-44"
-            loading="eager"
-            decoding="async"
-            draggable={false}
+          <div
+            className="absolute -inset-3 rounded-[2.25rem] bg-gradient-to-tr from-cyan-400/35 via-violet-500/25 to-fuchsia-500/40 blur-2xl"
+            aria-hidden
           />
+          <div className="relative rounded-[1.85rem] bg-gradient-to-br from-cyan-400/90 via-fuchsia-500/75 to-violet-600/85 p-[3px] shadow-[0_20px_50px_-12px_rgba(236,72,153,0.35)]">
+            <img
+              src={assets.brandMark}
+              alt="Pixorify"
+              className="h-36 w-36 rounded-[1.65rem] bg-slate-950 object-cover sm:h-44 sm:w-44"
+              loading="eager"
+              decoding="async"
+              draggable={false}
+            />
+          </div>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.08 }}
-          className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-4 py-1.5 font-display text-[11px] font-semibold uppercase tracking-widest text-slate-600 shadow-sm sm:text-xs"
+          className="type-hero-chip mt-5 inline-flex items-center gap-2 rounded-full border border-fuchsia-200/60 bg-white/85 px-4 py-1.5 shadow-sm"
         >
           <button
             type="button"
             onClick={goHomeTop}
-            className="rounded-full transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+            className="type-hero-chip rounded-full transition hover:text-brand-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/60"
           >
             Pixorify
           </button>
@@ -94,7 +100,7 @@ export default function Header() {
         <button
           type="button"
           onClick={goStudio}
-          className="inline-flex rounded-full bg-slate-900 px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+          className="btn-primary rounded-full px-8 py-2.5 text-sm font-semibold"
         >
           Open {WORKSPACE_NAME}
         </button>
@@ -121,14 +127,16 @@ export default function Header() {
           </div>
 
           <div className="shrink-0 sm:pl-2">
-            <img
-              src={assets.brandMark}
-              alt=""
-              className="h-[156px] w-[156px] rounded-[1.35rem] bg-slate-50 object-cover sm:h-[176px] sm:w-[176px]"
-              loading="lazy"
-              decoding="async"
-              draggable={false}
-            />
+            <div className="rounded-3xl bg-gradient-to-br from-cyan-400/25 via-fuchsia-400/20 to-violet-500/30 p-[2px] shadow-lg shadow-fuchsia-500/10">
+              <img
+                src={assets.brandMark}
+                alt=""
+                className="h-[156px] w-[156px] rounded-[1.35rem] object-cover sm:h-[176px] sm:w-[176px]"
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+              />
+            </div>
           </div>
         </div>
       </motion.div>

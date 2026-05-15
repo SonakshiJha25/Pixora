@@ -143,17 +143,22 @@ export default function HomeMiniFlow() {
               key={tile.label}
               to={`/studio?style=${encodeURIComponent(tile.studioStyle)}`}
               title={`Open ${WORKSPACE_NAME} with ${tile.label} selected`}
-              className="group relative shrink-0 overflow-hidden rounded-xl border border-slate-200/80 shadow-sm ring-1 ring-slate-100/80 transition hover:-translate-y-0.5 hover:border-slate-300/90 hover:shadow-md hover:ring-2 hover:ring-cyan-400/30"
+              className="block shrink-0"
             >
-              <img
-                src={tile.img}
-                alt=""
-                className="h-[44px] w-[58px] object-cover opacity-[0.92] saturate-[0.88] transition duration-300 group-hover:scale-[1.06] group-hover:brightness-105 group-hover:saturate-100 sm:h-[50px] sm:w-[68px]"
-                draggable={false}
-              />
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/82 to-transparent px-1 pb-1 pt-4 text-center text-[9px] font-semibold text-white">
-                {tile.label}
-              </span>
+              <motion.div
+                whileHover={{ y: -2 }}
+                className="relative overflow-hidden rounded-xl border border-slate-200/80 shadow-sm ring-1 ring-slate-100/80"
+              >
+                <img
+                  src={tile.img}
+                  alt=""
+                  className="h-[44px] w-[58px] object-cover opacity-[0.92] saturate-[0.88] sm:h-[50px] sm:w-[68px]"
+                  draggable={false}
+                />
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/82 to-transparent px-1 pb-1 pt-4 text-center text-[9px] font-semibold text-white">
+                  {tile.label}
+                </span>
+              </motion.div>
             </Link>
           ))}
         </div>
