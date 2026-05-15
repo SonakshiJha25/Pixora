@@ -22,8 +22,8 @@ export default function HistoryImageCard({ item, onOpen, showFavoritePip = true,
   const isWs = surface === "workspace";
 
   const tileClass = isWs
-    ? "group relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950/50 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.85)] shadow-black/70 ring-1 ring-white/[0.04] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-400/30 hover:shadow-[0_20px_56px_-24px_rgba(6,182,212,0.22),0_0_0_1px_rgba(34,211,238,0.12)] hover:ring-cyan-400/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
-    : "group relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-2xl border border-white/40 bg-slate-100 shadow-lg ring-1 ring-slate-900/5 transition duration-200 hover:-translate-y-0.5 hover:shadow-2xl hover:ring-brand-cyan/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan";
+    ? "group relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-2xl border border-white/[0.09] bg-slate-950/50 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.85)] shadow-black/70 ring-1 ring-white/[0.04] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-cyan-400/35 hover:shadow-[0_24px_56px_-24px_rgba(6,182,212,0.26),0_0_0_1px_rgba(34,211,238,0.14)] hover:ring-cyan-400/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+    : "group relative aspect-square w-full max-w-[280px] mx-auto overflow-hidden rounded-2xl border border-white/40 bg-slate-100 shadow-lg ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:scale-[1.015] hover:shadow-2xl hover:ring-brand-cyan/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan";
 
   return (
     <button
@@ -52,16 +52,29 @@ export default function HistoryImageCard({ item, onOpen, showFavoritePip = true,
           </p>
         </div>
       ) : (
-        <img
-          src={src}
-          alt={item.promptRaw || "Generated image"}
-          className={`h-full w-full object-cover transition duration-500 ease-out md:duration-400 ${
-            hover ? "scale-[1.04] brightness-[1.03]" : "scale-100"
-          }`}
-          loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
-        />
+        <>
+          {isWs ? (
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] flex items-start justify-between gap-2 bg-gradient-to-b from-slate-950/88 via-slate-950/35 to-transparent px-2 pb-10 pt-2">
+              <p className="min-w-0 flex-1 truncate text-left text-[10px] font-semibold leading-tight text-white/95">
+                {(item.promptRaw || item.prompt || "").slice(0, 72)}
+                {(item.promptRaw || item.prompt || "").length > 72 ? "…" : ""}
+              </p>
+              <span className="shrink-0 rounded-full bg-white/12 px-2 py-0.5 text-[9px] font-bold capitalize tracking-wide text-cyan-100 ring-1 ring-white/15">
+                {item.style || "Frame"}
+              </span>
+            </div>
+          ) : null}
+          <img
+            src={src}
+            alt={item.promptRaw || "Generated image"}
+            className={`h-full w-full object-cover transition duration-500 ease-out md:duration-400 ${
+              hover ? "scale-[1.07] brightness-[1.05]" : "scale-100"
+            }`}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailed(true)}
+          />
+        </>
       )}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-3 text-left text-white md:hidden">
         <p className="line-clamp-1 text-[11px] font-medium text-white/95">{item.promptRaw || "Image"}</p>

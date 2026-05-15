@@ -148,16 +148,17 @@ export default function Gallery() {
         ) : showEmptyGrid ? (
           <div className="rounded-[1.85rem] border border-dashed border-white/12 bg-white/[0.03] px-6 py-12 text-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
             {historyStatus === "error" && history.length === 0 ? (
-              <div className="mx-auto max-w-sm">
-                <p className="text-sm leading-snug text-slate-400">
-                  Can&apos;t load gallery — your work is safe.
+              <div className="mx-auto max-w-sm px-2">
+                <p className="font-display text-base font-semibold text-slate-200">Gallery is taking a breath</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                  We couldn&apos;t load your threads — nothing was deleted on the server.
                 </p>
                 <button
                   type="button"
                   onClick={() => fetchHistory()}
-                  className="mt-5 text-sm font-semibold text-cyan-300 underline-offset-4 hover:underline"
+                  className="mx-auto mt-6 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white"
                 >
-                  Refresh
+                  Try again
                 </button>
               </div>
             ) : view === "favorites" ? (
@@ -173,12 +174,16 @@ export default function Gallery() {
                 {" "}· ♥ a cover
               </p>
             ) : (
-              <p className="mx-auto max-w-sm text-sm leading-snug text-slate-400">
-                Empty — {" "}
-                <Link className="font-medium text-cyan-300 underline-offset-4 hover:underline" to="/studio">
-                  {WORKSPACE_NAME}
-                </Link>
-              </p>
+              <>
+                <p className="font-display text-base font-semibold text-slate-200">Your gallery is ready for its first piece</p>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-slate-400">
+                  Create in{" "}
+                  <Link className="font-semibold text-cyan-300 underline-offset-4 hover:underline" to="/studio">
+                    {WORKSPACE_NAME}
+                  </Link>{" "}
+                  — threads and favourites show up here automatically.
+                </p>
+              </>
             )}
           </div>
         ) : (
@@ -210,7 +215,7 @@ export default function Gallery() {
                       e.stopPropagation();
                       toggleFavorite(group.latest);
                     }}
-                    className={`absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
+                    className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
                       group.latest.isFavorite
                         ? "border-cyan-400/45 bg-slate-950/75 text-cyan-300"
                         : "border-white/15 bg-slate-950/55 text-slate-300 hover:border-cyan-400/35 hover:bg-slate-900/65 hover:text-white"

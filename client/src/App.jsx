@@ -30,7 +30,7 @@ const App = () => {
 
   return (
     <div
-      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-500 ease-out ${
+      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isDarkWorkspace ? "bg-studio-app" : "bg-mesh"
       }`}
     >
@@ -50,10 +50,13 @@ const App = () => {
           }`}
         >
           <motion.div
-            key={isDarkWorkspace ? "workspace" : "marketing"}
-            initial={{ opacity: 0.92, scale: 0.998 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            key={isStudioRoute ? "workspace-studio" : isDarkWorkspace ? "workspace-gallery" : "marketing"}
+            initial={{ opacity: 0.88, y: isStudioRoute ? 12 : 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: isStudioRoute ? 0.52 : isDarkWorkspace ? 0.42 : 0.36,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="flex flex-1 flex-col"
           >
             <Routes>

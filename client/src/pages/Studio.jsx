@@ -24,6 +24,13 @@ const STYLE_SHORT_LABEL = {
   minimal: "Clean",
 };
 
+const GENERATION_STAGE_HINTS = [
+  "Analyzing prompt…",
+  "Shaping composition…",
+  "Painting light & color…",
+  "Finishing details…",
+];
+
 function getSpeechRecognitionCtor() {
   if (typeof window === "undefined") return null;
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -109,6 +116,7 @@ export default function Studio() {
   const [refinementThread, setRefinementThread] = useState([]);
   const [refinePanelOpen, setRefinePanelOpen] = useState(false);
   const [refineSubmitting, setRefineSubmitting] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
 
   const recognitionRef = useRef(null);
 
@@ -160,6 +168,17 @@ export default function Studio() {
   useEffect(() => {
     return () => stopListening();
   }, [stopListening]);
+
+  useEffect(() => {
+    if (!loading && !refineSubmitting) {
+      setLoadingStage(0);
+      return undefined;
+    }
+    const id = window.setInterval(() => {
+      setLoadingStage((n) => (n + 1) % GENERATION_STAGE_HINTS.length);
+    }, 2400);
+    return () => window.clearInterval(id);
+  }, [loading, refineSubmitting]);
 
   const toggleVoiceInput = () => {
     const Ctor = getSpeechRecognitionCtor();
@@ -278,7 +297,7 @@ export default function Studio() {
       }
       await fetchHistory();
       await fetchUserData();
-      toast.success("Here you go — check the preview above.");
+      toast.success("Saved — your frame is above. Refine, download, or open Gallery.");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
 
@@ -331,7 +350,7 @@ export default function Studio() {
           "Clipdrop didn't return a new render — we saved a linked copy of your frame. Check API quota or try a simpler edit."
         );
       } else {
-        toast.success("Refinement added — newest frame is on top.");
+        toast.success("Refined — newest version is on top of the thread.");
       }
     } catch (error) {
       toast.error(refinementToastFromApiError(error));
@@ -436,13 +455,17 @@ export default function Studio() {
                           }`}
                         />
                         {(loading || refineSubmitting) && isLatest ? (
-                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/55 backdrop-blur-[2px]">
+                          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-slate-950/55 backdrop-blur-[2px]">
                             <motion.div
                               initial={{ opacity: 0.85, scale: 0.96 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ duration: 0.35, ease: "easeOut" }}
+                              className="flex flex-col items-center px-4"
                             >
                               <StudioOrbitSpinner sizeClass="h-14 w-14 sm:h-[4.25rem] sm:w-[4.25rem]" />
+                              <p className="mt-3 max-w-[14rem] text-center text-[11px] font-medium leading-snug tracking-tight text-cyan-50/95 sm:text-xs">
+                                {GENERATION_STAGE_HINTS[loadingStage]}
+                              </p>
                             </motion.div>
                           </div>
                         ) : null}
@@ -640,10 +663,15 @@ export default function Studio() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="studio-glow mx-auto flex max-w-md items-center justify-center gap-4 rounded-2xl border border-cyan-400/28 bg-slate-950/55 px-6 py-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+                  className="studio-glow mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-cyan-400/28 bg-slate-950/55 px-6 py-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:flex-row sm:gap-5"
                 >
                   <StudioOrbitSpinner />
-                  <p className="text-xs font-semibold tracking-tight text-cyan-50 sm:text-sm">Generating…</p>
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs font-semibold tracking-tight text-cyan-50 sm:text-sm">Generating</p>
+                    <p className="mt-1 max-w-[12rem] text-[11px] font-medium leading-snug text-cyan-100/85 sm:max-w-none sm:text-xs">
+                      {GENERATION_STAGE_HINTS[loadingStage]}
+                    </p>
+                  </div>
                 </motion.div>
               ) : null}
             </div>
@@ -685,12 +713,13 @@ export default function Studio() {
             {!isSignedIn ? (
               "Sign in · recent runs land here."
             ) : historyStatus === "error" ? (
-              <span className="block">
-                <span className="text-slate-300">Couldn&apos;t fetch history.</span>
+              <span className="mx-auto block max-w-sm">
+                <span className="font-medium text-slate-300">Your recent work isn&apos;t loading right now.</span>
+                <span className="mt-2 block text-slate-500">That&apos;s usually a blip — your gallery still has anything already saved.</span>
                 <button
                   type="button"
                   onClick={() => fetchHistory()}
-                  className="mt-3 block w-full text-center text-sm font-semibold text-cyan-300 hover:underline"
+                  className="mx-auto mt-4 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/35 hover:text-white"
                 >
                   Try again
                 </button>

@@ -13,21 +13,6 @@ import {
 } from "../lib/credits.js";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
-/** Matches product copy: ⚡ NN left — `credit` is canonical points after normalizeCreditsPoints. */
-function CreditsNavbarBadge({ points, zapSizeClassName, numberClassName, metaClassName }) {
-  const pts = normalizeCreditsPoints(points);
-  const zapCls = zapSizeClassName ?? "size-3 shrink-0 sm:size-3.5";
-  const numCls = numberClassName ?? "font-bold text-slate-900";
-  const metaCls = metaClassName ?? "text-[10px] font-semibold lowercase text-slate-600 sm:text-xs";
-  return (
-    <span className="inline-flex items-center gap-0.5 leading-none sm:gap-1">
-      <Zap className={`${zapCls} fill-brand-cyan/20 stroke-brand-cyan`} aria-hidden strokeWidth={2} />
-      <span className={`tabular-nums tracking-tight ${numCls}`.trim()}>{pts}</span>
-      <span className={`whitespace-nowrap ${metaCls}`}>left</span>
-    </span>
-  );
-}
-
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
 
@@ -134,29 +119,50 @@ export default function NavBar() {
                   ? "inline-flex flex-col items-center gap-px rounded-full border border-white/12 bg-gradient-to-r from-slate-900/90 to-slate-800/70 px-2 py-1 text-[11px] shadow-none ring-1 ring-white/10 transition hover:ring-cyan-400/35 sm:gap-0.5 sm:px-3 sm:text-xs"
                   : "inline-flex flex-col items-center gap-px rounded-full border border-slate-200 bg-gradient-to-r from-sky-50 to-cyan-50 px-2 py-1 text-[11px] shadow-sm ring-1 ring-cyan-100/70 transition hover:brightness-[1.03] hover:ring-brand-cyan/35 sm:gap-0.5 sm:px-3 sm:text-xs"
               }
-              title={`⚡ ${normalizeCreditsPoints(credit)} left · refills at midnight IST`}
-              aria-label={`${normalizeCreditsPoints(credit)} credits left, opens account menu`}
+              title={`${normalizeCreditsPoints(credit)} credits · pool refills at midnight IST`}
+              aria-label={`${normalizeCreditsPoints(credit)} credits — tap for account`}
               onClick={() => setProfileOpen(true)}
             >
-              <CreditsNavbarBadge
-                points={credit}
-                numberClassName={isWorkspaceNav ? "font-bold text-slate-100" : undefined}
-                metaClassName={
-                  isWorkspaceNav
-                    ? "text-[9px] font-semibold lowercase text-slate-500 sm:text-[10px]"
-                    : undefined
-                }
-              />
-              <span className="hidden max-w-[5.75rem] truncate text-center sm:block">
-                <CreditsResetCountdown
-                  nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
-                  showIstSuffix={false}
-                  className={
+              <span className="inline-flex items-start gap-1.5">
+                <Zap
+                  className={`mt-0.5 size-3.5 shrink-0 stroke-[2] sm:size-4 ${
                     isWorkspaceNav
-                      ? "text-[9px] font-semibold leading-tight text-slate-500"
-                      : "text-[9px] font-semibold leading-tight text-slate-600"
-                  }
+                      ? "fill-cyan-400/15 stroke-cyan-300/90"
+                      : "fill-brand-cyan/20 stroke-brand-cyan"
+                  }`}
+                  aria-hidden
                 />
+                <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
+                  <span
+                    className={`flex flex-wrap items-baseline gap-x-1 leading-none ${
+                      isWorkspaceNav ? "text-slate-100" : "text-slate-900"
+                    }`}
+                  >
+                    <span className="text-[13px] font-bold tabular-nums sm:text-sm">
+                      {normalizeCreditsPoints(credit)}
+                    </span>
+                    <span
+                      className={`text-[9px] font-semibold uppercase tracking-wide ${
+                        isWorkspaceNav ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
+                      credits
+                    </span>
+                  </span>
+                  <span
+                    className={`max-w-[6.85rem] truncate text-[8.5px] font-medium leading-tight sm:max-w-[7.25rem] sm:text-[9px] ${
+                      isWorkspaceNav ? "text-slate-500" : "text-slate-600"
+                    }`}
+                  >
+                    <span className="opacity-75">Daily · </span>
+                    <CreditsResetCountdown
+                      nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
+                      showIstSuffix={false}
+                      as="span"
+                      className="inline"
+                    />
+                  </span>
+                </span>
               </span>
             </button>
           ) : null}
