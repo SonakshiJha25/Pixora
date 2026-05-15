@@ -62,22 +62,26 @@ const journey = [
     n: "1",
     title: "Make an account",
     body: "Sign in to generate, track credits, and sync your gallery.",
-    chip: "~1 minute",
-    img: assets.sample_img_1,
+    img: assets.brandMark,
+    bannerClass:
+      "bg-gradient-to-br from-[#140828] via-violet-950/80 to-slate-900 ring-1 ring-inset ring-white/10",
+    imgClass: "object-contain object-center p-5 sm:p-6",
   },
   {
     n: "2",
     title: `Work in ${WORKSPACE_NAME}`,
-    body: `Choose a style, write the scene, generate — usually ~15s.`,
-    chip: "~15 s",
-    img: assets.sample_img_2,
+    body: `Choose a style, describe the scene clearly, and generate your first image.`,
+    img: assets.style_realistic,
+    bannerClass: "bg-gradient-to-br from-sky-50/95 to-slate-100/90 ring-1 ring-inset ring-slate-200/60",
+    imgClass: "object-cover object-[center_40%]",
   },
   {
     n: "3",
     title: "Refine without spending credits",
     body: "Refine tweaks the current frame on the same thread — not a new credit charge.",
-    chip: "Included",
-    img: assets.star_group,
+    img: assets.home_mascot,
+    bannerClass: "bg-gradient-to-br from-cyan-50/90 to-violet-50/70 ring-1 ring-inset ring-white/60",
+    imgClass: "object-cover object-[center_22%]",
   },
 ];
 
@@ -326,13 +330,16 @@ export default function Help() {
               transition={{ delay: 0.06 * i }}
               className="flex flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/85 bg-white/88 shadow-[0_22px_50px_-32px_rgba(15,23,42,0.45)]"
             >
-              <div className="relative h-[7.5rem] overflow-hidden sm:h-[8.5rem]">
-                <img src={step.img} alt="" className="h-full w-full object-cover" />
+              <div
+                className={`relative h-[7.5rem] overflow-hidden sm:h-[8.5rem] ${step.bannerClass ?? "bg-slate-100"}`}
+              >
+                <img
+                  src={step.img}
+                  alt=""
+                  className={`h-full w-full ${step.imgClass ?? "object-cover object-center"}`}
+                />
                 <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-[13px] font-black text-white ring-4 ring-white/90">
                   {step.n}
-                </span>
-                <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-900 shadow backdrop-blur">
-                  {step.chip}
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-4">
