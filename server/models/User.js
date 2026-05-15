@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { getNextIstMidnightUtcMs } from "../services/dailyCreditsService.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,13 +13,17 @@ const userSchema = new mongoose.Schema(
       maxlength: 254,
     },
     password: { type: String, required: true, select: false },
+    /** Daily pool in points; valid values 0, 10, …, 100 (see dailyCreditsService). */
     credits: { type: Number, required: true, default: 100, min: 0 },
-    creditBalance: { type: Number, min: 0 },
-    /** IST calendar date (YYYY-MM-DD) when credits were last reset to the daily pool */
-    lastCreditResetDate: { type: String, default: null, trim: true },
-    dailyCreditResetAt: { type: Date, default: null },
+    /** UTC instant when credits reset to the daily pool (next IST midnight boundary). */
+    nextCreditResetAt: {
+      type: Date,
+      required: true,
+      default() {
+        return new Date(getNextIstMidnightUtcMs(Date.now()));
+      },
+    },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    picture: { type: String, default: null },
   },
   { timestamps: true }
 );

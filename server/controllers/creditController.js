@@ -3,7 +3,6 @@ import AppError from "../utils/appError.js";
 import {
   getDailyCreditLimit,
   getCreditsPerImage,
-  getNextResetAt,
   getCreditsResetTimezoneLabel,
 } from "../services/dailyCreditsService.js";
 import { useCreditsAtomic } from "../services/creditService.js";
@@ -13,9 +12,12 @@ const sanitizeUser = (user) => ({
   id: user._id,
   name: user.name,
   email: user.email,
-  picture: user.picture || null,
   role: user.role,
+  credits: user.credits,
   creditBalance: user.credits,
+  nextCreditResetAt: user.nextCreditResetAt
+    ? user.nextCreditResetAt.toISOString()
+    : null,
 });
 
 export const getCredits = asyncHandler(async (req, res) => {
@@ -24,26 +26,31 @@ export const getCredits = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
+  const nextResetAt = user.nextCreditResetAt
+    ? user.nextCreditResetAt.toISOString()
+    : null;
+
   return res.status(200).json({
     success: true,
     credits: user.credits,
     remainingCredits: user.credits,
     dailyLimit: getDailyCreditLimit(),
     creditsPerImage: getCreditsPerImage(),
-    nextResetAt: getNextResetAt(),
+    nextResetAt,
     dailyResetTimezone: getCreditsResetTimezoneLabel(),
     user: sanitizeUser(user),
   });
 });
 
 export const useCredits = asyncHandler(async (req, res) => {
-  const raw = req.body.amount;
-  let amount = 1;
+  const cost = getCreditsPerImage();
+  const raw = req.body?.amount;
+  let amount = cost;
   if (raw !== undefined && raw !== null && raw !== "") {
     amount = Number(raw);
   }
-  if (!Number.isInteger(amount) || amount < 1) {
-    throw new AppError("amount must be a positive integer", 400, "VALIDATION_ERROR");
+  if (!Number.isInteger(amount) || amount !== cost) {
+    throw new AppError(`amount must be exactly ${cost}`, 400, "VALIDATION_ERROR");
   }
 
   const remaining = await useCreditsAtomic({ userId: req.user.id, amount });

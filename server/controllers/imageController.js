@@ -25,15 +25,19 @@ export const generateImage = asyncHandler(async (req, res) => {
     provider: "clipdrop",
   });
 
+  const serialized = serializeImage(image, req);
+
   logInfo(
     `Image generated: ${userEmail} style=${style || "realistic"} imageId=${String(image._id)}`
   );
 
+  return res.status(200).json({
     success: true,
     message: "Image generated",
     creditBalance: remainingCredits,
-    imageUrl: serialized.imageUrl,
+    credits: remainingCredits,
     remainingCredits,
+    imageUrl: serialized.imageUrl,
     resultImage: serialized.imageUrl,
     image: serialized,
   });
@@ -54,6 +58,13 @@ export const getMyImages = asyncHandler(async (req, res) => {
     Image.countDocuments({ userId, deletedAt: null }),
   ]);
 
+  const payload = images.map((img) => serializeImage(img, req));
+
+  logInfo(
+    `Gallery fetch: user=…${String(userId).slice(-8)} page=${page} batch=${payload.length} total=${total}`
+  );
+
+  return res.status(200).json({
     success: true,
     images: payload,
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },

@@ -70,7 +70,7 @@ export default function NavBar() {
     setTimeout(() => scrollPageTop(true), 280);
   };
 
-  const avatarSrc = user?.picture || assets.avatarDefault;
+  const avatarSrc = assets.avatarDefault;
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/80 shadow-sm backdrop-blur-xl">

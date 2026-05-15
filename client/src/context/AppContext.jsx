@@ -72,8 +72,8 @@ const AppContextProvider = ({ children }) => {
       const raw =
         data?.credits ??
         data?.remainingCredits ??
-        data?.user?.creditBalance ??
         data?.user?.credits ??
+        data?.user?.creditBalance ??
         0;
       const pts = normalizeCreditsPoints(raw);
       const u = data?.user ?? null;
@@ -82,6 +82,9 @@ const AppContextProvider = ({ children }) => {
       const nextApi = data?.nextResetAt;
       const nextIso =
         (typeof nextApi === "string" && nextApi.trim() !== "" ? nextApi.trim() : null) ??
+        (typeof u?.nextCreditResetAt === "string" && u.nextCreditResetAt.trim() !== ""
+          ? u.nextCreditResetAt.trim()
+          : null) ??
         getNextCalendarBoundaryIso();
       setDailyCreditSchedule({
         timezone: data?.dailyResetTimezone ?? "IST",

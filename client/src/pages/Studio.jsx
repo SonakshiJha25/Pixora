@@ -172,7 +172,7 @@ export default function Studio() {
       const previewSrc = resolveImageUrl(
         response.resultImage ?? response.imageUrl ?? response.image?.imageUrl
       );
-      const credits = response.creditBalance ?? response.remainingCredits;
+      const credits = response.credits ?? response.creditBalance ?? response.remainingCredits;
 
       setImage(previewSrc);
       if (credits !== undefined && credits !== null) {

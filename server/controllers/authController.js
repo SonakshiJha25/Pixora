@@ -8,9 +8,12 @@ const sanitizeUser = (user) => ({
   id: user._id,
   name: user.name,
   email: user.email,
-  picture: user.picture || null,
   role: user.role,
+  credits: user.credits,
   creditBalance: user.credits,
+  nextCreditResetAt: user.nextCreditResetAt
+    ? user.nextCreditResetAt.toISOString()
+    : null,
 });
 
 export const registerUser = asyncHandler(async (req, res) => {
