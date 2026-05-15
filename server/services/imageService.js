@@ -6,6 +6,7 @@ import axios from "axios";
 import FormData from "form-data";
 import AppError from "../utils/appError.js";
 import { isCloudinaryConfigured, uploadGeneratedImage } from "./cloudinaryService.js";
+import { logError, logInfo, logWarn } from "../utils/logger.js";
 
 const CLIPDROP_ENDPOINT = "https://clipdrop-api.co/text-to-image/v1";
 const MAX_PROMPT_LEN = 1000;
@@ -93,10 +94,10 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
   if (isCloudinaryConfigured()) {
     try {
       const cloudUrl = await uploadGeneratedImage(buffer, { publicId: baseName });
-      console.log("Generated image uploaded to Cloudinary:", cloudUrl);
+      logInfo(`Cloudinary upload completed (asset: ${baseName})`);
       return cloudUrl;
     } catch (err) {
-      console.error("Cloudinary upload failed:", err.message);
+      logError("Cloudinary upload failed", err);
       if (isProd) {
         throw new AppError(
           `Image storage failed (Cloudinary): ${err.message}`,
@@ -112,13 +113,12 @@ export async function resolveGeneratedImageUrl({ prompt, promptEnhanced }) {
       "STORAGE_NOT_CONFIGURED"
     );
   } else {
-    console.warn(
-      "Cloudinary not configured (set CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET). " +
-        "Saving to local disk — ok for development only."
+    logWarn(
+      "Cloudinary not configured (set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET). Saving to local disk only (development)."
     );
   }
 
   const relativeUrl = await saveLocallyAsFallback(buffer, `${baseName}.png`);
-  console.log("Generated image stored at:", relativeUrl);
+  logInfo(`Image stored locally (${baseName}.png, dev fallback)`);
   return relativeUrl;
 }

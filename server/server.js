@@ -18,9 +18,10 @@ import userRouter from "./routes/userRoutes.js";
 import imageRouter from "./routes/imageRoutes.js";
 import feedbackRouter from "./routes/feedbackRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
+import { logError, logInfo } from "./utils/logger.js";
 
 if (!process.env.JWT_SECRET?.trim()) {
-  console.error("JWT_SECRET is missing — set it in server/.env");
+  logError("Server startup aborted: JWT_SECRET is not set (configure server/.env)");
   process.exit(1);
 }
 
@@ -57,7 +58,7 @@ app.use(
   })
 );
 app.use(helmet());
-app.use(morgan("dev"));
+app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
 app.set("trust proxy", 1);
 
 const generationLimiter = rateLimit({
@@ -125,7 +126,7 @@ app.get("/pixora-runtime.js", (_req, res) => {
 const clientDist = path.join(__dirname, "..", "client", "dist");
 
 if (fs.existsSync(clientDist)) {
-  console.log("[server] Serving SPA from", clientDist);
+  logInfo(`Serving SPA static files from built client (${clientDist})`);
   app.use(express.static(clientDist));
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -156,16 +157,18 @@ app.use(errorHandler);
 
 async function startServer() {
   try {
+    logInfo("Pixorify API startup: initializing MongoDB connection");
     await connectDB();
 
     const PORT = process.env.PORT || 4000;
 
     app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
+      logInfo(
+        `Server listening on port ${PORT} (${process.env.NODE_ENV === "production" ? "production" : "development"})`
+      );
     });
   } catch (error) {
-    console.error("Server startup failed:");
-    console.error(error);
+    logError("Server startup failed", error);
     process.exit(1);
   }
 }

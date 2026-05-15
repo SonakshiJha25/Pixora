@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+/**
+ * Gallery row persisted in MongoDB. Core fields for URL-based persistence:
+ * `userId`, `imageUrl`, `prompt`, and `createdAt` (via timestamps).
+ */
 const imageSchema = new mongoose.Schema(
   {
     userId: {

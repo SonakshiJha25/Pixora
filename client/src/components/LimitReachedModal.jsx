@@ -7,10 +7,9 @@ import { motion } from "motion/react";
  * Props:
  *   open                 - boolean
  *   onClose              - () => void
- *   resetAt              - ISO date string of when the daily limit refreshes (optional)
  *   dailyResetTimezone   - label from API, e.g. "IST", "UTC", or another zone id (optional)
  */
-export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTimezone }) {
+export default function LimitReachedModal({ open, onClose, dailyResetTimezone }) {
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
@@ -21,24 +20,12 @@ export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTi
 
   if (!open) return null;
 
-  let untilLabel = "tomorrow";
-  if (resetAt) {
-    try {
-      const t = new Date(resetAt);
-      untilLabel = t.toLocaleString(undefined, {
-        weekday: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      untilLabel = "tomorrow";
-    }
-  }
-
-  const tzSuffix =
-    dailyResetTimezone && dailyResetTimezone !== "UTC"
-      ? `${dailyResetTimezone} calendar day`
-      : "UTC calendar day";
+  const tzPhrase =
+    dailyResetTimezone === "UTC" || dailyResetTimezone === "Etc/UTC"
+      ? "midnight UTC"
+      : dailyResetTimezone
+        ? `midnight (${dailyResetTimezone})`
+        : "midnight (IST)";
 
   return (
     <div
@@ -80,8 +67,8 @@ export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTi
           Oops — you're all out for today!
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          You've used up your daily image credits. Your pool rolls over at the next{" "}
-          {tzSuffix} boundary — around <strong>{untilLabel}</strong> on your device.
+          You've used up your daily image credits. Your pool refills at the next calendar{" "}
+          <strong>{tzPhrase}</strong> (00:00).
         </p>
         <div className="mt-5 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-cyan-100">
           You get <span className="font-bold text-slate-900">100 credits</span> per day.
@@ -93,8 +80,22 @@ export default function LimitReachedModal({ open, onClose, resetAt, dailyResetTi
           onClick={onClose}
           className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-sky px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-105"
         >
-          See you tomorrow!
+          Upgrade
         </button>
+        <div className="mt-3 flex flex-col items-center gap-1.5">
+          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">or</span>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Stay curious till tomorrow — close"
+            className="inline-flex items-center gap-1 text-xs text-slate-500 underline decoration-slate-400 underline-offset-4 transition hover:text-slate-700 hover:decoration-slate-500"
+          >
+            <span>Stay curious till tomorrow ✨</span>
+            <span className="font-normal text-slate-900" aria-hidden="true">
+              →
+            </span>
+          </button>
+        </div>
       </motion.div>
     </div>
   );

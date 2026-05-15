@@ -1,11 +1,12 @@
 import { getNextResetAt, getCreditsResetTimezoneLabel } from "../services/dailyCreditsService.js";
+import { logError } from "../utils/logger.js";
 
 const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const code = err.code || "INTERNAL_SERVER_ERROR";
 
   if (statusCode >= 500) {
-    console.error("[ERROR]", err);
+    logError(`HTTP ${statusCode} ${req.method} ${req.originalUrl} (${code})`, err);
   }
 
   const errorPayload = {

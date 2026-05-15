@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
+import { normalizeCreditsPoints } from '../lib/credits.js'
 import { motion } from 'motion/react'
 import { toast } from 'react-toastify'
 
 const Login = () => {
 
     const [state, setState] = useState('Login')
-    const {setShowLogin, setToken, api} = useContext(AppContext)
+    const {setShowLogin, setToken, setUser, setCredit, api} = useContext(AppContext)
     const navigate = useNavigate()
 
     const [name, setName] = useState('')
@@ -41,6 +42,17 @@ const Login = () => {
 
             if (response.data.success) {
                 const token = response.data.token || response.token;
+                const srvUser = response.data.user;
+                if (srvUser) {
+                    const raw =
+                        srvUser.creditBalance ?? srvUser.credits ?? 0;
+                    const pts = normalizeCreditsPoints(raw);
+                    setUser({
+                        ...srvUser,
+                        creditBalance: pts,
+                    });
+                    setCredit(pts);
+                }
                 localStorage.setItem("token", token);
                 setToken(token);
                 setShowLogin(false);

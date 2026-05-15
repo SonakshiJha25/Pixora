@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import Image from "../models/Image.js";
 import AppError from "../utils/appError.js";
 import { ensureDailyCredits, getCreditsPerImage } from "./dailyCreditsService.js";
+import { logInfo } from "../utils/logger.js";
 
 export async function deductCreditAndSaveImage({
   userId,
@@ -53,8 +54,7 @@ export async function deductCreditAndSaveImage({
       { session }
     );
 
-    await session.commitTransaction();
-    return { image, remainingCredits: user.credits };
+    return { image, remainingCredits: user.credits, userEmail: user.email };
   } catch (err) {
     await session.abortTransaction();
     throw err;
@@ -78,6 +78,7 @@ export async function useCreditsAtomic({ userId, amount = 1 }) {
     user.credits -= amount;
     await user.save({ session });
     await session.commitTransaction();
+    logInfo(`Credits deducted: ${amount} (user: ${user.email}, remaining balance: ${user.credits})`);
     return user.credits;
   } catch (err) {
     await session.abortTransaction();

@@ -1,34 +1,25 @@
-import { useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import ConfirmModal from "../components/ConfirmModal";
+import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import { resolveImageUrl } from "../config/api.js";
 
 export default function Gallery() {
-  const { token, setShowLogin, api, fetchHistory, history, setHistory } = useContext(AppContext);
+  const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
   const [busyId, setBusyId] = useState(null);
   const [lightbox, setLightbox] = useState(null);
   const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
   const [view, setView] = useState("all"); // all | favorites
-
-  useEffect(() => {
-    if (!token) {
-      setShowLogin(true);
-      return;
-    }
-    fetchHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once when token exists
-  }, [token]);
 
   const run = async (id, fn) => {
     setBusyId(id);
     try {
       await fn();
       await fetchHistory();
-    } catch (e) {
-      toast.error(e?.response?.data?.error?.message || e.message);
+    } catch {
+      await fetchHistory({ silent: true });
     } finally {
       setBusyId(null);
     }
@@ -38,12 +29,9 @@ export default function Gallery() {
     const id = item._id;
     const next = !item.isFavorite;
     setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: next } : x)));
-    api
-      .patch(`/api/image/${id}/favorite`)
-      .catch((e) => {
-        setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: !next } : x)));
-        toast.error(e?.response?.data?.error?.message || e.message);
-      });
+    api.patch(`/api/image/${id}/favorite`).catch(() => {
+      setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: !next } : x)));
+    });
   };
 
   if (!token) {
@@ -51,12 +39,23 @@ export default function Gallery() {
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-4 text-center">
         <h1 className="text-2xl font-bold text-slate-900">My gallery</h1>
         <p className="mt-2 text-slate-600">Sign in to view and manage your images.</p>
-        <Link to="/" className="btn-primary mt-6 rounded-full px-8 py-3 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => setShowLogin(true)}
+          className="btn-primary mt-6 rounded-full px-8 py-3 text-sm font-semibold"
+        >
+          Sign in
+        </button>
+        <Link to="/" className="mt-3 text-sm font-medium text-slate-500 hover:text-slate-800">
           Back home
         </Link>
       </div>
     );
   }
+
+  const showSkeleton = historyStatus === "loading" && history.length === 0;
+  const list = view === "favorites" ? history.filter((x) => x.isFavorite) : history;
+  const showEmptyGrid = !showSkeleton && list.length === 0;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-2 pb-24 pt-10 sm:px-4">
@@ -92,16 +91,37 @@ export default function Gallery() {
         </button>
       </div>
 
-      {history.length === 0 ? (
-        <p className="rounded-3xl border border-dashed border-slate-300 bg-white/60 py-16 text-center text-slate-500">
-          Nothing here yet.{" "}
-          <Link className="font-semibold text-brand-cyan" to="/studio">
-            Generate something
-          </Link>
-        </p>
+      {showSkeleton ? (
+        <GalleryGridSkeleton className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3" count={6} />
+      ) : showEmptyGrid ? (
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-white/60 py-16 text-center text-slate-500">
+          {historyStatus === "error" && history.length === 0 ? (
+            <div className="px-4">
+              <p className="text-sm text-slate-600">We couldn&apos;t load your gallery.</p>
+              <button
+                type="button"
+                onClick={() => fetchHistory()}
+                className="mt-4 text-sm font-semibold text-brand-cyan hover:underline"
+              >
+                Try again
+              </button>
+            </div>
+          ) : view === "favorites" ? (
+            <p className="text-sm">
+              No favorites yet. Heart images from the <span className="font-medium text-slate-700">All</span> tab.
+            </p>
+          ) : (
+            <p className="text-sm">
+              Nothing here yet.{" "}
+              <Link className="font-semibold text-brand-cyan hover:underline" to="/studio">
+                Generate something
+              </Link>
+            </p>
+          )}
+        </div>
       ) : (
         <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {(view === "favorites" ? history.filter((x) => x.isFavorite) : history).map((item) => (
+          {list.map((item) => (
             <li
               key={item._id}
               className="flex flex-col items-center gap-4 rounded-3xl border border-white/60 bg-white/50 p-4 shadow-lg backdrop-blur"
@@ -175,8 +195,7 @@ export default function Gallery() {
             <div className="p-5 text-left text-sm text-white/90">
               <p className="font-medium text-white">{lightbox.promptRaw}</p>
               <p className="mt-2 text-xs text-white/60">
-                {new Date(lightbox.createdAt).toLocaleString()} · Style: {lightbox.style} ·{" "}
-                Pixorify
+                {new Date(lightbox.createdAt).toLocaleString()} · Style: {lightbox.style} · Pixorify
               </p>
               <button
                 type="button"

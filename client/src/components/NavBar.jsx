@@ -2,8 +2,33 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import CreditsResetCountdown from "./CreditsResetCountdown.jsx";
 import { scrollPageTop } from "../lib/navigation";
-import { CREDITS_PER_IMAGE, DAILY_CREDITS_LIMIT, generationsRemaining, normalizeCreditsPoints } from "../lib/credits.js";
+import { Zap } from "lucide-react";
+import {
+  CREDITS_PER_IMAGE,
+  DAILY_CREDITS_LIMIT,
+  formatCreditsLeftLabel,
+  generationsRemaining,
+  normalizeCreditsPoints,
+} from "../lib/credits.js";
+
+/** Lightning + points (like “⚡ 100”), themed to Pixorify cyan; `credit` stays in sync everywhere. */
+function CreditsEnergyBadge({ points, zapSizeClassName, numberClassName }) {
+  const pts = normalizeCreditsPoints(points);
+  const zapCls = zapSizeClassName ?? "size-3 shrink-0 sm:size-3.5";
+  const numCls = numberClassName ?? "font-bold text-slate-900";
+  return (
+    <span className="inline-flex items-center gap-0.5 leading-none sm:gap-1">
+      <Zap
+        className={`${zapCls} fill-brand-cyan/20 stroke-brand-cyan`}
+        aria-hidden="true"
+        strokeWidth={2}
+      />
+      <span className={`tabular-nums tracking-tight ${numCls}`.trim()}>{pts}</span>
+    </span>
+  );
+}
 
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
@@ -25,7 +50,6 @@ export default function NavBar() {
   const profileRef = useRef(null);
 
   const gensLeft = generationsRemaining(credit);
-  const creditPts = normalizeCreditsPoints(credit);
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -91,6 +115,23 @@ export default function NavBar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {user ? (
+            <button
+              type="button"
+              className="inline-flex flex-col items-center gap-px rounded-full border border-slate-200 bg-gradient-to-r from-sky-50 to-cyan-50 px-2 py-1 text-[11px] shadow-sm ring-1 ring-cyan-100/70 transition hover:brightness-[1.03] hover:ring-brand-cyan/35 sm:gap-0.5 sm:px-3 sm:text-xs"
+              title={`${formatCreditsLeftLabel(credit)} · refills at midnight IST`}
+              aria-label={`${formatCreditsLeftLabel(credit)}, opens account menu`}
+              onClick={() => setProfileOpen(true)}
+            >
+              <CreditsEnergyBadge points={credit} />
+              <span className="hidden max-w-[5.75rem] truncate text-center sm:block">
+                <CreditsResetCountdown
+                  showIstSuffix={false}
+                  className="text-[9px] font-semibold leading-tight text-slate-600"
+                />
+              </span>
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -140,13 +181,16 @@ export default function NavBar() {
                       <p className="text-xs text-slate-500">{user.email}</p>
                     </div>
                     <div className="px-4 py-2">
-                      <p className="text-sm font-semibold text-slate-800">
-                        Credits: {creditPts}{" "}
-                        <span className="text-xs font-normal text-slate-500">/ {DAILY_CREDITS_LIMIT}</span>
+                      <p className="inline-flex flex-wrap items-center gap-x-1 gap-y-0.5 text-sm text-slate-800">
+                        <CreditsEnergyBadge points={credit} zapSizeClassName="size-3.5 shrink-0" />
+                        <span className="text-xs font-normal text-slate-500">· max {DAILY_CREDITS_LIMIT}/day</span>
                       </p>
+                      <CreditsResetCountdown
+                        as="p"
+                        className="mt-1 text-[10px] font-semibold tracking-tight text-slate-600"
+                      />
                       <p className="mt-0.5 text-[10px] leading-snug text-slate-500">
-                        ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left today · {CREDITS_PER_IMAGE} credits each ·
-                        refreshes midnight IST
+                        ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left today · {CREDITS_PER_IMAGE} credits each
                       </p>
                     </div>
                     <button
@@ -206,12 +250,16 @@ export default function NavBar() {
                   My gallery
                 </NavLink>
                 <div className="px-3 py-2">
-                  <p className="text-sm font-semibold text-slate-700">
-                    Credits: {creditPts}{" "}
-                    <span className="text-xs font-normal text-slate-500">/ {DAILY_CREDITS_LIMIT}</span>
+                  <p className="inline-flex flex-wrap items-center gap-x-1 gap-y-0.5 text-sm text-slate-700">
+                    <CreditsEnergyBadge points={credit} zapSizeClassName="size-3.5 shrink-0" />
+                    <span className="text-xs font-normal text-slate-500">· max {DAILY_CREDITS_LIMIT}/day</span>
                   </p>
+                  <CreditsResetCountdown
+                    as="p"
+                    className="mt-1 text-[10px] font-semibold tracking-tight text-slate-600"
+                  />
                   <p className="mt-0.5 text-[10px] text-slate-500">
-                    ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left · {CREDITS_PER_IMAGE} credits each · midnight IST
+                    ~{gensLeft} image{gensLeft === 1 ? "" : "s"} left · {CREDITS_PER_IMAGE} credits each
                   </p>
                 </div>
                 <button

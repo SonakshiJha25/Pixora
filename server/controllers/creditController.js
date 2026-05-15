@@ -1,14 +1,13 @@
-import User from "../models/User.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import {
-  ensureDailyCredits,
   getDailyCreditLimit,
   getCreditsPerImage,
   getNextResetAt,
   getCreditsResetTimezoneLabel,
 } from "../services/dailyCreditsService.js";
 import { useCreditsAtomic } from "../services/creditService.js";
+import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
 
 const sanitizeUser = (user) => ({
   id: user._id,
@@ -20,12 +19,10 @@ const sanitizeUser = (user) => ({
 });
 
 export const getCredits = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const user = await refreshUserCreditsFromDb(req.user.id);
   if (!user) {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
-
-  await ensureDailyCredits(user);
 
   return res.status(200).json({
     success: true,

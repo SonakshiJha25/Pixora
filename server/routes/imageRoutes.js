@@ -43,6 +43,8 @@ imageRouter.post(
   generateImage
 );
 imageRouter.get('/history', userAuth, getMyImages)
+/** Alias for gallery clients — same handler as /history, newest first for logged-in user only. */
+imageRouter.get('/my-images', userAuth, getMyImages)
 imageRouter.post('/cleanup-broken', userAuth, cleanupBrokenImages)
 imageRouter.delete('/:imageId', userAuth, deleteImage)
 imageRouter.patch('/:imageId/favorite', userAuth, toggleFavoriteImage)

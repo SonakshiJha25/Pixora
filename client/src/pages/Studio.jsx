@@ -6,11 +6,11 @@ import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import StylePreviewCarousel from "../components/StylePreviewCarousel";
+import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import LimitReachedModal from "../components/LimitReachedModal";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
-import { normalizeCreditsPoints, DAILY_CREDITS_LIMIT, CREDITS_PER_IMAGE } from "../lib/credits.js";
-import { getNextCalendarBoundaryIso } from "../lib/nextDailyReset.js";
+import { normalizeCreditsPoints } from "../lib/credits.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 
@@ -20,8 +20,17 @@ function getSpeechRecognitionCtor() {
 }
 
 export default function Studio() {
-  const { api, setShowLogin, fetchHistory, fetchUserData, history, setHistory, setCredit, credit, dailyCreditSchedule } =
-    useContext(AppContext);
+  const {
+    api,
+    setShowLogin,
+    fetchHistory,
+    fetchUserData,
+    history,
+    setHistory,
+    setCredit,
+    dailyCreditSchedule,
+    historyStatus,
+  } = useContext(AppContext);
 
   const authToken = getToken()?.trim() ?? "";
   const isSignedIn = Boolean(authToken);
@@ -34,13 +43,10 @@ export default function Studio() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
-  const [limitModal, setLimitModal] = useState({ open: false, resetAt: null, dailyResetTimezone: null });
+  const [limitModal, setLimitModal] = useState({ open: false, dailyResetTimezone: null });
 
   const recognitionRef = useRef(null);
   const autoStopTimerRef = useRef(null);
-
-  const nextRefillIso =
-    dailyCreditSchedule?.nextResetAtIso ?? getNextCalendarBoundaryIso() ?? undefined;
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
 
@@ -195,7 +201,6 @@ export default function Studio() {
         const err = error?.response?.data?.error;
         setLimitModal({
           open: true,
-          resetAt: err?.nextResetAt || null,
           dailyResetTimezone: err?.dailyResetTimezone ?? null,
         });
       } else if (error?.response?.status === 404) {
@@ -227,41 +232,10 @@ export default function Studio() {
           {!isSignedIn ? (
             <>
               {" "}
-              <span className="font-semibold text-slate-800">Sign in to generate — credits reset daily.</span>
+              <span className="font-semibold text-slate-800">Sign in to generate — credits refresh at midnight.</span>
             </>
           ) : null}
         </p>
-        <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-cyan-100 bg-gradient-to-r from-sky-50 to-cyan-50 px-4 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs">
-          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-          {isSignedIn ? (
-            <span className="inline-block max-w-xl text-center leading-snug sm:text-left">
-              You have{" "}
-              <span className="font-bold text-slate-900">{normalizeCreditsPoints(credit)}</span> credits left · pool{" "}
-              <span className="font-bold text-slate-900">{DAILY_CREDITS_LIMIT}</span>/day ·{" "}
-              <span className="font-bold text-slate-900">{CREDITS_PER_IMAGE}</span> per image.
-              {nextRefillIso ? (
-                <>
-                  {" "}
-                  Next refill:{" "}
-                  <time dateTime={nextRefillIso} className="font-semibold text-slate-800">
-                    {new Date(nextRefillIso).toLocaleString(undefined, {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </time>
-                  <span className="text-slate-600"> ({dailyCreditSchedule?.timezone ?? "IST"})</span>
-                </>
-              ) : null}
-            </span>
-          ) : (
-            <span>
-              <span className="font-bold text-slate-900">Sign in</span> for daily credits and a saved gallery
-            </span>
-          )}
-        </div>
       </motion.div>
 
       <motion.form
@@ -438,10 +412,27 @@ export default function Studio() {
             </Link>
           </div>
         </div>
-        {history.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 bg-white/50 py-12 text-center text-sm text-slate-500">
-            {!isSignedIn ? "Sign in to see generations saved here." : "No images yet"}
-          </p>
+        {historyStatus === "loading" && history.length === 0 ? (
+          <GalleryGridSkeleton className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" count={8} />
+        ) : history.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white/50 py-12 text-center text-sm text-slate-500">
+            {!isSignedIn ? (
+              "Sign in to see generations saved here."
+            ) : historyStatus === "error" ? (
+              <span className="block">
+                <span className="text-slate-600">We couldn&apos;t load your history.</span>
+                <button
+                  type="button"
+                  onClick={() => fetchHistory()}
+                  className="mt-3 block w-full text-center text-sm font-semibold text-brand-cyan hover:underline"
+                >
+                  Try again
+                </button>
+              </span>
+            ) : (
+              "No images yet"
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {history.slice(0, 12).map((item) => (
@@ -484,14 +475,13 @@ export default function Studio() {
 
       <LimitReachedModal
         open={limitModal.open}
-        resetAt={limitModal.resetAt}
         dailyResetTimezone={
           limitModal.dailyResetTimezone ??
           dailyCreditSchedule?.timezone ??
           "IST"
         }
         onClose={() =>
-          setLimitModal({ open: false, resetAt: null, dailyResetTimezone: null })
+          setLimitModal({ open: false, dailyResetTimezone: null })
         }
       />
     </div>

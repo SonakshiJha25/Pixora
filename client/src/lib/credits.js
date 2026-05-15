@@ -18,3 +18,8 @@ export function generationsRemaining(creditBalancePoints) {
   if (pts <= 0) return 0;
   return Math.floor(pts / CREDITS_PER_IMAGE);
 }
+
+/** Shared copy for navbar + menus: “100 left” (uses normalized points). */
+export function formatCreditsLeftLabel(rawOrPoints) {
+  return `${normalizeCreditsPoints(rawOrPoints)} left`;
+}

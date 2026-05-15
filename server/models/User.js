@@ -14,6 +14,8 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, select: false },
     credits: { type: Number, required: true, default: 100, min: 0 },
     creditBalance: { type: Number, min: 0 },
+    /** IST calendar date (YYYY-MM-DD) when credits were last reset to the daily pool */
+    lastCreditResetDate: { type: String, default: null, trim: true },
     dailyCreditResetAt: { type: Date, default: null },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     picture: { type: String, default: null },

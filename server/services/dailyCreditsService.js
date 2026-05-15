@@ -1,3 +1,5 @@
+import { logError, logInfo, logWarn } from "../utils/logger.js";
+
 const DAILY_CREDITS = 100;
 const CREDITS_PER_IMAGE = 10;
 const DAY_MS = 86400000;
@@ -29,18 +31,33 @@ function calendarDayKey(dateInput, tz) {
       day: "2-digit",
     });
     return fmt.format(d);
-  } catch (err) {
-    console.warn("[dailyCredits] Invalid CREDITS_RESET_TIMEZONE — using IST (Asia/Kolkata):", tz, err?.message ?? err);
+  } catch (_err) {
+    logWarn(`Invalid CREDITS_RESET_TIMEZONE "${tz}" — using Asia/Kolkata`);
     return calendarDayKey(d, DEFAULT_CREDITS_RESET_IANA);
   }
 }
 
-export function sameCreditsCalendarDay(last, nowInput, tz) {
-  if (!last) return false;
-  const a = last instanceof Date ? last : new Date(last);
-  const b = nowInput instanceof Date ? nowInput : new Date(nowInput);
-  const zone = tz && tz.toUpperCase() !== "UTC" ? tz : "";
-  return calendarDayKey(a, zone) === calendarDayKey(b, zone);
+/** IST calendar date string YYYY-MM-DD (Asia/Kolkata wall clock). */
+export function getTodayIstDateString(nowInput = new Date()) {
+  return calendarDayKey(nowInput instanceof Date ? nowInput : new Date(nowInput), DEFAULT_CREDITS_RESET_IANA);
+}
+
+/**
+ * Normalize DB value for last IST reset day — handles YYYY-MM-DD, ISO strings, or Dates.
+ */
+export function normalizeStoredIstDayKey(value) {
+  if (value == null || value === "") return null;
+  if (value instanceof Date) {
+    const t = value.getTime();
+    if (!Number.isFinite(t)) return null;
+    return calendarDayKey(value, DEFAULT_CREDITS_RESET_IANA);
+  }
+  const s = String(value).trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const t = Date.parse(s);
+  if (!Number.isFinite(t)) return null;
+  return calendarDayKey(new Date(t), DEFAULT_CREDITS_RESET_IANA);
 }
 
 export async function ensureDailyCredits(user, { session } = {}) {
@@ -56,13 +73,30 @@ export async function ensureDailyCredits(user, { session } = {}) {
     await user.save({ session });
   }
 
-  const now = new Date();
-  const tz = getCreditsResetTimezone();
-  const last = user.dailyCreditResetAt ? new Date(user.dailyCreditResetAt) : null;
+  const todayIst = getTodayIstDateString();
 
-  if (!last || !sameCreditsCalendarDay(last, now, tz)) {
+  let lastDay = normalizeStoredIstDayKey(user.lastCreditResetDate);
+
+  // Backfill from legacy timestamp once per document so existing balances aren’t wiped mid–IST-day on deploy.
+  if (!lastDay && user.dailyCreditResetAt) {
+    lastDay = calendarDayKey(new Date(user.dailyCreditResetAt), DEFAULT_CREDITS_RESET_IANA);
+  }
+
+  const istDayChanged = !lastDay || lastDay !== todayIst;
+
+  if (istDayChanged) {
+    const who = user.email ? String(user.email) : `id:${String(user._id)}`;
     user.credits = DAILY_CREDITS;
-    user.dailyCreditResetAt = now;
+    user.lastCreditResetDate = todayIst;
+    user.dailyCreditResetAt = new Date();
+    await user.save({ session });
+    logInfo(`Daily credits reset for user: ${who} (IST day ${todayIst}, balance ${DAILY_CREDITS})`);
+    return user.credits;
+  }
+
+  const storedKey = normalizeStoredIstDayKey(user.lastCreditResetDate);
+  if (!storedKey && lastDay) {
+    user.lastCreditResetDate = lastDay;
     await user.save({ session });
   }
 
@@ -77,30 +111,50 @@ export function getCreditsPerImage() {
   return CREDITS_PER_IMAGE;
 }
 
+/** India Standard Time is fixed UTC+5:30 (no DST). */
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
+
+function nextUtcMidnightAfter(nowMs) {
+  const d = new Date(nowMs);
+  const next = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
+  return next;
+}
+
+/** Next 00:00:00 wall-clock in Asia/Kolkata, as an absolute UTC instant. */
+function nextAsiaKolkataMidnightAfter(nowMs) {
+  const startOfTodayIst = Math.floor((nowMs + IST_OFFSET_MS) / DAY_MS) * DAY_MS - IST_OFFSET_MS;
+  let next = startOfTodayIst + DAY_MS;
+  if (next <= nowMs) next += DAY_MS;
+  return next;
+}
+
 /**
- * First instant strictly after now when the daily calendar key changes in the configured zone,
- * serialized as UTC ISO — used so users see when credits refresh next.
+ * Next 00:00:00 in the configured zone (UTC or fixed-offset IST path for Asia/Kolkata).
+ * ISO string for API/errors — refill is always “calendar midnight”, not a vague afternoon time.
  */
 export function getNextResetAt(nowInput = new Date()) {
   const now = nowInput instanceof Date ? nowInput : new Date(nowInput);
   const tz = getCreditsResetTimezone();
+  const t = now.getTime();
 
   if (!tz) {
-    return new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0)
-    ).toISOString();
+    return new Date(nextUtcMidnightAfter(t)).toISOString();
+  }
+
+  if (tz === DEFAULT_CREDITS_RESET_IANA || tz === "Asia/Kolkata") {
+    return new Date(nextAsiaKolkataMidnightAfter(t)).toISOString();
   }
 
   const keyNow = calendarDayKey(now, tz);
-  let lo = now.getTime();
+  let lo = t;
   let hi = lo + DAY_MS;
   let hops = 0;
   while (calendarDayKey(new Date(hi), tz) === keyNow) {
     hi += DAY_MS;
     hops += 1;
     if (hops > 400) {
-      console.error("[dailyCredits] getNextResetAt: could not advance day key");
-      return new Date(lo + DAY_MS).toISOString();
+      logError("Daily credits: getNextResetAt search bound exceeded — returning fallback instant", null);
+      return new Date(hi).toISOString();
     }
   }
 

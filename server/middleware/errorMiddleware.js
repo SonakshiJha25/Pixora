@@ -1,3 +1,5 @@
+import { logError } from "../utils/logger.js";
+
 export default function errorMiddleware(err, req, res, next) {
   if (res.headersSent) {
     next(err);
@@ -8,7 +10,7 @@ export default function errorMiddleware(err, req, res, next) {
   const message = err.message || "Internal Server Error";
 
   if (statusCode >= 500) {
-    console.error("[Server]", message);
+    logError(`HTTP ${statusCode} (legacy error middleware)`, err);
   }
 
   res.status(statusCode).json({
