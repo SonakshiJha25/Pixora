@@ -31,7 +31,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
   }, [open]);
 
   const footerHint = useMemo(
-    () => "Same thread; refines don’t use a full-image credit. Details: Help.",
+    () => "Stays on this thread; no extra full-image credit. See Help for details.",
     []
   );
 
@@ -46,7 +46,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[80] bg-slate-950/40 backdrop-blur-sm md:bg-slate-950/25"
-            aria-label="Close refine panel"
+            aria-label="Close refine this image"
             onClick={() => !submitting && onClose()}
           />
           <motion.aside
@@ -61,10 +61,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
           >
             <header className="relative shrink-0 border-b border-slate-100 px-5 pb-3 pt-4 pr-16">
               <h2 id="refine-panel-title" className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">
-                Refine
+                Refine this image
               </h2>
               <p className="mt-1 text-xs leading-snug text-slate-600 sm:text-sm">
-                One line: lighting, colour, or small fixes on this frame.
+                Describe one change to this frame — lighting, colour, or small details.
               </p>
               <button
                 type="button"
@@ -95,7 +95,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
               )}
 
               <label htmlFor="refine-instruction" className="mt-6 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Your instruction
+                What to change
               </label>
               <textarea
                 id="refine-instruction"
@@ -119,10 +119,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 {submitting ? (
                   <>
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Refining…
+                    Applying…
                   </>
                 ) : (
-                  "Run refine"
+                  "Refine this image"
                 )}
               </button>
             </div>

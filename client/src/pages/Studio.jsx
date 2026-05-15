@@ -44,6 +44,42 @@ function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
   );
 }
 
+/** Map /api/images/edit errors to clear toasts (server sends { error: { code, message, details } }). */
+function refinementToastFromApiError(error) {
+  const payload = error?.response?.data;
+  const errObj = payload?.error ?? (payload?.success === false ? payload : null);
+  const code = errObj?.code;
+  const apiMsg = typeof errObj?.message === "string" ? errObj.message.trim() : "";
+  const detailFromArray =
+    Array.isArray(errObj?.details) && errObj.details[0]?.msg
+      ? String(errObj.details[0].msg).trim()
+      : "";
+
+  if (!error?.response) {
+    return "Can't reach the server — check your connection or API URL.";
+  }
+
+  switch (code) {
+    case "CLIPDROP_ERROR":
+    case "CLIPDROP_EMPTY":
+      return apiMsg || "Clipdrop failed for this refine — check API key, quota, or try a shorter instruction.";
+    case "CLIPDROP_NOT_CONFIGURED":
+      return "Server is missing CLIPDROP_API — refinement needs the same key as Generate.";
+    case "EDIT_FAILED":
+    case "EDIT_SOURCE_READ_FAILED":
+      return apiMsg || "Couldn't read or re-save your last image (storage or URL). Try generating again, then refine.";
+    case "STORAGE_UPLOAD_FAILED":
+    case "STORAGE_NOT_CONFIGURED":
+      return apiMsg || "Could not save image on the server — check Cloudinary or disk storage.";
+    case "IMAGE_NOT_FOUND":
+      return "That image is gone — run Generate again, then use Refine this image.";
+    case "VALIDATION_ERROR":
+      return detailFromArray || apiMsg || "Invalid request — check instruction length and try again.";
+    default:
+      return detailFromArray || apiMsg || "Refine didn't complete — try again.";
+  }
+}
+
 export default function Studio() {
   const {
     api,
@@ -260,7 +296,7 @@ export default function Studio() {
 
   const applyRefinement = async (editPrompt) => {
     if (!latestThreadImageId) {
-      toast.error("No frame to refine yet — generate one first.");
+      toast.error("No image to refine yet — generate one first.");
       return;
     }
     try {
@@ -270,7 +306,11 @@ export default function Studio() {
         editPrompt,
       });
       if (!data?.success || !data?.image) {
-        toast.error("Couldn't finish that refine.");
+        const fallback =
+          typeof data?.error?.message === "string" && data.error.message.trim()
+            ? data.error.message.trim()
+            : "Server returned no image — try again.";
+        toast.error(fallback);
         return;
       }
       const nextImg = data.image;
@@ -282,23 +322,13 @@ export default function Studio() {
       setRefinePanelOpen(false);
       if (data.refinementMode === "duplicate_fallback") {
         toast.warning(
-          "The render service didn't return a new image — your thread still has a linked step. Check Clipdrop quota or try a simpler instruction."
+          "Clipdrop didn't return a new render — we saved a linked copy of your frame. Check API quota or try a simpler edit."
         );
       } else {
-        toast.success("Refine added — newest frame is on top.");
+        toast.success("Refinement added — newest frame is on top.");
       }
     } catch (error) {
-      const payload = error?.response?.data;
-      const errObj = payload?.error;
-      const detailMsg =
-        Array.isArray(errObj?.details) && errObj.details[0]?.msg ? String(errObj.details[0].msg).trim() : "";
-      const apiMsg =
-        typeof errObj?.message === "string"
-          ? errObj.message.trim()
-          : typeof payload?.message === "string"
-            ? payload.message.trim()
-            : "";
-      toast.error(detailMsg || apiMsg || "Couldn't finish that refine.");
+      toast.error(refinementToastFromApiError(error));
     } finally {
       setRefineSubmitting(false);
     }
@@ -454,7 +484,7 @@ export default function Studio() {
                     onClick={() => setRefinePanelOpen(true)}
                     className="inline-flex items-center justify-center rounded-full border border-cyan-400/35 bg-gradient-to-r from-cyan-500/15 to-sky-500/10 px-8 py-3 text-center text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-300/55"
                   >
-                    Refine
+                    Refine this image
                   </button>
                   <button
                     type="button"
@@ -462,7 +492,7 @@ export default function Studio() {
                     onClick={() => setRefinePanelOpen(true)}
                     className="inline-flex items-center justify-center rounded-full border border-transparent px-6 py-2 text-center text-sm font-semibold text-cyan-300/95 underline-offset-4 hover:underline disabled:opacity-50"
                   >
-                    Another pass
+                    Edit again
                   </button>
                 </div>
 
@@ -592,7 +622,7 @@ export default function Studio() {
                     </p>
                   ) : null}
                   <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2 text-[11px] leading-snug text-slate-500 sm:text-xs">
-                    New runs cost credits; <span className="font-medium text-slate-400">Refine</span> doesn&apos;t.{" "}
+                    New runs cost credits; <span className="font-medium text-slate-400">Refine this image</span> doesn&apos;t.{" "}
                     <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
                       Help
                     </Link>

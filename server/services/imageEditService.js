@@ -1,13 +1,43 @@
 import axios from "axios";
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 import AppError from "../utils/appError.js";
 import { logInfo, logWarn } from "../utils/logger.js";
 import { persistImageBuffer } from "./imageStorageService.js";
 import { resolveGeneratedImageUrl } from "./imageService.js";
 import { PROMPT_STYLES } from "../utils/promptStyles.js";
 
+const __dirname_here = path.dirname(fileURLToPath(import.meta.url));
+const GENERATED_DIR = path.join(__dirname_here, "..", "public", "generated");
+
 const FETCH_TIMEOUT_MS = 45_000;
 const CLIP_PROMPT_MAX = 1000;
+
+/**
+ * When duplicate fallback runs, HTTP GET sometimes breaks (encoding, SSRF to self).
+ * If the asset lives under /generated/, read straight from disk.
+ */
+async function tryReadLocalGeneratedBuffer(absoluteUrl) {
+  let pathname = "";
+  try {
+    pathname = new URL(String(absoluteUrl).trim()).pathname;
+  } catch {
+    return null;
+  }
+  const m = pathname.match(/\/generated\/([^/?#]+)$/i);
+  if (!m?.[1]) return null;
+  const name = path.basename(m[1]);
+  if (!name || name !== path.basename(path.normalize(m[1]))) return null;
+  if (!/^[a-zA-Z0-9._-]+\.(png|jpe?g|webp)$/i.test(name)) return null;
+  try {
+    const buf = await fs.readFile(path.join(GENERATED_DIR, name));
+    return buf?.length >= 100 ? buf : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Clipdrop text-to-image only accepts ~1000 chars. User edit must survive truncation;
@@ -66,14 +96,23 @@ export async function duplicateImageToNewUrl(sourceAbsoluteUrl) {
     throw new AppError("Invalid source image URL for edit fallback", 400, "VALIDATION_ERROR");
   }
 
-  const response = await axios.get(url, {
-    responseType: "arraybuffer",
-    timeout: FETCH_TIMEOUT_MS,
-    maxRedirects: 5,
-    validateStatus: (s) => s >= 200 && s < 400,
-  });
+  let buffer = await tryReadLocalGeneratedBuffer(url);
 
-  const buffer = Buffer.from(response.data);
+  if (!buffer?.length || buffer.length < 100) {
+    try {
+      const response = await axios.get(url, {
+        responseType: "arraybuffer",
+        timeout: FETCH_TIMEOUT_MS,
+        maxRedirects: 5,
+        validateStatus: (s) => s >= 200 && s < 400,
+      });
+      buffer = Buffer.from(response.data);
+    } catch (httpErr) {
+      logWarn(`Edit fallback: fetch failed (${httpErr?.message || httpErr}); trying local /generated`);
+      buffer = await tryReadLocalGeneratedBuffer(url);
+    }
+  }
+
   if (!buffer?.length || buffer.length < 100) {
     throw new AppError("Could not read source image for edit fallback", 502, "EDIT_SOURCE_READ_FAILED");
   }
@@ -107,8 +146,17 @@ export async function resolveEditedImageUrl({
     try {
       const imageUrl = await duplicateImageToNewUrl(sourceAbsoluteUrl);
       return { imageUrl, mode: "duplicate_fallback" };
-    } catch {
-      throw new AppError("Could not apply refine", 502, "EDIT_FAILED");
+    } catch (dupErr) {
+      logWarn(`Image edit: duplicate fallback failed (${dupErr?.code || dupErr?.message || dupErr})`);
+      throw new AppError(
+        "Refine failed: Clipdrop error and we could not re-save your previous image. Ensure CLIPDROP_API is valid (quota/key) and stored images load from disk or CDN.",
+        502,
+        "EDIT_FAILED",
+        {
+          clipdrop: err?.code || String(err?.message || err),
+          duplicate: dupErr?.code || String(dupErr?.message || dupErr),
+        }
+      );
     }
   }
 }
