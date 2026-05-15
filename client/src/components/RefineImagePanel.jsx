@@ -32,7 +32,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
   }, [open]);
 
   const footerHint = useMemo(
-    () => "Refinements use your conversation context and do not spend credits.",
+    () => "This stays on the thread you started, so we don’t tick credits for every nudge.",
     []
   );
 
@@ -62,10 +62,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
           >
             <header className="relative shrink-0 border-b border-slate-100 px-5 pb-4 pt-5 pr-16">
               <h2 id="refine-panel-title" className="text-lg font-bold tracking-tight text-slate-900">
-                Refine your image
+                Nudge this version
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                Make small changes without spending extra credits.
+                Say what to change in plain language — no extra credit hit for this path.
               </p>
               <button
                 type="button"

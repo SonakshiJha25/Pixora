@@ -44,7 +44,7 @@ export default function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.04 }}
       >
-        Thoughts become pictures without the scramble
+        Thoughts in your head, pixels on the screen
       </motion.h1>
 
       <motion.p
@@ -54,9 +54,15 @@ export default function Header() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         {user ? (
-          <>You’ve got today’s credit pool—splash it on new art, keep threads in your gallery, polish with free refines.</>
+          <>
+            Your credits are topped up for today. Make something new, or open the gallery and polish an old thread —
+            refines don&apos;t chip away at the same pool.
+          </>
         ) : (
-          <>Sign in to unlock daily credits, stash every thread, and riff on results without watching the meter twitch.</>
+          <>
+            Sign in and you get a daily credit budget, a gallery that remembers your threads, and refines that
+            don&apos;t feel like you&apos;re bleeding points.
+          </>
         )}
       </motion.p>
 
@@ -76,18 +82,18 @@ export default function Header() {
       </motion.div>
 
       <motion.div
-        className="mx-auto mt-10 w-full max-w-3xl rounded-3xl border border-slate-200/80 bg-white/60 p-4 text-left shadow-card backdrop-blur sm:p-6"
+        className="mx-auto mt-10 w-full max-w-3xl rounded-[2rem] border border-white/65 bg-white/60 p-4 text-left shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:p-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.18 }}
       >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-sky">Starter kit</p>
-            <h2 className="mt-2 text-xl font-extrabold text-slate-900 sm:text-2xl">Make it, keep it, remix it</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-sky">Inside the box</p>
+            <h2 className="mt-2 text-xl font-extrabold text-slate-900 sm:text-2xl">Studio for making, Gallery for keeping</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Studio is the playground, My gallery is the scrapbook—jump between styles, heart the keepers, snag PNGs,
-              and revisit every refine like a highlight reel.
+              Toggle styles mid-day, tuck favourites away, grab PNG downloads when something feels final. Threads stay
+              lined up so nothing gets lost behind a vague filename.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">Studio</span>

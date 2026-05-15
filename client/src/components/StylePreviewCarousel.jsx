@@ -12,7 +12,7 @@ const AUTO_MS = 4500;
  * the element on every cycle, causing the page to "blink" as the browser
  * fetched and decoded the next image. Cross-fading mounted elements is smooth.
  */
-export default function StylePreviewCarousel() {
+export default function StylePreviewCarousel({ className = "" }) {
   const [i, setI] = useState(0);
   const n = STUDIO_STYLE_SAMPLES.length;
 
@@ -27,7 +27,7 @@ export default function StylePreviewCarousel() {
   const slide = STUDIO_STYLE_SAMPLES[i];
 
   return (
-    <div className="mx-auto w-full max-w-[min(92vw,520px)]">
+    <div className={`mx-auto w-full max-w-[min(92vw,520px)] ${className}`.trim()}>
       <div className="glass relative w-full overflow-hidden rounded-3xl p-2 shadow-glow">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100/80">
           {STUDIO_STYLE_SAMPLES.map((s, idx) => (
@@ -48,7 +48,7 @@ export default function StylePreviewCarousel() {
           <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-slate-900/55 via-slate-900/5 to-transparent" />
 
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-3 pb-10 sm:p-4 sm:pb-11">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100/90 sm:text-xs">Look</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-100/90 sm:text-xs">Preview</p>
             <p className="mt-0.5 text-base font-extrabold text-white sm:text-lg">{slide.label}</p>
             <p className="mt-0.5 line-clamp-2 text-xs text-white/90 sm:line-clamp-1 sm:text-sm">{slide.caption}</p>
           </div>

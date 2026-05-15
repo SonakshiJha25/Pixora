@@ -54,21 +54,21 @@ export const assets = {
 
 export const stepsData = [
   {
-    title: "Tell us what you’re picturing",
+    title: "Say what you’re after",
     description:
-      "Describe the vibe like you’re texting a chatty illustrator—mention light, mood, palette, characters. Little details make the leap from “fine” to “wow”.",
+      "Type it the way you’d explain it to a friend: who’s there, lighting, palette, vibe. Tiny specifics usually beat “make it cool”.",
     icon: step_icon_1,
   },
   {
-    title: "Generate, grin, tweak",
+    title: "Pick a style, hit generate",
     description:
-      "Dial in a style, smash generate, and watch pixels appear. Want another angle? Change the prompt or linger on your favourite frame and refine it—those follow-ups skip your credit meter.",
+      "Realistic, anime, cyberpunk — pick one and go. Changing your mind afterwards is fine too. Tweaks inside the thread use Refine, not another full charge.",
     icon: step_icon_2,
   },
   {
-    title: "Save what sparks joy",
+    title: "Keep what sticks",
     description:
-      "PNG downloads whenever you fancy, plus My gallery hoards threads, favourites, and reruns—like a sticker book you’ll actually reopen.",
+      "Download a PNG anytime, tuck favourites in My gallery, and reopen threads whenever you remember that one tweak you skipped.",
     icon: credit_star,
   },
 ];

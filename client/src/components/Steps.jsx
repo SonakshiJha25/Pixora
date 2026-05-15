@@ -11,10 +11,10 @@ export default function Steps() {
       transition={{ duration: 0.55 }}
       className="mx-auto flex w-full max-w-3xl flex-col items-center py-20 text-center"
     >
-      <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">How Pixorify feels day-to-day</h2>
+      <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">The bit that matters</h2>
       <p className="mt-3 max-w-xl text-slate-600">
-        Three beats: whisper a scene, steal a glimpse in seconds, then noodle it until your heart settles—fresh ideas
-        cost credits; curious tweaks ride along free.
+        Sketch the idea, let the model fill in the frame, then mess with it until it&apos;s honest. No magic words
+        required — just be specific about what you want to see.
       </p>
       <div className="mt-10 w-full space-y-4">
         {stepsData.map((item, index) => (
@@ -37,13 +37,14 @@ export default function Steps() {
         to="/studio"
         className="btn-primary mt-12 inline-flex rounded-full px-8 py-3 text-sm font-semibold shadow-md transition hover:opacity-95"
       >
-        Leap into Studio
+        Go try it
       </Link>
       <p className="mt-5 text-sm text-slate-600">
-        Hungry for detail on credits, midnight resets, or refine etiquette?{" "}
+        Need the credit timeline or IST reset spelled out slowly?{" "}
         <Link to="/help" className="font-semibold text-brand-cyan underline-offset-4 hover:underline">
-          Help centre’s got snacks
+          We wrote Help for that
         </Link>
+        .
       </p>
     </motion.section>
   );

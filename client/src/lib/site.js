@@ -18,27 +18,27 @@ export const SITE = {
 export const STUDIO_STYLE_SAMPLES = [
   {
     label: "Realistic",
-    caption: "Photo-like lighting and detail",
+    caption: "Skews toward photo-real lighting when you spell out the shot",
     image: assets.style_realistic,
   },
   {
     label: "Anime",
-    caption: "Illustration & clean line energy",
+    caption: "Cleaner lines and illustration energy — good characters and props",
     image: assets.style_anime,
   },
   {
     label: "Cyberpunk",
-    caption: "Neon, contrast, future-city mood",
+    caption: "Neon, gritty glass, futuristic city palettes",
     image: assets.style_cyberpunk,
   },
   {
     label: "Fantasy",
-    caption: "Dramatic scenes & atmosphere",
+    caption: "Drama, atmosphere, big scenes that read like a still from a film",
     image: assets.style_fantasy,
   },
   {
     label: "Minimal",
-    caption: "Space, color blocks, simple forms",
+    caption: "Breathing room, blocks of colour, less noise on screen",
     image: assets.style_minimal,
   },
 ];

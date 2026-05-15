@@ -20,14 +20,24 @@ const App = () => {
   const { showLogin } = useContext(AppContext);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isStudioRoute =
+    location.pathname === "/studio" || location.pathname === "/result";
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-mesh">
       <ToastContainer position="bottom-right" theme="colored" />
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
+      <div
+        className={`mx-auto flex min-h-screen w-full flex-col px-4 sm:px-6 lg:px-8 ${
+          isStudioRoute ? "max-w-none" : "max-w-6xl"
+        }`}
+      >
         <NavBar />
         {showLogin && <Login />}
-        <main className={`flex flex-1 flex-col ${isHome ? "" : "items-center"}`}>
+        <main
+          className={`flex flex-1 flex-col ${
+            isHome ? "" : isStudioRoute ? "w-full items-stretch" : "items-center"
+          }`}
+        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/help" element={<Help />} />

@@ -49,9 +49,10 @@ export default function HelpContactForm({ id }) {
     <section id={id} className="scroll-mt-28">
       <div className="rounded-[1.5rem] border border-slate-200/80 bg-gradient-to-br from-white via-cyan-50/30 to-violet-50/25 p-[1px] shadow-lg shadow-slate-900/10">
         <div className="rounded-[1.43rem] bg-white/90 px-5 py-6 sm:px-8 sm:py-7">
-          <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">Whisper directly to humans</h2>
+          <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">Talk to a person</h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Weird bug, sparkly idea, or “how do I even…?” vibes—stuff the box shamelessly.
+            Bug, billing hiccup, idea you can&apos;t shoehorn into a ticket — write what happened. Rough notes are OK;
+            we stitch the story together on our side.
           </p>
         </div>
       </div>

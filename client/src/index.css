@@ -30,6 +30,12 @@
   .nav-link-active {
     @apply bg-slate-900 text-white shadow-md hover:bg-slate-900 hover:text-white;
   }
+  .studio-shell {
+    @apply border border-white/[0.09] bg-slate-950/[0.72] shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_24px_80px_-32px_rgba(0,0,0,0.75)] backdrop-blur-2xl;
+  }
+  .studio-glow {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12), 0 0 64px -8px rgba(34, 211, 238, 0.28);
+  }
 }
 
 .placeholder-color {

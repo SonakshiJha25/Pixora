@@ -13,22 +13,15 @@ import {
   Zap,
 } from "lucide-react";
 import HelpContactForm from "../components/HelpContactForm.jsx";
+import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
 import { SITE } from "../lib/site.js";
 import { assets } from "../assets/assets.js";
-
-const styleTiles = [
-  { img: assets.style_realistic, label: "Realistic glow" },
-  { img: assets.style_anime, label: "Anime pop" },
-  { img: assets.style_cyberpunk, label: "Neon nights" },
-  { img: assets.style_fantasy, label: "Epic vibes" },
-  { img: assets.style_minimal, label: "Calm minimal" },
-];
 
 const quickLinks = [
   {
     to: "/studio",
-    title: "Open Studio",
-    desc: "Where the brushes actually move",
+    title: "Studio",
+    desc: "Prompts, styles, downloads — main workspace.",
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
     border: "border-cyan-200/70",
@@ -36,8 +29,8 @@ const quickLinks = [
   },
   {
     to: "/gallery",
-    title: "Your gallery",
-    desc: "Threads, hearts, PNGs galore",
+    title: "Gallery",
+    desc: "Threads you’ve saved, favourites, PNGs.",
     icon: LayoutGrid,
     grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
     border: "border-violet-200/70",
@@ -45,8 +38,8 @@ const quickLinks = [
   },
   {
     to: "/pricing",
-    title: "Plans & perks",
-    desc: "What’s free vs what grows next",
+    title: "Pricing",
+    desc: "What you get free vs paid.",
     icon: Sparkles,
     grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
     border: "border-amber-200/70",
@@ -54,8 +47,8 @@ const quickLinks = [
   },
   {
     to: "/feedback",
-    title: "Tell us feelings",
-    desc: "Rants welcome; praise too",
+    title: "Feedback",
+    desc: "Something broken or half-baked — say it here.",
     icon: Heart,
     grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
     border: "border-rose-200/70",
@@ -66,34 +59,35 @@ const quickLinks = [
 const journey = [
   {
     n: "1",
-    title: "Create an account",
-    body: "It keeps credits, drafts, and your gallery humming on every device.",
-    chip: "Takes seconds",
+    title: "Make an account",
+    body: "You need this to generate, save credits, and keep your gallery in sync wherever you log in.",
+    chip: "~1 minute",
     img: assets.sample_img_1,
   },
   {
     n: "2",
-    title: "Play in Studio",
-    body: "Pick a vibe, jot a juicy prompt, and press generate. Bam—visual proof.",
-    chip: "~15s vibes",
+    title: "Work in Studio",
+    body: "Pick a look — realistic, anime, and the rest — write what you want, tap generate. Most images arrive in maybe ten or twenty seconds.",
+    chip: "~15 s",
     img: assets.sample_img_2,
   },
   {
     n: "3",
-    title: "Refine on a whim",
-    body: 'Need “more teal” or “fluffier cape”? Tap Refine—it rides under the same story, no sneaky fare.',
-    chip: "On the house",
+    title: "Refine without spending credits",
+    body: 'Small edits on something you already have — warmer light, different jacket — use Refine on the same thread. That does not eat your daily pool.',
+    chip: "Included",
     img: assets.star_group,
   },
 ];
 
 const creditCards = [
   {
-    title: "Credits you can predict",
+    title: "Credits, straight up",
     body: (
       <>
-        Wake up with <strong>100</strong> sparkly points. A brand‑new masterpiece costs <strong>10</strong>, so maths
-        says <strong>10 fresh images</strong> a day tops. Runs out? Tomorrow’s midnight IST restocks automatically—no 24‑hour riddles.
+        You usually start each day around <strong>100</strong> credits. Spinning up a brand‑new image costs about{" "}
+        <strong>10</strong>, which works out near <strong>ten</strong> fresh pieces if you burn only on new prompts. At{" "}
+        <strong>midnight IST</strong> everything refills automatically.
       </>
     ),
     icon: Zap,
@@ -101,11 +95,11 @@ const creditCards = [
     border: "border-amber-100/90",
   },
   {
-    title: "Second helpings stay free",
+    title: "Refine keeps the conversation going",
     body: (
       <>
-        Tweaks tied to something you already made—tone, outfit, skyline—happily skate through&nbsp;
-        <strong>Refine</strong>. Credits stay politely untouched so you can be picky without guilt.
+        Editing what you already have — same thread, tighter brief — goes through{" "}
+        <strong>Refine</strong> and skips that extra credit charge people worry about.
       </>
     ),
     icon: Sparkles,
@@ -117,50 +111,50 @@ const creditCards = [
 const tipCards = [
   {
     emoji: "🎬",
-    title: "Set the shot",
-    text: 'Call out framing you actually want—“wide dusk highway” beats “pretty road”.',
+    title: "Name the lens, not just the vibe",
+    text: "Say ‘wide dusk road with wet asphalt’ rather than ‘cool drive’. Helps the style land where you pictured it.",
     tone: "from-sky-50 to-blue-50/80",
   },
   {
     emoji: "✍️",
-    title: "Nibble, don’t bite",
-    text: 'Stack tiny refinements—hair, lighting, skyline—rather than cramming fifteen wishes at once.',
+    title: "Change one thing, then tweak again",
+    text: 'Hair texture now, skyline later. Smaller edits stack into a big swing without muddying every lever at once.',
     tone: "from-fuchsia-50 to-violet-50/70",
   },
   {
     emoji: "📂",
-    title: "Trace the lineage",
-    text: 'Gallery bundles each thread—tap “View thread” anytime you crave the side‑by‑side story.',
+    title: "Use ‘View thread’ in Gallery",
+    text: "You’ll see versions in order instead of hunting which render belongs to which idea.",
     tone: "from-lime-50 to-teal-50/70",
   },
 ];
 
 const funFacts = [
-  { emoji: "🌙", text: "Resets obey India midnight—not a mystery timer hiding in Croatia." },
-  { emoji: "🧊", text: 'Refinement ≠ “another generate”—your thread keeps its soul.' },
-  { emoji: "✨", text: "Credits only tick down on net‑new canvases you've started." },
+  { emoji: "🌙", text: "Daily reset is midnight IST for everyone; it’s not a rolling timer from your last session." },
+  { emoji: "🧊", text: "Refine nudges what you already made. Generate starts a new line from your prompt." },
+  { emoji: "✨", text: "Credits pull from your balance for brand-new runs; refines on that line stay off the meter." },
 ];
 
 const faqs = [
   {
-    q: "How many net‑new images can I realistically finish daily?",
-    a: 'You refill to 100 credits at each IST midnight. Each brand‑new pic spends 10, so pencil in about ten fresh masterpieces. Everything after counts as refining the same lineage—zilch credits.',
+    q: "How many new images can I actually finish in a day?",
+    a: "Think about ten if you only start fresh ideas (100 credits ÷ 10 each). After that you can still refine what you’ve got without burning more credits.",
   },
   {
-    q: "Exactly when does the wallet refill?",
-    a: 'On the literal tail of IST local midnight—not “from your last logout”. Less calendar yoga, more “set an alarm once and forget”.',
+    q: "When do my credits come back?",
+    a: 'At midnight India time. Not “24 hours after you closed the tab” — just the next calendar day in IST.',
   },
   {
-    q: "Okay but how is Refine genuinely different?",
-    a: 'Generate births a timeline. Refine politely nudges that timeline—same scene DNA, sweeter lighting, bolder palette—without starting a financial tab again.',
+    q: "What counts as refine versus hitting generate?",
+    a: 'Refine is for the preview already on screen inside that workflow — little fixes. A fresh prompt counts as starting over with credits.',
   },
   {
-    q: "Suddenly older gallery tiles look smashed—why?",
-    a: 'If your host nuked ephemeral disk folders (think deploy houseclean), even perfect URLs whimper away. Reliable cloud storage fixes that—we can help your admin wire it.',
+    q: "Older thumbs suddenly look broken?",
+    a: 'Sometimes deployments wipe temporary file storage while the gallery row still sits there. The fix is moving images to persistent storage — your dev can wire that.',
   },
   {
-    q: "Can I poke around anonymously?",
-    a: "Almost—browse copy, flirt with Help. Generating images, juggling credits, and remembering threads need a cheerful login.",
+    q: "Do I need to sign in?",
+    a: 'You can read the pages, but making images + saving galleries needs an account. Keeps quotas honest.',
   },
 ];
 
@@ -210,27 +204,27 @@ export default function Help() {
       >
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-sky">
-            <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help nook
+            <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-[2.55rem]">
-            Ask anything—we brought snacks and screenshots.
+            Here’s how Pixorify fits together.
           </h1>
           <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-slate-600">
-            Wander through sparkly buttons, skim the gist of credits versus refines, and slide into our inbox whenever
-            you need a human. Zero corporate throat clearing.
+            Credits, refines, styles — the bits people usually ask about. Scroll if you like, or skip to the form at the
+            bottom and we&apos;ll read it properly.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to="/studio"
               className="inline-flex rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-slate-800"
             >
-              Try Studio
+              Open Studio
             </Link>
             <a
               href="#contact"
               className="inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-brand-cyan/50 hover:text-brand-cyan"
             >
-              <MessageCircleHeart className="h-4 w-4 text-rose-400" /> Ping us below
+              <MessageCircleHeart className="h-4 w-4 text-rose-400" aria-hidden /> Message us
             </a>
           </div>
           <div className="mt-6 flex gap-3 overflow-x-auto pb-2 sm:gap-4">
@@ -260,7 +254,7 @@ export default function Help() {
               className="relative z-10 mx-auto max-h-[280px] w-auto max-w-full rounded-[1.85rem] object-contain shadow-2xl ring-8 ring-white/80 sm:max-h-[320px]"
             />
             <div className="absolute -bottom-6 left-8 right-8 z-[1] mx-auto rounded-2xl bg-gradient-to-r from-cyan-400/65 to-violet-400/65 px-5 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-slate-900/10">
-              humans + silliness included
+              Someone actually reads messages
             </div>
           </motion.div>
         </div>
@@ -270,8 +264,8 @@ export default function Help() {
       <section className="relative mt-12">
         <div className="flex flex-wrap items-end justify-between gap-3 px-1">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Shortcut shelf</p>
-            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Tap what you crave</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Quick links</p>
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Jump somewhere useful</h2>
           </div>
         </div>
         <ul className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -308,10 +302,10 @@ export default function Help() {
 
       {/* Journey */}
       <section className="relative mt-16">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Ride-along diary</p>
-        <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">From zero to cherished thread</h2>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">The usual flow</p>
+        <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Account → Studio → tweaks</h2>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Each card hides a spoiler for what comes next—we kept it bite-sized because nobody loves homework.
+          Same three steps nearly everyone lands on once they’re past Hello world.
         </p>
         <div className="mt-7 grid gap-5 lg:grid-cols-3">
           {journey.map((step, i) => (
@@ -343,8 +337,8 @@ export default function Help() {
 
       {/* Credit duo */}
       <section className="relative mt-16">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Wallet chatter</p>
-        <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Credits & refinements decoded</h2>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Credits</p>
+        <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">What costs what</h2>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {creditCards.map((card) => {
             const C = card.icon;
@@ -391,8 +385,8 @@ export default function Help() {
         <div className="flex items-start gap-2 px-1">
           <Lightbulb className="mt-1 h-5 w-5 text-amber-400" aria-hidden />
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Spark plugs</p>
-            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Mini tricks that actually sparkle</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Small habits</p>
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Three things folks wish they knew earlier</h2>
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -416,8 +410,8 @@ export default function Help() {
       {/* FAQ */}
       <section className="relative mt-14">
         <div className="px-1 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">FAQ party</p>
-          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Answers while you hydrate</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">FAQ</p>
+          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Common questions</h2>
         </div>
         <div className="mt-6 space-y-3">
           {faqs.map((item, i) => (
@@ -438,13 +432,13 @@ export default function Help() {
             <Mail className="h-6 w-6 text-brand-cyan" strokeWidth={2} />
           </span>
           <div>
-            <h2 className="text-lg font-extrabold text-slate-900">Emails still cool</h2>
+            <h2 className="text-lg font-extrabold text-slate-900">Email still works</h2>
             <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-slate-600">
-              Serious bug, silly typo, unsolicited compliment—whatever—ping{" "}
+              For bugs, billing, or honestly anything fuzzy — write{" "}
               <a className="font-bold text-brand-cyan hover:underline" href={`mailto:${SITE.helpEmail}`}>
                 {SITE.helpEmail}
               </a>
-              . We wander in constantly.
+              . A real inbox, not an auto-folder black hole (we try).
             </p>
           </div>
         </div>
@@ -456,7 +450,7 @@ export default function Help() {
 
       <p className="relative mt-12 text-center text-sm text-slate-500">
         <Link to="/" className="font-semibold text-brand-cyan hover:underline">
-          ← Shuffle back home
+          ← Back home
         </Link>
       </p>
     </div>
