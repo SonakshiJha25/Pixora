@@ -86,7 +86,13 @@ export default function NavBar() {
           }`}
           onClick={goHomeTop}
         >
-          <img src={assets.brandMark} alt="" className="h-9 w-9 shrink-0 sm:h-10 sm:w-10" />
+          <img
+            src={assets.brandMark}
+            alt="Pixorify"
+            className={`h-9 w-9 shrink-0 rounded-2xl object-cover ring-1 sm:h-10 sm:w-10 ${
+              isWorkspaceNav ? "ring-white/15" : "ring-black/[0.08]"
+            }`}
+          />
           <span
             className={`truncate text-base font-extrabold tracking-tight sm:text-lg ${
               isWorkspaceNav ? "text-white" : "text-slate-900"

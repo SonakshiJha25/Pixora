@@ -59,7 +59,11 @@ export default function ComingSoon() {
       transition={{ duration: 0.45 }}
       className="flex w-full max-w-lg flex-col items-center px-4 pb-24 pt-16 text-center"
     >
-      <img src={assets.brandMark} alt="" className="h-14 w-14 opacity-90" />
+      <img
+        src={assets.brandMark}
+        alt="Pixorify"
+        className="h-14 w-14 rounded-2xl object-cover opacity-90 ring-1 ring-black/[0.1]"
+      />
       <p className="type-eyebrow-brand mt-6">{SITE.name}</p>
       {variant ? (
         <p className="type-eyebrow-muted mt-3">{CHANNEL_LABEL[variant.channel]}</p>
