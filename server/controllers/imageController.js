@@ -8,8 +8,19 @@ import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { resolveEditedImageUrl } from "../services/imageEditService.js";
 import { collectThreadFromAnyNode } from "../utils/imageThread.js";
+import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
+import { snapCreditsToLedger } from "../services/dailyCreditsService.js";
+import { logInfo } from "../utils/logger.js";
 
 export const generateImage = asyncHandler(async (req, res) => {
+  if (Boolean(req.body?.isRefinement)) {
+    throw new AppError(
+      "Use POST /api/images/edit for refinements (no credits deducted).",
+      400,
+      "USE_EDIT_ENDPOINT"
+    );
+  }
+
   const { prompt, style, isPublic, tags } = req.body;
 
   const promptEnhanced = enhancePrompt(prompt, style);
@@ -47,6 +58,11 @@ export const generateImage = asyncHandler(async (req, res) => {
 export const editImage = asyncHandler(async (req, res) => {
   const { imageId, editPrompt } = req.body;
   const trimmed = String(editPrompt || "").trim();
+
+  const creditSnapshot = await refreshUserCreditsFromDb(req.user.id);
+  if (!creditSnapshot) {
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
+  }
 
   const parent = await Image.findOne({
     _id: imageId,
@@ -93,6 +109,13 @@ export const editImage = asyncHandler(async (req, res) => {
   logInfo(
     `Image edit saved: user=…${String(req.user.id).slice(-8)} parent=${String(parent._id)} child=${String(child._id)} mode=${mode}`
   );
+
+  const who =
+    typeof creditSnapshot.email === "string" && creditSnapshot.email.trim()
+      ? creditSnapshot.email.trim()
+      : String(req.user.id);
+  const unchanged = snapCreditsToLedger(creditSnapshot.credits);
+  logInfo(`[Free Refinement]\nUser: ${who}\nCredits unchanged: ${unchanged}`);
 
   return res.status(200).json({
     success: true,

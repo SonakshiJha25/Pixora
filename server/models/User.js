@@ -13,10 +13,13 @@ const userSchema = new mongoose.Schema(
       maxlength: 254,
     },
     password: { type: String, required: true, select: false },
-    /** Daily pool in points; valid values 0, 10, …, 100 (see dailyCreditsService). */
+    /** Daily pool in points; allowed 0–100 in steps of 10 (snapCreditsToLedger). */
     credits: { type: Number, required: true, default: 100, min: 0 },
-    /** UTC instant when credits reset to the daily pool (next IST midnight boundary). */
-    nextCreditResetAt: {
+    /**
+     * Next calendar reset at IST midnight (stored as UTC Date).
+     * When now >= dailyCreditResetAt → credits refill to daily pool + field advances.
+     */
+    dailyCreditResetAt: {
       type: Date,
       required: true,
       default() {
@@ -30,7 +33,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", function creditsLedgerPreSave(next) {
   if (this.isModified("credits")) {
-    this.credits = snapCreditsToLedger(this.credits);
+    this.credits = Math.max(0, snapCreditsToLedger(this.credits));
   }
   next();
 });

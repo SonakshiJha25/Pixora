@@ -8,6 +8,9 @@ import {
 import { useCreditsAtomic } from "../services/creditService.js";
 import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
 
+const resetIsoFromUser = (user) =>
+  user.dailyCreditResetAt ? user.dailyCreditResetAt.toISOString() : null;
+
 const sanitizeUser = (user) => ({
   id: user._id,
   name: user.name,
@@ -15,9 +18,7 @@ const sanitizeUser = (user) => ({
   role: user.role,
   credits: user.credits,
   creditBalance: user.credits,
-  nextCreditResetAt: user.nextCreditResetAt
-    ? user.nextCreditResetAt.toISOString()
-    : null,
+  dailyCreditResetAt: resetIsoFromUser(user),
 });
 
 export const getCredits = asyncHandler(async (req, res) => {
@@ -26,9 +27,7 @@ export const getCredits = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
-  const nextResetAt = user.nextCreditResetAt
-    ? user.nextCreditResetAt.toISOString()
-    : null;
+  const nextResetAt = resetIsoFromUser(user);
 
   return res.status(200).json({
     success: true,
@@ -37,6 +36,7 @@ export const getCredits = asyncHandler(async (req, res) => {
     dailyLimit: getDailyCreditLimit(),
     creditsPerImage: getCreditsPerImage(),
     nextResetAt,
+    dailyCreditResetAt: nextResetAt,
     dailyResetTimezone: getCreditsResetTimezoneLabel(),
     user: sanitizeUser(user),
   });

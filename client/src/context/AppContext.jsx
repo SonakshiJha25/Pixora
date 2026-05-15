@@ -79,11 +79,11 @@ const AppContextProvider = ({ children }) => {
       const u = data?.user ?? null;
       setUser(u ? { ...u, creditBalance: pts } : null);
       setCredit(pts);
-      const nextApi = data?.nextResetAt;
+      const nextApi = data?.nextResetAt ?? data?.dailyCreditResetAt;
       const nextIso =
         (typeof nextApi === "string" && nextApi.trim() !== "" ? nextApi.trim() : null) ??
-        (typeof u?.nextCreditResetAt === "string" && u.nextCreditResetAt.trim() !== ""
-          ? u.nextCreditResetAt.trim()
+        (typeof u?.dailyCreditResetAt === "string" && u.dailyCreditResetAt.trim() !== ""
+          ? u.dailyCreditResetAt.trim()
           : null) ??
         getNextCalendarBoundaryIso();
       setDailyCreditSchedule({

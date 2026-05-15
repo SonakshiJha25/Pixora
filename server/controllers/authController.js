@@ -11,8 +11,8 @@ const sanitizeUser = (user) => ({
   role: user.role,
   credits: user.credits,
   creditBalance: user.credits,
-  nextCreditResetAt: user.nextCreditResetAt
-    ? user.nextCreditResetAt.toISOString()
+  dailyCreditResetAt: user.dailyCreditResetAt
+    ? user.dailyCreditResetAt.toISOString()
     : null,
 });
 

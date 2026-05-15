@@ -5,8 +5,8 @@ export const CREDITS_PER_IMAGE = 10;
 /** Snap to valid ledger values 0, 10, …, 100 (matches server dailyCreditsService). */
 export function normalizeCreditsPoints(raw) {
   const n = Math.round(Number(raw));
-  if (!Number.isFinite(n) || n < 0) return 0;
-  const capped = Math.min(DAILY_CREDITS_LIMIT, n);
+  if (!Number.isFinite(n)) return 0;
+  const capped = Math.min(DAILY_CREDITS_LIMIT, Math.max(0, n));
   return Math.floor(capped / CREDITS_PER_IMAGE) * CREDITS_PER_IMAGE;
 }
 

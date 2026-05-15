@@ -3,7 +3,7 @@ import { logInfo } from "../utils/logger.js";
 export const DAILY_CREDITS = 100;
 export const CREDITS_PER_IMAGE = 10;
 const DAY_MS = 86400000;
-/** India Standard Time = UTC+5:30 (no DST). All daily resets use IST midnight only. */
+/** India Standard Time = UTC+5:30 (no DST). All daily resets use IST midnight only (calendar, not rolling 24h). */
 const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
 
 /**
@@ -18,19 +18,23 @@ export function getNextIstMidnightUtcMs(fromMs = Date.now()) {
 }
 
 /**
- * Valid balances: 0, 10, …, 100 only.
+ * Valid balances only: 0, 10, …, 100. Never negative.
  */
 export function snapCreditsToLedger(raw) {
   let n = Math.round(Number(raw));
-  if (!Number.isFinite(n) || n < 0) return 0;
-  n = Math.min(DAILY_CREDITS, n);
+  if (!Number.isFinite(n)) n = 0;
+  n = Math.max(0, Math.min(DAILY_CREDITS, n));
   return Math.floor(n / CREDITS_PER_IMAGE) * CREDITS_PER_IMAGE;
 }
 
+function formatCreditLogUser(user) {
+  if (user?.email) return String(user.email).trim();
+  return String(user?._id ?? user?.id ?? "unknown");
+}
+
 /**
- * Ensures daily pool is current for IST calendar boundaries and credits are on-ledger.
- * Uses `nextCreditResetAt` (UTC Date): when `now >= nextCreditResetAt`, credits reset to 100
- * and `nextCreditResetAt` advances to the following IST midnight.
+ * Ensures daily pool matches IST midnight cutover and credits snap to ledger.
+ * `dailyCreditResetAt` holds the UTC instant of the upcoming IST midnight when credits reset.
  */
 export async function ensureDailyCredits(user, { session } = {}) {
   const saveOpts = session ? { session } : {};
@@ -43,22 +47,26 @@ export async function ensureDailyCredits(user, { session } = {}) {
     dirty = true;
   }
 
-  let nextMs = user.nextCreditResetAt ? new Date(user.nextCreditResetAt).getTime() : NaN;
+  let nextMs = user.dailyCreditResetAt ? new Date(user.dailyCreditResetAt).getTime() : NaN;
+
+  const who = formatCreditLogUser(user);
+
   if (!Number.isFinite(nextMs)) {
-    user.nextCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
+    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
     dirty = true;
   } else if (nowMs >= nextMs) {
+    const oldCredits = snapCreditsToLedger(user.credits);
     user.credits = DAILY_CREDITS;
-    user.nextCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
+    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
     dirty = true;
-    const who = user.email ? String(user.email) : String(user._id);
     logInfo(
-      `IST credit reset: user=${who} balance=${DAILY_CREDITS} nextResetAt=${user.nextCreditResetAt.toISOString()}`
+      `[Credit Reset]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
     );
   }
 
   if (dirty) {
     await user.save(saveOpts);
+    user.credits = snapCreditsToLedger(user.credits);
   }
 
   user.credits = snapCreditsToLedger(user.credits);

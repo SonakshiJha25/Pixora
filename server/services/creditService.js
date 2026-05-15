@@ -9,6 +9,11 @@ import {
 } from "./dailyCreditsService.js";
 import { logInfo } from "../utils/logger.js";
 
+function creditLogUser(email, fallbackId) {
+  const e = email && String(email).trim();
+  return e || String(fallbackId ?? "unknown");
+}
+
 export async function deductCreditAndSaveImage({
   userId,
   prompt,
@@ -31,6 +36,15 @@ export async function deductCreditAndSaveImage({
     await ensureDailyCredits(user, { session });
 
     const cost = getCreditsPerImage();
+    const balanceBefore = snapCreditsToLedger(user.credits);
+
+    if (balanceBefore < cost) {
+      throw new AppError(
+        "Daily image limit reached. Come back tomorrow.",
+        402,
+        "DAILY_LIMIT_REACHED"
+      );
+    }
 
     const updated = await User.findOneAndUpdate(
       { _id: userId, credits: { $gte: cost } },
@@ -46,9 +60,9 @@ export async function deductCreditAndSaveImage({
       );
     }
 
-    const ledger = snapCreditsToLedger(updated.credits);
-    if (ledger !== updated.credits) {
-      updated.credits = ledger;
+    let balanceAfter = Math.max(0, snapCreditsToLedger(updated.credits));
+    if (balanceAfter !== updated.credits) {
+      updated.credits = balanceAfter;
       await updated.save({ session });
     }
 
@@ -76,15 +90,15 @@ export async function deductCreditAndSaveImage({
 
     await session.commitTransaction();
 
-    const who = updated.email ? String(updated.email) : String(userId);
+    const who = creditLogUser(updated.email, userId);
     logInfo(
-      `Credit deduction: user=${who} -${cost} remaining=${updated.credits} imageId=${String(image._id)}`
+      `[Credit Deducted]\nUser: ${who}\nBefore: ${balanceBefore}\nAfter: ${balanceAfter}\nReason: new_generation`
     );
     logInfo(
       `Image saved: userId=${String(userId).slice(-8)} imageId=${String(image._id)} url=${String(imageUrl).slice(0, 120)}`
     );
 
-    return { image, remainingCredits: updated.credits, userEmail: updated.email };
+    return { image, remainingCredits: balanceAfter, userEmail: updated.email };
   } catch (err) {
     await session.abortTransaction();
     throw err;
@@ -93,9 +107,7 @@ export async function deductCreditAndSaveImage({
   }
 }
 
-/**
- * Atomic deduction used by POST /api/credits/use. Only the per-image cost is allowed.
- */
+/** Atomic deduction for POST /api/credits/use; same ledger rules as new generation deduction. */
 export async function useCreditsAtomic({ userId, amount }) {
   const cost = getCreditsPerImage();
   if (amount !== cost) {
@@ -110,6 +122,11 @@ export async function useCreditsAtomic({ userId, amount }) {
       throw new AppError("User not found", 404, "USER_NOT_FOUND");
     }
     await ensureDailyCredits(user, { session });
+    const balanceBefore = snapCreditsToLedger(user.credits);
+
+    if (balanceBefore < cost) {
+      throw new AppError("Insufficient credits", 402, "INSUFFICIENT_CREDITS");
+    }
 
     const updated = await User.findOneAndUpdate(
       { _id: userId, credits: { $gte: cost } },
@@ -121,17 +138,20 @@ export async function useCreditsAtomic({ userId, amount }) {
       throw new AppError("Insufficient credits", 402, "INSUFFICIENT_CREDITS");
     }
 
-    const ledger = snapCreditsToLedger(updated.credits);
-    if (ledger !== updated.credits) {
-      updated.credits = ledger;
+    let balanceAfter = Math.max(0, snapCreditsToLedger(updated.credits));
+    if (balanceAfter !== updated.credits) {
+      updated.credits = balanceAfter;
       await updated.save({ session });
     }
 
     await session.commitTransaction();
+
+    const who = creditLogUser(updated.email, userId);
     logInfo(
-      `Credit deduction (use endpoint): user=${updated.email || userId} -${cost} remaining=${updated.credits}`
+      `[Credit Deducted]\nUser: ${who}\nBefore: ${balanceBefore}\nAfter: ${balanceAfter}\nReason: manual_use_endpoint`
     );
-    return updated.credits;
+
+    return balanceAfter;
   } catch (err) {
     await session.abortTransaction();
     throw err;

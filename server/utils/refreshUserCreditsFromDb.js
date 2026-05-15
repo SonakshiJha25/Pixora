@@ -2,8 +2,8 @@ import User from "../models/User.js";
 import { ensureDailyCredits } from "../services/dailyCreditsService.js";
 
 /**
- * Runs IST-midnight credit rollover via `nextCreditResetAt`, persists if needed, then reloads
- * the user so API responses reflect the canonical balance.
+ * On every authenticated credits/guard path: IST-midnight check via dailyCreditResetAt,
+ * persist if needed, reload user from MongoDB so responses show the canonical balance.
  */
 export default async function refreshUserCreditsFromDb(userId, { session } = {}) {
   let user = session
