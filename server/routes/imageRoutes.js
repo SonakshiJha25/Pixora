@@ -49,7 +49,7 @@ imageRouter.post(
   "/edit",
   userAuth,
   [
-    body("imageId").isMongoId(),
+    body("imageId").customSanitizer((v) => (v == null ? "" : String(v).trim())).isMongoId(),
     body("editPrompt").isLength({ min: 3, max: 1000 }),
     validate,
   ],

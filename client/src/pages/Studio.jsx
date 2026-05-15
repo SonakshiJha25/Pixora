@@ -83,7 +83,11 @@ export default function Studio() {
     [refinementThread]
   );
 
-  const latestThreadImageId = sortedThread.at(-1)?._id;
+  const latestThreadImageIdRaw = sortedThread.at(-1)?._id;
+  const latestThreadImageId =
+    latestThreadImageIdRaw !== undefined && latestThreadImageIdRaw !== null
+      ? String(latestThreadImageIdRaw)
+      : "";
   const autoStopTimerRef = useRef(null);
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
@@ -255,7 +259,7 @@ export default function Studio() {
 
   const applyRefinement = async (editPrompt) => {
     if (!latestThreadImageId) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("No frame to refine yet — generate one first.");
       return;
     }
     try {
@@ -265,19 +269,35 @@ export default function Studio() {
         editPrompt,
       });
       if (!data?.success || !data?.image) {
-        toast.error("Couldn't apply that edit right now.");
+        toast.error("Couldn't finish that refine.");
         return;
       }
       const nextImg = data.image;
       setRefinementThread((prev) =>
-        [...prev, nextImg].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        [...prev, nextImg].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       );
       setImage(resolveImageUrl(nextImg.imageUrl));
       await fetchHistory();
       setRefinePanelOpen(false);
-      toast.success("Updated — newest version is on top.");
-    } catch {
-      toast.error("Couldn't apply that edit right now.");
+      if (data.refinementMode === "duplicate_fallback") {
+        toast.warning(
+          "The render service didn't return a new image — your thread still has a linked step. Check Clipdrop quota or try a simpler instruction."
+        );
+      } else {
+        toast.success("Refine added — newest frame is on top.");
+      }
+    } catch (error) {
+      const payload = error?.response?.data;
+      const errObj = payload?.error;
+      const detailMsg =
+        Array.isArray(errObj?.details) && errObj.details[0]?.msg ? String(errObj.details[0].msg).trim() : "";
+      const apiMsg =
+        typeof errObj?.message === "string"
+          ? errObj.message.trim()
+          : typeof payload?.message === "string"
+            ? payload.message.trim()
+            : "";
+      toast.error(detailMsg || apiMsg || "Couldn't finish that refine.");
     } finally {
       setRefineSubmitting(false);
     }

@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const PLACEHOLDERS = [
-  "Make the gown floor length",
-  "Add neon lighting",
-  "Make it realistic",
-  "Change sky to sunset",
-  "Remove background people",
-  "Change dress color to red",
-  "Make it cinematic",
+  "Add warm window light from the left",
+  "Make colours a little more saturated",
+  "Change the sky to late sunset",
+  "Soften the background, keep the subject sharp",
+  "Remove the small logo in the corner",
+  "Give it a calmer, matte finish",
 ];
 
 function usePlaceholderRotate(active) {
@@ -32,7 +31,8 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
   }, [open]);
 
   const footerHint = useMemo(
-    () => "This stays on the thread you started, so we don’t tick credits for every nudge.",
+    () =>
+      `Stays on this thread — refinements don't use another full image credit. Details: Help → credits.`,
     []
   );
 
@@ -62,10 +62,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
           >
             <header className="relative shrink-0 border-b border-slate-100 px-5 pb-4 pt-5 pr-16">
               <h2 id="refine-panel-title" className="text-lg font-bold tracking-tight text-slate-900">
-                Nudge this version
+                Refine
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                Say what to change in plain language — no extra credit hit for this path.
+                One clear sentence is enough — adjust lighting, palette, subjects, or small details on this frame.
               </p>
               <button
                 type="button"
@@ -85,20 +85,21 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 >
                   <img
                     src={previewSrc}
-                    alt="Image to refine"
+                    alt="Frame you are refining"
                     className="max-h-[40vh] w-full object-contain md:max-h-[32vh]"
                   />
                 </motion.div>
               ) : (
                 <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
-                  No preview available
+                  Preview unavailable — close and reopen after a render completes.
                 </div>
               )}
 
-              <label className="mt-6 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Describe the change
+              <label htmlFor="refine-instruction" className="mt-6 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Your instruction
               </label>
               <textarea
+                id="refine-instruction"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={5}
@@ -119,10 +120,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 {submitting ? (
                   <>
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Applying…
+                    Refining…
                   </>
                 ) : (
-                  "Apply changes"
+                  "Run refine"
                 )}
               </button>
             </div>

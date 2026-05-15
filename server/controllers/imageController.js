@@ -121,6 +121,7 @@ export const editImage = asyncHandler(async (req, res) => {
     success: true,
     message: "Refinement saved",
     creditsUnchanged: true,
+    refinementMode: mode,
     image: serializeImage(child, req),
   });
 });
