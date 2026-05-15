@@ -12,9 +12,10 @@ export default function Steps() {
       transition={{ duration: 0.55 }}
       className="mx-auto flex w-full flex-col items-center py-12 text-center sm:py-16"
     >
-      <h2 className="type-section-title">Sketch → polish</h2>
-      <p className="type-body mx-auto mt-2 max-w-md sm:max-w-lg">
-        Concrete prompts beat vague ones.
+      <h2 className="type-section-title">From sketch to polish</h2>
+      <p className="type-body mx-auto mt-2 max-w-lg sm:max-w-xl">
+        Vague mood words are fun, but cameras love specifics — the more you describe, the less guessing the model has to
+        do.
       </p>
       <div className="mt-9 w-full space-y-3 sm:mt-10">
         {stepsData.map((item, index) => (
@@ -40,10 +41,12 @@ export default function Steps() {
       >
         Open {WORKSPACE_NAME}
       </Link>
-      <p className="type-meta mt-3">
+      <p className="type-meta mt-3 max-w-lg leading-relaxed sm:mx-auto">
+        IST resets, refinement nuance, and what free refinements cover —{" "}
         <Link to="/help" className="type-link-brand">
-          Credits & refines → Help
+          read Help
         </Link>
+        .
       </p>
     </motion.section>
   );

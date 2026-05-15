@@ -9,21 +9,21 @@ const flowSteps = [
   {
     n: "1",
     title: "Log in once",
-    line: "One login unlocks credits & gallery.",
+    line: "One account keeps your credits, renders, and gallery in sync wherever you sign in.",
     img: assets.sample_img_1,
     imgClass: "object-cover object-center",
   },
   {
     n: "2",
     title: "Describe & generate",
-    line: "Style + prompt → render.",
+    line: "Pick a mood, write the scene clearly, and produce a first image in about a minute.",
     img: assets.sample_img_2,
     imgClass: "object-cover object-center",
   },
   {
     n: "3",
     title: "Refine without stress",
-    line: "Tight edits on the same thread.",
+    line: "Small follow-up edits live on the same thread — no scramble for “another full credit” feelings.",
     img: assets.home_mascot,
     imgClass: "object-cover object-[center_20%]",
   },
@@ -41,6 +41,9 @@ export default function HomeMiniFlow() {
       >
         <div className="px-0 sm:px-1">
           <h2 className="type-subsection-title mt-3">Quick links</h2>
+          <p className="type-body-tight mx-auto mt-1.5 max-w-2xl md:mx-0">
+            Studio, gallery, plans, and troubleshooting — the routes people open most, right up front.
+          </p>
         </div>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-5">
           {HOME_SHORTCUT_TILES.map((link, idx) => {
@@ -93,8 +96,9 @@ export default function HomeMiniFlow() {
         <div className="relative text-center sm:text-center">
           <p className="type-eyebrow-brand">How it flows</p>
           <h2 className="type-section-accent mt-2">Idea → image → refine</h2>
-          <p className="type-body mx-auto mt-2 max-w-md sm:max-w-lg">
-            New generations use credits; same-thread refinements don&apos;t.
+          <p className="type-body mx-auto mt-2 max-w-lg sm:max-w-xl">
+            A brand-new prompt eats from your daily allowance. Tweaking what you already produced on that same thread
+            refines the look without spending like a full new render.
           </p>
         </div>
 
@@ -162,7 +166,9 @@ export default function HomeMiniFlow() {
           <span className="inline-flex items-center justify-center gap-2">
             <Zap className="h-4 w-4 shrink-0 text-amber-500" aria-hidden />
             <span className="type-body text-slate-700">
-              ~<strong className="type-emphasis">10 new images</strong>/day from 100 credits (10/run). Refines skip that charge.
+              Free accounts get about <strong className="type-emphasis">10 fresh images</strong> a day from{" "}
+              <strong>100</strong> credits (roughly <strong>10</strong> credits per run). Same-thread refinements
+              usually skip that full charge — see Help for the fine print.
             </span>
           </span>
           <Link
@@ -173,10 +179,12 @@ export default function HomeMiniFlow() {
           </Link>
         </motion.div>
 
-        <p className="type-meta relative mt-5 text-center">
+        <p className="type-meta relative mt-5 text-center leading-relaxed">
+          Need timezones, IST resets, or refinement rules spelled out?{" "}
           <Link to="/help" className="type-link-brand">
-            Full details → Help
+            Open the Help hub
           </Link>
+          .
         </p>
       </motion.div>
     </section>

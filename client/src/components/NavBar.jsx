@@ -101,7 +101,7 @@ export default function NavBar() {
             />
           </span>
           <span
-            className={`truncate text-base font-extrabold tracking-tight sm:text-lg ${
+            className={`truncate font-display text-base font-bold tracking-tight sm:text-lg ${
               isWorkspaceNav ? "text-white" : "text-slate-900"
             }`}
           >

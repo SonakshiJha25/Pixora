@@ -93,7 +93,7 @@ export default function Footer() {
                 className="h-9 w-9 rounded-[13px] object-cover ring-1 ring-white/80"
               />
             </span>
-            <span className="text-sm font-extrabold text-slate-900 sm:text-[15px]">{SITE.name}</span>
+            <span className="font-display text-sm font-bold text-slate-900 sm:text-[15px]">{SITE.name}</span>
           </button>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 sm:justify-end">
             <a className="font-semibold text-brand-sky hover:underline" href={`mailto:${SITE.helpEmail}`}>

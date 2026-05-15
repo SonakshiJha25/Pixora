@@ -79,9 +79,15 @@ export default function Header() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         {user ? (
-          <>Credits reset daily — new images use your pool; refinements work differently.</>
+          <>
+            Your credits refresh every morning (IST). Spend them on brand-new images — then nudge the same scene with
+            refinements that behave a little differently than a fresh run.
+          </>
         ) : (
-          <>Sign in for credits, gallery, and refinements.</>
+          <>
+            Sign in for daily credits, a private gallery, threaded history, and the option to refine images you&apos;ve
+            already created.
+          </>
         )}
       </motion.p>
 
@@ -110,7 +116,8 @@ export default function Header() {
           <div className="min-w-0 flex-1">
             <h2 className="type-subsection-title">Studio + gallery</h2>
             <p className="type-body mt-1.5 text-slate-600">
-              Styles, favourites, downloads — one thread per idea.
+              Create in {WORKSPACE_NAME}, keep everything inside your Pixorify gallery — styles, favourites, and PNG
+              downloads stay ordered in one thread per idea.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Styles</span>

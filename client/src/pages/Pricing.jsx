@@ -15,8 +15,10 @@ export default function Pricing() {
         >
           <p className="type-eyebrow-brand">Pricing</p>
           <h1 className="type-page-title mt-2">Free tier, Pro when you need it</h1>
-          <p className="type-body mx-auto mt-2 max-w-md">
-            Credits & IST reset →{" "}
+          <p className="type-body mx-auto mt-2 max-w-xl">
+            Free clears the basics — daily credits, every style, and refinement passes on threads you&apos;ve started.
+            Pro buys breathing room when you genuinely live inside the workspace.
+            Need the ledger details? Visit{" "}
             <Link to="/help" className="type-link-brand">
               Help
             </Link>

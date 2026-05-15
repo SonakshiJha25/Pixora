@@ -16,9 +16,10 @@ export default function Description() {
         className="w-full max-w-[17.5rem] rounded-2xl object-cover shadow-glow ring-1 ring-white/70 sm:max-w-xs"
       />
       <div className="max-w-md text-center md:text-left">
-        <h2 className="type-section-title">Workflow-first</h2>
+        <h2 className="type-section-title">Built around how you actually work</h2>
         <p className="type-body mt-3">
-          Studio to create, gallery to keep it — no clutter.
+          Pixora Studio stays laser-focused on generating and iterating; Pixorify keeps outputs tidy so you aren&apos;t
+          juggling downloads with no storyline.
         </p>
       </div>
     </motion.section>

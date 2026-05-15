@@ -377,11 +377,13 @@ export default function Studio() {
             />
           </div>
           <div className="min-w-0">
-            <h1 className="mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
-            <p className="type-body-dim mx-auto mt-1 max-w-md sm:mx-0">
-              Prompt + style → preview.
+            <h1 className="font-display mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
+            <p className="type-body-dim mx-auto mt-1.5 max-w-lg sm:mx-0">
+              Pair a cinematic style with a deliberate prompt — we render it below so you can download or refine further.
               {!isSignedIn ? (
-                <span className="mt-1 block text-slate-500">Sign in to render · credits reset midnight IST</span>
+                <span className="mt-1.5 block text-slate-500">
+                  Sign in first to spend credits; balances refresh at midnight IST.
+                </span>
               ) : null}
             </p>
           </div>
@@ -443,8 +445,8 @@ export default function Studio() {
                         <span className="font-semibold text-slate-200">
                           {idx === 0 ? "Started from" : `Tweak ${idx}`}:
                         </span>{" "}
-                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 160)}
-                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 160
+                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 200)}
+                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 200
                           ? "…"
                           : ""}
                       </p>
@@ -613,11 +615,13 @@ export default function Studio() {
                       ) : null}
                     </p>
                   ) : null}
-                  <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2 text-[11px] leading-snug text-slate-500 sm:text-xs">
-                    New runs cost credits; <span className="font-medium text-slate-400">Refine this image</span> doesn&apos;t.{" "}
+                  <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
+                    New runs cost credits; <span className="font-medium text-slate-400">Refine this image</span> keeps tiny
+                    follow-ups on the same thread without another full charge — read{" "}
                     <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
                       Help
-                    </Link>
+                    </Link>{" "}
+                    for the nuance.
                   </p>
                 </div>
               </div>
@@ -643,8 +647,10 @@ export default function Studio() {
       <section className="mt-12 w-full sm:mt-16">
         <div className="studio-shell mb-5 flex flex-col gap-3 rounded-[1.5rem] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="text-center sm:text-left">
-            <h2 className="text-base font-bold text-white sm:text-lg">Recent</h2>
-            <p className="text-xs text-slate-400 sm:text-sm">Last runs · full history in Gallery</p>
+            <h2 className="font-display text-base font-semibold text-white sm:text-lg">Recent</h2>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
+              A quick skim of renders from this session — open Gallery for favourites, PNGs, and full threads.
+            </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
             <button

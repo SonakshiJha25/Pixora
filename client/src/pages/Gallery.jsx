@@ -58,8 +58,11 @@ export default function Gallery() {
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-cyan/20 to-brand-sky/15 text-brand-cyan ring-1 ring-white/80">
               <LayoutGrid className="h-6 w-6" strokeWidth={2} aria-hidden />
             </span>
-            <h1 className="type-page-title mt-5">Sign in for gallery</h1>
-            <p className="type-body mt-2">Threads from {WORKSPACE_NAME} sync here.</p>
+            <h1 className="type-page-title mt-5">Your Pixorify gallery</h1>
+            <p className="type-body mx-auto mt-3 max-w-md">
+              Sign in once and every render from {WORKSPACE_NAME} syncs automatically — favourites, PNGs, and refinement
+              chains stay grouped the way you left them.
+            </p>
             <button
               type="button"
               onClick={() => setShowLogin(true)}
@@ -88,9 +91,10 @@ export default function Gallery() {
           transition={{ duration: 0.4 }}
           className="mx-auto mb-8 max-w-2xl text-center sm:mb-10"
         >
-          <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Gallery</h1>
-          <p className="mx-auto mt-1.5 max-w-sm text-xs leading-snug text-slate-400 sm:text-[13px]">
-            Threads · latest on cover · ♥ saved
+          <h1 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">Gallery</h1>
+          <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-slate-400 sm:text-sm">
+            Each tile is one idea threaded through time — newest render on the cover, versions inside{" "}
+            <span className="font-medium text-slate-300">Open thread</span>, hearts land in Saved for quick recall.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
             <Link to="/studio" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">

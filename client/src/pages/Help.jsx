@@ -22,7 +22,7 @@ const quickLinks = [
   {
     to: "/studio",
     title: WORKSPACE_NAME,
-    desc: `${WORKSPACE_NAME} — styles & downloads.`,
+    desc: `Prompts, styles, and downloads — everything happens inside ${WORKSPACE_NAME}.`,
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
     border: "border-cyan-200/70",
@@ -31,7 +31,7 @@ const quickLinks = [
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "Threads, favourites, PNGs.",
+    desc: "See every thread, favourite the hits, and export PNGs without hunting folders.",
     icon: LayoutGrid,
     grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
     border: "border-violet-200/70",
@@ -40,7 +40,7 @@ const quickLinks = [
   {
     to: "/pricing",
     title: "Pricing",
-    desc: "Free vs paid.",
+    desc: "Compare allowances, learn what Pro unlocks later, then jump back to creating.",
     icon: Sparkles,
     grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
     border: "border-amber-200/70",
@@ -49,7 +49,7 @@ const quickLinks = [
   {
     to: "/feedback",
     title: "Feedback",
-    desc: "Bugs & ideas.",
+    desc: "Something confusing, broken, or half-baked? Tell us plainly — humans read these.",
     icon: Heart,
     grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
     border: "border-rose-200/70",
@@ -215,8 +215,8 @@ export default function Help() {
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
           <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
-          <p className="type-body mt-2 max-w-md sm:mt-2.5">
-            Credits, refines, contact.
+          <p className="type-body mt-2 max-w-lg sm:mt-3">
+            Credits, daily limits, refinements, IST clocks, and where to message a human if something looks off.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link

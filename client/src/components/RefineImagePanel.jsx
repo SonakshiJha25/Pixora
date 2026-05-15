@@ -31,7 +31,8 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
   }, [open]);
 
   const footerHint = useMemo(
-    () => "Stays on this thread; no extra full-image credit. See Help for details.",
+    () =>
+      "Refinements stay chained to this thread and don’t behave like a totally new generation for credits. See Help → credits for the wording that matters.",
     []
   );
 
@@ -60,11 +61,12 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
             className="fixed bottom-0 right-0 top-0 z-[85] flex w-full flex-col bg-white/96 shadow-2xl ring-1 ring-slate-200/80 md:left-auto md:max-w-md"
           >
             <header className="relative shrink-0 border-b border-slate-100 px-5 pb-3 pt-4 pr-16">
-              <h2 id="refine-panel-title" className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">
+              <h2 id="refine-panel-title" className="font-display text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
                 Refine this image
               </h2>
-              <p className="mt-1 text-xs leading-snug text-slate-600 sm:text-sm">
-                Describe one change to this frame — lighting, colour, or small details.
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600 sm:text-sm">
+                Paint a picture with words: mention light direction, colour tweaks, or subjects to nudge while keeping
+                composition mostly intact.
               </p>
               <button
                 type="button"

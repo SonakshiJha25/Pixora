@@ -55,17 +55,19 @@ export const assets = {
 export const stepsData = [
   {
     title: "Describe the scene",
-    description: "Subject, lighting, palette — specifics win over vibe words.",
+    description:
+      "Mention who is in frame, the light, and the palette — a few concrete beats one vague adjective every time.",
     icon: step_icon_1,
   },
   {
-    title: "Style + Generate",
-    description: "Pick a look and run it. Tweaks afterward use Refine on the thread.",
+    title: "Style + generate",
+    description:
+      "Lock a look (realistic, anime, cyberpunk, and the rest) before you hit go. Further polish lives in Refine on that same thread.",
     icon: step_icon_2,
   },
   {
     title: "Save what works",
-    description: "Download PNGs, favourite shots, revisit threads anytime.",
+    description: "Download PNGs, star favourites, or reopen a thread when you think of the next micro-tweak.",
     icon: credit_star,
   },
 ];

@@ -3,6 +3,10 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Outfit"', '"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+      },
       colors: {
         brand: {
           /** Deep indigo canvas — aligns with logo night sky */
