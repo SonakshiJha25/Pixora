@@ -24,7 +24,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/studio",
     title: WORKSPACE_NAME,
-    desc: "Prompt, pick a look, generate.",
+    desc: "Prompt, style, go.",
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
     border: "border-cyan-200/70",
@@ -33,7 +33,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "Saved threads & favourites.",
+    desc: "Threads & favourites.",
     icon: LayoutGrid,
     grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
     border: "border-violet-200/70",
@@ -42,7 +42,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/pricing",
     title: "Plans",
-    desc: "What’s included on Free vs paid.",
+    desc: "Free vs Pro.",
     icon: Sparkles,
     grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
     border: "border-amber-200/70",
@@ -51,7 +51,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/help",
     title: "Help",
-    desc: "Credits, refines, the boring bits explained.",
+    desc: "Credits & refines.",
     icon: CircleHelp,
     grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
     border: "border-rose-200/70",

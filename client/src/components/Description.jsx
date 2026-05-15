@@ -1,6 +1,5 @@
 import { assets } from "../assets/assets";
 import { motion } from "motion/react";
-import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Description() {
   return (
@@ -9,7 +8,7 @@ export default function Description() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.55 }}
-      className="mx-auto flex w-full flex-col items-center gap-9 py-14 md:flex-row md:items-center md:gap-12"
+      className="mx-auto flex w-full flex-col items-center gap-8 py-11 md:flex-row md:items-center md:gap-10"
     >
       <img
         src={assets.sample_img_1}
@@ -17,9 +16,9 @@ export default function Description() {
         className="w-full max-w-[17.5rem] rounded-2xl object-cover shadow-glow ring-1 ring-white/70 sm:max-w-xs"
       />
       <div className="max-w-md text-center md:text-left">
-        <h2 className="type-section-title">Built for workflows</h2>
+        <h2 className="type-section-title">Workflow-first</h2>
         <p className="type-body mt-3">
-          {WORKSPACE_NAME} for making, Pixorify gallery for keeping — without demo-page clutter.
+          Studio to create, gallery to keep it — no clutter.
         </p>
       </div>
     </motion.section>

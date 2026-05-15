@@ -31,8 +31,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
   }, [open]);
 
   const footerHint = useMemo(
-    () =>
-      `Stays on this thread — refinements don't use another full image credit. Details: Help → credits.`,
+    () => "Same thread; refines don’t use a full-image credit. Details: Help.",
     []
   );
 
@@ -60,12 +59,12 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
             className="fixed bottom-0 right-0 top-0 z-[85] flex w-full flex-col bg-white/96 shadow-2xl ring-1 ring-slate-200/80 md:left-auto md:max-w-md"
           >
-            <header className="relative shrink-0 border-b border-slate-100 px-5 pb-4 pt-5 pr-16">
-              <h2 id="refine-panel-title" className="text-lg font-bold tracking-tight text-slate-900">
+            <header className="relative shrink-0 border-b border-slate-100 px-5 pb-3 pt-4 pr-16">
+              <h2 id="refine-panel-title" className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">
                 Refine
               </h2>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                One clear sentence is enough — adjust lighting, palette, subjects, or small details on this frame.
+              <p className="mt-1 text-xs leading-snug text-slate-600 sm:text-sm">
+                One line: lighting, colour, or small fixes on this frame.
               </p>
               <button
                 type="button"
@@ -90,8 +89,8 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                   />
                 </motion.div>
               ) : (
-                <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-500">
-                  Preview unavailable — close and reopen after a render completes.
+                <div className="flex h-36 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-500 sm:text-sm">
+                  Preview after a render completes.
                 </div>
               )}
 
@@ -102,12 +101,12 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 id="refine-instruction"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                rows={5}
+                rows={4}
                 disabled={submitting}
                 placeholder={ph}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none ring-0 transition placeholder:text-slate-400 focus:border-brand-cyan/50 focus:ring-2 focus:ring-brand-cyan/20 disabled:opacity-60"
               />
-              <p className="mt-3 text-[11px] leading-relaxed text-slate-500">{footerHint}</p>
+              <p className="mt-2 text-[10px] leading-snug text-slate-500 sm:text-[11px]">{footerHint}</p>
             </div>
 
             <div className="shrink-0 border-t border-slate-100 bg-white/95 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">

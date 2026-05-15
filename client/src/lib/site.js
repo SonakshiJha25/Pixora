@@ -24,27 +24,27 @@ export const CLIPDROP_ATTRIBUTION = "Powered by Clipdrop AI";
 export const STUDIO_STYLE_SAMPLES = [
   {
     label: "Realistic",
-    caption: "Photo-real when you spell the light and lens",
+    caption: "Photo look — name the light",
     image: assets.style_realistic,
   },
   {
     label: "Anime",
-    caption: "Clean lines, illustration energy, characters & props",
+    caption: "Clean lines, illustration",
     image: assets.style_anime,
   },
   {
     label: "Cyberpunk",
-    caption: "Neon, glass, gritty future-city palettes",
+    caption: "Neon, glass, grime",
     image: assets.style_cyberpunk,
   },
   {
     label: "Fantasy",
-    caption: "Big atmosphere, drama, almost a film still",
+    caption: "Drama, epic mood",
     image: assets.style_fantasy,
   },
   {
     label: "Minimal",
-    caption: "Space, flat colour blocks, less noise",
+    caption: "Space, flat colour",
     image: assets.style_minimal,
   },
 ];

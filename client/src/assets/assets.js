@@ -54,21 +54,18 @@ export const assets = {
 
 export const stepsData = [
   {
-    title: "Say what you’re after",
-    description:
-      "Type it the way you’d explain it to a friend: who’s there, lighting, palette, vibe. Tiny specifics usually beat “make it cool”.",
+    title: "Describe the scene",
+    description: "Subject, lighting, palette — specifics win over vibe words.",
     icon: step_icon_1,
   },
   {
-    title: "Pick a style, hit generate",
-    description:
-      "Realistic, anime, cyberpunk — pick one in Pixora Studio and go. Changing your mind afterwards is fine too. Tweaks inside the thread use Refine, not another full charge.",
+    title: "Style + Generate",
+    description: "Pick a look and run it. Tweaks afterward use Refine on the thread.",
     icon: step_icon_2,
   },
   {
-    title: "Keep what sticks",
-    description:
-      "Download a PNG anytime, tuck favourites in My gallery, and reopen threads whenever you remember that one tweak you skipped.",
+    title: "Save what works",
+    description: "Download PNGs, favourite shots, revisit threads anytime.",
     icon: credit_star,
   },
 ];

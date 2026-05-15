@@ -9,21 +9,21 @@ const flowSteps = [
   {
     n: "1",
     title: "Log in once",
-    line: "Credits, gallery, threads — one login.",
+    line: "One login unlocks credits & gallery.",
     img: assets.sample_img_1,
     imgClass: "object-cover object-center",
   },
   {
     n: "2",
     title: "Describe & generate",
-    line: "Pick a look, type the scene, render.",
+    line: "Style + prompt → render.",
     img: assets.sample_img_2,
     imgClass: "object-cover object-center",
   },
   {
     n: "3",
     title: "Refine without stress",
-    line: "Small edits on what you have — same thread, no credit panic.",
+    line: "Tight edits on the same thread.",
     img: assets.home_mascot,
     imgClass: "object-cover object-[center_20%]",
   },
@@ -40,7 +40,7 @@ export default function HomeMiniFlow() {
         transition={{ duration: 0.42 }}
       >
         <div className="px-0 sm:px-1">
-          <h2 className="type-subsection-title mt-3">Shortcuts</h2>
+          <h2 className="type-subsection-title mt-3">Quick links</h2>
         </div>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-5">
           {HOME_SHORTCUT_TILES.map((link, idx) => {
@@ -79,7 +79,7 @@ export default function HomeMiniFlow() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.45 }}
-        className="relative mt-11 overflow-hidden rounded-[1.65rem] border border-white/70 bg-white/60 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:mt-12 sm:p-7 lg:p-8"
+        className="relative mt-9 overflow-hidden rounded-[1.65rem] border border-white/70 bg-white/60 p-4 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:mt-10 sm:p-6 lg:p-7"
       >
         <div
           className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-brand-cyan/12 blur-3xl"
@@ -92,12 +92,9 @@ export default function HomeMiniFlow() {
 
         <div className="relative text-center sm:text-center">
           <p className="type-eyebrow-brand">How it flows</p>
-          <h2 className="type-section-accent mt-2">
-            Idea → image → tighten it up
-          </h2>
-          <p className="type-body mx-auto mt-3 max-w-xl sm:max-w-2xl">
-            Starting something brand new uses part of your daily credits. Tweaking what you&apos;ve already made with
-            Refine doesn&apos;t.
+          <h2 className="type-section-accent mt-2">Idea → image → refine</h2>
+          <p className="type-body mx-auto mt-2 max-w-md sm:max-w-lg">
+            New generations use credits; same-thread refinements don&apos;t.
           </p>
         </div>
 
@@ -165,25 +162,21 @@ export default function HomeMiniFlow() {
           <span className="inline-flex items-center justify-center gap-2">
             <Zap className="h-4 w-4 shrink-0 text-amber-500" aria-hidden />
             <span className="type-body text-slate-700">
-              Roughly{" "}
-              <strong className="type-emphasis">ten fresh images</strong> a day on the usual allowance (10 credits each
-              from 100 daily). Same-thread refines don&apos;t rerun the meter.
+              ~<strong className="type-emphasis">10 new images</strong>/day from 100 credits (10/run). Refines skip that charge.
             </span>
           </span>
           <Link
             to="/help"
             className="type-link-brand mt-3 block shrink-0 text-center sm:mt-0 sm:inline-block"
           >
-            See how credits reset on Help
+            Credit resets on Help
           </Link>
         </motion.div>
 
-        <p className="type-meta relative mt-6 text-center">
-          Need timezones or edge cases spelled out?
-          <Link to="/help" className="type-link-brand ms-1">
-            Read Help
+        <p className="type-meta relative mt-5 text-center">
+          <Link to="/help" className="type-link-brand">
+            Full details → Help
           </Link>
-          .
         </p>
       </motion.div>
     </section>

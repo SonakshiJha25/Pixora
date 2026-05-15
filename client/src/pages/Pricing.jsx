@@ -14,11 +14,9 @@ export default function Pricing() {
           className="text-center"
         >
           <p className="type-eyebrow-brand">Pricing</p>
-          <h1 className="type-page-title mt-2">
-            Start free, scale when it sticks
-          </h1>
-          <p className="type-body mx-auto mt-3 max-w-2xl">
-            Daily credits, every style, your gallery on Free. Pro is for heavier weeks. Refills and timezones live on{" "}
+          <h1 className="type-page-title mt-2">Free tier, Pro when you need it</h1>
+          <p className="type-body mx-auto mt-2 max-w-md">
+            Credits & IST reset →{" "}
             <Link to="/help" className="type-link-brand">
               Help
             </Link>
@@ -37,7 +35,7 @@ export default function Pricing() {
               You&apos;re probably here
             </span>
             <p className="type-price-tier">Free</p>
-            <p className="mt-1.5 text-2xl font-extrabold tabular-nums text-slate-900 sm:text-3xl">₹0</p>
+            <p className="mt-1.5 text-xl font-extrabold tabular-nums text-slate-900 sm:text-2xl">₹0</p>
             <p className="type-meta">No card, no trial clock</p>
             <ul className="type-body-tight mt-5 space-y-2.5">
               <li className="flex items-start gap-2">
@@ -52,27 +50,25 @@ export default function Pricing() {
                 <span className="mt-0.5 text-emerald-500" aria-hidden>
                   ✓
                 </span>
-                <span>About <span className="type-emphasis">ten new images</span> a day if each run costs 10 credits</span>
+                <span>~10 new runs/day at 10 credits</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-emerald-500" aria-hidden>
                   ✓
                 </span>
-                <span>
-                  <span className="type-emphasis">Refine</span> on the same thread without spending again
-                </span>
+                <span><span className="type-emphasis">Refine</span> skips another full-image charge</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-emerald-500" aria-hidden>
                   ✓
                 </span>
-                <span>Every look we ship (realistic, anime, the rest)</span>
+                <span>All styles</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-emerald-500" aria-hidden>
                   ✓
                 </span>
-                <span>Gallery + history so nothing floats away nameless</span>
+                <span>Gallery & download history</span>
               </li>
             </ul>
             <button
@@ -94,7 +90,7 @@ export default function Pricing() {
               Heavier weeks
             </span>
             <p className="type-price-tier">Pro</p>
-            <p className="mt-1.5 text-2xl font-extrabold tabular-nums text-slate-900 sm:text-3xl">
+            <p className="mt-1.5 text-xl font-extrabold tabular-nums text-slate-900 sm:text-2xl">
               ₹499<span className="type-price-tier ml-1 inline text-base font-semibold tabular-nums text-slate-500"> / month</span>
             </p>
             <p className="type-meta text-slate-600">Pause or cancel whenever</p>
@@ -111,25 +107,25 @@ export default function Pricing() {
                 <span className="mt-0.5 text-brand-cyan" aria-hidden>
                   ✓
                 </span>
-                <span>Roughly <span className="type-emphasis">100 fresh images</span> a day at 10 credits each</span>
+                <span>Roughly 100 runs/day @ 10 credits</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-brand-cyan" aria-hidden>
                   ✓
                 </span>
-                <span>Faster lane when the queue piles up</span>
+                <span>Faster priority when queued</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-brand-cyan" aria-hidden>
                   ✓
                 </span>
-                <span>Sharper exports (think HD-ready)</span>
+                <span>Higher-res exports</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-brand-cyan" aria-hidden>
                   ✓
                 </span>
-                <span>Workspace-friendly usage rights — read the fine print before client work</span>
+                <span>Usage rights — check fine print for client work</span>
               </li>
             </ul>
             <Link

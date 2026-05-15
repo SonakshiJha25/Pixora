@@ -22,7 +22,7 @@ const quickLinks = [
   {
     to: "/studio",
     title: WORKSPACE_NAME,
-    desc: `Prompts, styles, downloads — ${WORKSPACE_NAME}.`,
+    desc: `${WORKSPACE_NAME} — styles & downloads.`,
     icon: Wand2,
     grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
     border: "border-cyan-200/70",
@@ -31,7 +31,7 @@ const quickLinks = [
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "Threads you’ve saved, favourites, PNGs.",
+    desc: "Threads, favourites, PNGs.",
     icon: LayoutGrid,
     grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
     border: "border-violet-200/70",
@@ -40,7 +40,7 @@ const quickLinks = [
   {
     to: "/pricing",
     title: "Pricing",
-    desc: "What you get free vs paid.",
+    desc: "Free vs paid.",
     icon: Sparkles,
     grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
     border: "border-amber-200/70",
@@ -49,7 +49,7 @@ const quickLinks = [
   {
     to: "/feedback",
     title: "Feedback",
-    desc: "Something broken or half-baked — say it here.",
+    desc: "Bugs & ideas.",
     icon: Heart,
     grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
     border: "border-rose-200/70",
@@ -61,21 +61,21 @@ const journey = [
   {
     n: "1",
     title: "Make an account",
-    body: "You need this to generate, save credits, and keep your gallery in sync wherever you log in.",
+    body: "Sign in to generate, track credits, and sync your gallery.",
     chip: "~1 minute",
     img: assets.sample_img_1,
   },
   {
     n: "2",
     title: `Work in ${WORKSPACE_NAME}`,
-    body: `${WORKSPACE_NAME}: pick a look — realistic, anime, and the rest — write what you want, tap generate. Most images arrive in maybe ten or twenty seconds.`,
+    body: `Choose a style, write the scene, generate — usually ~15s.`,
     chip: "~15 s",
     img: assets.sample_img_2,
   },
   {
     n: "3",
     title: "Refine without spending credits",
-    body: 'Small edits on something you already have — warmer light, different jacket — use Refine on the same thread. That does not eat your daily pool.',
+    body: "Refine tweaks the current frame on the same thread — not a new credit charge.",
     chip: "Included",
     img: assets.star_group,
   },
@@ -83,12 +83,11 @@ const journey = [
 
 const creditCards = [
   {
-    title: "Credits, straight up",
+    title: "Credits",
     body: (
       <>
-        You usually start each day around <strong>100</strong> credits. Spinning up a brand‑new image costs about{" "}
-        <strong>10</strong>, which works out near <strong>ten</strong> fresh pieces if you burn only on new prompts. At{" "}
-        <strong>midnight IST</strong> everything refills automatically.
+        ~<strong>100</strong> credits daily; new images ~<strong>10</strong> each (~<strong>10</strong>/day). Refills{" "}
+        <strong>midnight IST</strong>.
       </>
     ),
     icon: Zap,
@@ -96,11 +95,10 @@ const creditCards = [
     border: "border-amber-100/90",
   },
   {
-    title: "Refine keeps the conversation going",
+    title: "Refine",
     body: (
       <>
-        Editing what you already have — same thread, tighter brief — goes through{" "}
-        <strong>Refine</strong> and skips that extra credit charge people worry about.
+        Iterations on the same thread use <strong>Refine</strong> — skips the extra per-image credit.
       </>
     ),
     icon: Sparkles,
@@ -113,19 +111,19 @@ const tipCards = [
   {
     emoji: "🎬",
     title: "Say what you’d point a camera at",
-    text: '“Low angle, wet road, orange streetlights” beats “cool vibe.” A few concrete words usually get you closer than a mood word.',
+    text: "Concrete beats moody: “wet road, orange streetlights” > “cool vibe”.",
     tone: "from-sky-50 to-blue-50/80",
   },
   {
     emoji: "✍️",
     title: "One fix, then the next",
-    text: "Changing hair, then the sky, then the outfit in separate refines works better than asking for everything at once.",
+    text: "One change per refine works better than a laundry list.",
     tone: "from-fuchsia-50 to-violet-50/70",
   },
   {
     emoji: "📂",
     title: "Gallery keeps the order",
-    text: "Inside a thread you’ll see versions top to bottom — first image, then each tweak — so you’re not matching files in your head.",
+    text: "Threads stack versions top to bottom — easy to scan.",
     tone: "from-lime-50 to-teal-50/70",
   },
 ];
@@ -133,38 +131,38 @@ const tipCards = [
 const funFacts = [
   {
     emoji: "🌙",
-    text: "Credits refill at midnight IST for everyone. We don’t count 24 hours from your last visit — it’s just the next calendar day in India time.",
+    text: "Daily refill at midnight IST (calendar day, not 24h from last visit).",
   },
   {
     emoji: "🧊",
-    text: `Refine is for the picture already in front of you. A brand-new prompt in ${WORKSPACE_NAME} starts a new line and uses credits like any other fresh run.`,
+    text: `New prompt in ${WORKSPACE_NAME} = new run + credits. Refine = same thread, no extra charge.`,
   },
   {
     emoji: "✨",
-    text: "Totally new compositions spend from your daily balance. Follow-up refinements on that same thread generally don’t.",
+    text: "Brand-new compositions spend daily balance; same-thread refines usually don’t.",
   },
 ];
 
 const faqs = [
   {
     q: "How many new images can I actually finish in a day?",
-    a: "On the usual free pool, about ten brand-new images if each costs 10 credits out of 100. When you’re out for the day you can still refine what you already generated — that bit doesn’t chew through credits the same way.",
+    a: "~10 new images/day at 10 credits each from 100. Out of credits? You can still refine existing work.",
   },
   {
     q: "When do my credits come back?",
-    a: "Midnight India time. Closing the tab doesn’t reset a timer in the background — you wake up (or stay up) into a new IST day and the number tops up.",
+    a: "Midnight India time — new calendar day, fresh balance.",
   },
   {
     q: `What counts as refine versus hitting generate in ${WORKSPACE_NAME}?`,
-    a: `Refine is the small-step flow on something you’ve already made on that thread. Typing a brand-new idea and running it in ${WORKSPACE_NAME} as a new image is a separate start, and that’s what spends another chunk of credits.`,
+    a: `Refine = small steps on that thread. A brand-new idea in ${WORKSPACE_NAME} is a new run and spends credits.`,
   },
   {
     q: "Older thumbs suddenly look broken?",
-    a: "Sometimes a deploy clears temp storage but the gallery rows are still there — links go nowhere. Your team needs persistent file hosting; we can point them in the right direction if they’re stuck.",
+    a: "Deploys can clear temp URLs; rows may persist. Host needs durable storage.",
   },
   {
     q: "Do I need to sign in?",
-    a: "Browsing the site works either way. Saving work, credits, and a real gallery needs an account — mostly so the product doesn’t get shredded by bots.",
+    a: "Browse without an account. Saving work and credits needs sign-in.",
   },
 ];
 
@@ -179,7 +177,7 @@ function FaqItem({ item, open, onToggle }) {
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left sm:px-5"
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:px-5"
         aria-expanded={open}
       >
         <span className="type-faq-question">{item.q}</span>
@@ -190,8 +188,8 @@ function FaqItem({ item, open, onToggle }) {
         </span>
       </button>
       {open ? (
-        <div className="border-t border-slate-100/90 px-4 pb-4 pt-0 sm:px-5">
-          <p className="type-body pt-4">{item.a}</p>
+        <div className="border-t border-slate-100/90 px-4 pb-3 pt-0 sm:px-5">
+          <p className="type-body pt-3">{item.a}</p>
         </div>
       ) : null}
     </motion.div>
@@ -216,9 +214,9 @@ export default function Help() {
           <p className="type-eyebrow-brand inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1">
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
-          <h1 className="type-page-title mt-3 sm:mt-4">How Pixorify fits</h1>
-          <p className="type-body mt-2 max-w-lg sm:mt-3">
-            Credits, refines, styles — or skip straight to contact below.
+          <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
+          <p className="type-body mt-2 max-w-md sm:mt-2.5">
+            Credits, refines, contact.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link
@@ -275,11 +273,11 @@ export default function Help() {
       </motion.section>
 
       {/* Jump tiles */}
-      <section className="relative mt-12">
+      <section className="relative mt-10">
         <div className="flex flex-wrap items-end justify-between gap-3 px-1">
           <div>
             <p className="type-eyebrow-muted">Quick links</p>
-            <h2 className="type-subsection-title mt-1">Jump somewhere useful</h2>
+            <h2 className="type-subsection-title mt-1">Jump</h2>
           </div>
         </div>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
@@ -315,12 +313,9 @@ export default function Help() {
       </section>
 
       {/* Journey */}
-      <section className="relative mt-12">
+      <section className="relative mt-10">
         <p className="type-eyebrow-muted">The usual flow</p>
-        <h2 className="type-subsection-title mt-2">Account → {WORKSPACE_NAME} → tweaks</h2>
-        <p className="type-body mt-2 max-w-2xl">
-          Same three steps nearly everyone lands on once they’re past Hello world.
-        </p>
+        <h2 className="type-subsection-title mt-2">Three steps</h2>
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
           {journey.map((step, i) => (
             <motion.article
@@ -350,9 +345,9 @@ export default function Help() {
       </section>
 
       {/* Credit duo */}
-      <section className="relative mt-12">
+      <section className="relative mt-10">
         <p className="type-eyebrow-muted">Credits</p>
-        <h2 className="type-subsection-title mt-2">What costs what</h2>
+        <h2 className="type-subsection-title mt-2">Costs</h2>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {creditCards.map((card) => {
             const C = card.icon;
@@ -376,7 +371,7 @@ export default function Help() {
       </section>
 
       {/* Fun facts marquee-ish */}
-      <section className="relative mt-12">
+      <section className="relative mt-10">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
           {funFacts.map((f, i) => (
             <motion.span
@@ -385,7 +380,7 @@ export default function Help() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.05 * i }}
-              className="type-body-tight inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/88 px-3 py-2 text-xs font-medium text-slate-700 shadow-sm sm:text-sm"
+              className="type-body-tight inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/88 px-2.5 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs"
             >
               <span className="text-base leading-none">{f.emoji}</span>
               <span>{f.text}</span>
@@ -400,7 +395,7 @@ export default function Help() {
           <Lightbulb className="mt-1 h-5 w-5 text-amber-400" aria-hidden />
           <div>
             <p className="type-eyebrow-muted">Quick tips</p>
-            <h2 className="type-subsection-title mt-0.5">Stuff that quietly helps</h2>
+            <h2 className="type-subsection-title mt-0.5">Tips</h2>
           </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -413,9 +408,9 @@ export default function Help() {
               transition={{ delay: 0.05 * idx }}
               className={`rounded-[1.25rem] border border-white/85 bg-gradient-to-br ${tip.tone} p-5 shadow-md ring-1 ring-slate-200/65`}
             >
-              <span className="text-3xl">{tip.emoji}</span>
-              <h3 className="type-tile-title mt-4">{tip.title}</h3>
-              <p className="type-body mt-2 text-slate-700">{tip.text}</p>
+              <span className="text-2xl">{tip.emoji}</span>
+              <h3 className="type-tile-title mt-3">{tip.title}</h3>
+              <p className="type-body mt-1.5 text-slate-700">{tip.text}</p>
             </motion.div>
           ))}
         </div>
@@ -425,7 +420,7 @@ export default function Help() {
       <section className="relative mt-11">
         <div className="px-1 text-center">
           <p className="type-eyebrow-muted">Questions</p>
-          <h2 className="type-subsection-title mt-2">People ask us this a lot</h2>
+          <h2 className="type-subsection-title mt-2">FAQ</h2>
         </div>
         <div className="mt-6 space-y-3">
           {faqs.map((item, i) => (
@@ -446,13 +441,11 @@ export default function Help() {
             <Mail className="h-6 w-6 text-brand-cyan" strokeWidth={2} />
           </span>
           <div>
-            <h2 className="type-card-title-sm">Email still works</h2>
-            <p className="type-body mt-1 max-w-xl">
-              For bugs, billing, or honestly anything fuzzy — write{" "}
+            <h2 className="type-card-title-sm">Email</h2>
+            <p className="type-body mt-1 max-w-lg">
               <a className="type-link-brand" href={`mailto:${SITE.helpEmail}`}>
                 {SITE.helpEmail}
               </a>
-              . A real inbox, not an auto-folder black hole (we try).
             </p>
           </div>
         </div>

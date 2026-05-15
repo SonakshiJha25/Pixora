@@ -331,13 +331,11 @@ export default function Studio() {
           transition={{ duration: 0.45 }}
           className="mb-6 text-center sm:mb-8"
         >
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-white sm:text-4xl">{WORKSPACE_NAME}</h1>
-          <p className="type-body-dim mx-auto mt-2 max-w-xl">
-            Prompt, style, generate — preview below.
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
+          <p className="type-body-dim mx-auto mt-1.5 max-w-md">
+            Prompt + style → preview.
             {!isSignedIn ? (
-              <span className="mt-1.5 block text-slate-500">
-                Sign in to render · credits reset midnight IST
-              </span>
+              <span className="mt-1 block text-slate-500">Sign in to render · credits reset midnight IST</span>
             ) : null}
           </p>
         </motion.div>
@@ -394,12 +392,12 @@ export default function Studio() {
                           </div>
                         ) : null}
                       </motion.div>
-                      <p className="mt-2 max-w-lg px-2 text-center text-xs leading-relaxed text-slate-400">
+                      <p className="mt-1.5 max-w-lg px-2 text-center text-[11px] leading-snug text-slate-400 sm:text-xs">
                         <span className="font-semibold text-slate-200">
                           {idx === 0 ? "Started from" : `Tweak ${idx}`}:
                         </span>{" "}
-                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 220)}
-                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 220
+                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 160)}
+                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 160
                           ? "…"
                           : ""}
                       </p>
@@ -408,7 +406,7 @@ export default function Studio() {
                 })}
               </div>
 
-              <div className="mt-12 flex w-full max-w-2xl flex-col items-center gap-10 px-2">
+              <div className="mt-10 flex w-full max-w-2xl flex-col items-center gap-8 px-2">
                 <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
                   <button
                     type="button"
@@ -451,8 +449,8 @@ export default function Studio() {
                   </button>
                 </div>
 
-                <div className="w-full border-t border-white/[0.08] pt-8 text-center">
-                  <p className="text-sm text-slate-400">
+                <div className="w-full border-t border-white/[0.08] pt-6 text-center">
+                  <p className="text-xs text-slate-400 sm:text-sm">
                     Off?{" "}
                     <Link
                       to="/feedback"
@@ -474,9 +472,9 @@ export default function Studio() {
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:items-center">
                   <div className="text-left">
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">Idle canvas</p>
-                    <p className="mt-1.5 text-xl font-bold capitalize tracking-tight text-white sm:text-2xl">{style}</p>
+                    <p className="mt-1 text-lg font-bold capitalize tracking-tight text-white sm:text-xl">{style}</p>
                   </div>
-                  <p className="max-w-2xl text-left text-[13px] leading-relaxed text-white/60 sm:text-sm lg:max-w-xl lg:text-right">
+                  <p className="max-w-xl text-left text-xs leading-snug text-white/55 sm:text-[13px] lg:max-w-md lg:text-right">
                     {activeStyleSample?.caption ??
                       `Style moods for ${WORKSPACE_NAME} · hero art stays on Home.`}
                   </p>
@@ -576,11 +574,10 @@ export default function Studio() {
                       ) : null}
                     </p>
                   ) : null}
-                  <p className="mt-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-[12px] leading-snug text-slate-500 sm:text-[13px]">
-                    New runs use credits; same-shot nudges use{" "}
-                    <span className="font-semibold text-slate-400">Refine</span>.{" "}
+                  <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2 text-[11px] leading-snug text-slate-500 sm:text-xs">
+                    New runs cost credits; <span className="font-medium text-slate-400">Refine</span> doesn&apos;t.{" "}
                     <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
-                      Credits
+                      Help
                     </Link>
                   </p>
                 </div>
@@ -597,18 +594,18 @@ export default function Studio() {
                   className="studio-glow mx-auto flex max-w-md items-center justify-center gap-4 rounded-2xl border border-cyan-400/28 bg-slate-950/55 px-6 py-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md"
                 >
                   <StudioOrbitSpinner />
-                  <p className="text-sm font-semibold tracking-tight text-cyan-50">Generating…</p>
+                  <p className="text-xs font-semibold tracking-tight text-cyan-50 sm:text-sm">Generating…</p>
                 </motion.div>
               ) : null}
             </div>
           )}
         </motion.form>
 
-      <section className="mt-16 w-full sm:mt-20">
-        <div className="studio-shell mb-6 flex flex-col gap-4 rounded-[1.5rem] p-5 sm:flex-row sm:items-center sm:justify-between">
+      <section className="mt-12 w-full sm:mt-16">
+        <div className="studio-shell mb-5 flex flex-col gap-3 rounded-[1.5rem] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="text-center sm:text-left">
-            <h2 className="text-lg font-bold text-white sm:text-xl">Recent</h2>
-            <p className="text-sm text-slate-400">Last runs from here · everything in Gallery</p>
+            <h2 className="text-base font-bold text-white sm:text-lg">Recent</h2>
+            <p className="text-xs text-slate-400 sm:text-sm">Last runs · full history in Gallery</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
             <button

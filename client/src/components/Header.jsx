@@ -22,7 +22,7 @@ export default function Header() {
   };
 
   return (
-    <section className="mx-auto w-full pt-8 text-center sm:pt-11">
+    <section className="mx-auto w-full pt-7 text-center sm:pt-9">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -55,9 +55,9 @@ export default function Header() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         {user ? (
-          <>Credits refreshed — new runs or polish a thread. Refines skim your daily budget differently.</>
+          <>Credits reset daily — new images use your pool; refinements work differently.</>
         ) : (
-          <>Credits, gallery threads, tighter refines — after sign-in.</>
+          <>Sign in for credits, gallery, and refinements.</>
         )}
       </motion.p>
 
@@ -84,9 +84,9 @@ export default function Header() {
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
-            <h2 className="type-subsection-title">{WORKSPACE_NAME} builds · Gallery keeps</h2>
+            <h2 className="type-subsection-title">Studio + gallery</h2>
             <p className="type-body mt-1.5 text-slate-600">
-              Styles, favourites, PNGs — threads stay ordered.
+              Styles, favourites, downloads — one thread per idea.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Styles</span>
