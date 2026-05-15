@@ -33,7 +33,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "Threads you’ve saved and liked.",
+    desc: "Saved threads & favourites.",
     icon: LayoutGrid,
     grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
     border: "border-violet-200/70",

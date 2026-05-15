@@ -110,10 +110,11 @@ export default function Footer() {
               Pricing
             </Link>
           </div>
-          <p className="type-micro mt-0.5 text-slate-500">
+          <p className="type-micro mt-0.5 text-slate-400">
             © {new Date().getFullYear()} {SITE.name}
+            <span className="text-slate-300"> · </span>
+            {CLIPDROP_ATTRIBUTION}
           </p>
-          <p className="type-micro mt-1 text-slate-400">{CLIPDROP_ATTRIBUTION}</p>
         </div>
       </div>
     </footer>

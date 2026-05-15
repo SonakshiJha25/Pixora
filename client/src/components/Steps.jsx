@@ -13,8 +13,8 @@ export default function Steps() {
       className="mx-auto flex w-full flex-col items-center py-[4.25rem] text-center sm:py-24"
     >
       <h2 className="type-section-title">The bit that matters</h2>
-      <p className="type-body mx-auto mt-3 max-w-xl sm:mt-4 sm:max-w-2xl">
-        Sketch the idea, let it render, then tweak until it feels right—specific beats “vibes.”
+      <p className="type-body mx-auto mt-2 max-w-xl sm:max-w-2xl">
+        Sketch → render → tweak. Specific beats vague.
       </p>
       <div className="mt-9 w-full space-y-4 sm:mt-11">
         {stepsData.map((item, index) => (

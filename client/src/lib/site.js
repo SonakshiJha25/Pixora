@@ -24,27 +24,27 @@ export const CLIPDROP_ATTRIBUTION = "Powered by Clipdrop AI";
 export const STUDIO_STYLE_SAMPLES = [
   {
     label: "Realistic",
-    caption: "Skews toward photo-real lighting when you spell out the shot",
+    caption: "Photo-real when you spell the light and lens",
     image: assets.style_realistic,
   },
   {
     label: "Anime",
-    caption: "Cleaner lines and illustration energy — good characters and props",
+    caption: "Clean lines, illustration energy, characters & props",
     image: assets.style_anime,
   },
   {
     label: "Cyberpunk",
-    caption: "Neon, gritty glass, futuristic city palettes",
+    caption: "Neon, glass, gritty future-city palettes",
     image: assets.style_cyberpunk,
   },
   {
     label: "Fantasy",
-    caption: "Drama, atmosphere, big scenes that read like a still from a film",
+    caption: "Big atmosphere, drama, almost a film still",
     image: assets.style_fantasy,
   },
   {
     label: "Minimal",
-    caption: "Breathing room, blocks of colour, less noise on screen",
+    caption: "Space, flat colour blocks, less noise",
     image: assets.style_minimal,
   },
 ];
@@ -65,27 +65,27 @@ export const HERO_SLIDES = [
       "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=85&auto=format&fit=crop",
     kicker: "What is Pixorify",
     title: "Create images from text",
-    sub: `Pixora Studio is where prompts and styles live. Your threads stay organized in ${SITE.name}’s gallery.`,
+    sub: `Prompts & styles in Pixora Studio · threads in ${SITE.name} gallery`,
   },
   {
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=85&auto=format&fit=crop",
     kicker: "Credits & limits",
     title: "10 credits refresh every day on Free",
-    sub: "Use them in Pixora Studio, track the balance in your profile, and top up with Pro when you’re ready to scale.",
+    sub: "Spend in Pixora Studio · balance in your profile · scale on Pro",
   },
   {
     image:
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1920&q=85&auto=format&fit=crop",
     kicker: "Styles",
     title: "Realistic, anime, cyberpunk, and more",
-    sub: "Pick a style that matches the story—so outputs feel intentional, not random.",
+    sub: "Pick a look so results feel intentional—not random.",
   },
   {
     image:
       "https://images.unsplash.com/photo-1523240795612-9a054b0d7039?w=1920&q=85&auto=format&fit=crop",
     kicker: "Gallery & files",
-    title: "Save, favorite, and download your runs",
-    sub: "Open My gallery to filter favorites, download PNGs, and remove what you do not need.",
+    title: "Save, fave, export",
+    sub: "Favs, PNGs, cleanup—My gallery.",
   },
 ];

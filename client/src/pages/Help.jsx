@@ -216,12 +216,9 @@ export default function Help() {
           <p className="type-eyebrow-brand inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1">
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
-          <h1 className="type-page-title mt-3 sm:mt-4">
-            Here’s how Pixorify fits together.
-          </h1>
+          <h1 className="type-page-title mt-3 sm:mt-4">How Pixorify fits</h1>
           <p className="type-body mt-2 max-w-lg sm:mt-3">
-            Credits, refines, styles — the bits people usually ask about. Scroll if you like, or skip to the form at the
-            bottom and we&apos;ll read it properly.
+            Credits, refines, styles — or skip straight to contact below.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link

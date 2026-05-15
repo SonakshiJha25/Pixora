@@ -53,16 +53,13 @@ export default function Gallery() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[2rem] border border-white/70 bg-white/65 px-8 py-12 shadow-xl shadow-slate-900/5 backdrop-blur-xl"
+            className="rounded-[2rem] border border-white/70 bg-white/65 px-8 py-10 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:py-11"
           >
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-cyan/20 to-brand-sky/15 text-brand-cyan ring-1 ring-white/80">
               <LayoutGrid className="h-6 w-6" strokeWidth={2} aria-hidden />
             </span>
-            <h1 className="type-page-title mt-5">Your gallery lives behind a login</h1>
-            <p className="type-body mt-3">
-              Sign in and we&apos;ll show every thread you&apos;ve run in {WORKSPACE_NAME} — original render plus
-              refinements in one stack.
-            </p>
+            <h1 className="type-page-title mt-5">Your gallery · sign in</h1>
+            <p className="type-body mt-2">{WORKSPACE_NAME} threads and refinements sync here.</p>
             <button
               type="button"
               onClick={() => setShowLogin(true)}
@@ -89,15 +86,12 @@ export default function Gallery() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mx-auto mb-10 max-w-2xl text-center sm:mb-12"
+          className="mx-auto mb-8 max-w-2xl text-center sm:mb-10"
         >
-          <p className="type-eyebrow-brand">Gallery</p>
-          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-            Your creations in {WORKSPACE_NAME}
-          </h1>
-          <p className="mt-3 text-[13px] leading-relaxed text-slate-400 sm:text-sm">
-            Each card is one idea from {WORKSPACE_NAME}: the newest picture is on the cover, refinements sit behind{" "}
-            <span className="font-semibold text-slate-200">Open thread</span>. Heart something and it shows up under Saved.
+          <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Gallery</h1>
+          <p className="mx-auto mt-2 max-w-md text-[13px] leading-snug text-slate-400 sm:text-sm">
+            {WORKSPACE_NAME} threads · cover = latest · stack in{" "}
+            <span className="font-medium text-slate-300">Open thread</span> · ♥ → Saved
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
             <Link to="/studio" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
@@ -112,7 +106,7 @@ export default function Gallery() {
           </div>
         </motion.header>
 
-        <div className="mb-10 flex flex-wrap items-center justify-center gap-2">
+        <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => setView("all")}
@@ -149,11 +143,11 @@ export default function Gallery() {
             count={6}
           />
         ) : showEmptyGrid ? (
-          <div className="rounded-[1.85rem] border border-dashed border-white/12 bg-white/[0.03] px-6 py-16 text-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
+          <div className="rounded-[1.85rem] border border-dashed border-white/12 bg-white/[0.03] px-6 py-12 text-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
             {historyStatus === "error" && history.length === 0 ? (
               <div className="mx-auto max-w-sm">
-                <p className="text-sm leading-relaxed text-slate-400">
-                  We couldn&apos;t load your gallery right now. Your work is still safe — try again in a moment.
+                <p className="text-sm leading-snug text-slate-400">
+                  Can&apos;t load gallery — your work is safe.
                 </p>
                 <button
                   type="button"
@@ -164,24 +158,23 @@ export default function Gallery() {
                 </button>
               </div>
             ) : view === "favorites" ? (
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-400">
-                Nothing saved yet. Switch to{" "}
+              <p className="mx-auto max-w-sm text-sm leading-snug text-slate-400">
+                Nothing saved.{" "}
                 <button
                   type="button"
                   onClick={() => setView("all")}
-                  className="font-semibold text-slate-200 underline underline-offset-2 hover:text-cyan-300"
+                  className="font-medium text-slate-200 underline underline-offset-2 hover:text-cyan-300"
                 >
                   All threads
-                </button>{" "}
-                and tap the heart on a cover card.
+                </button>
+                {" "}· ♥ a cover
               </p>
             ) : (
-              <p className="mx-auto max-w-sm text-sm leading-relaxed text-slate-400">
-                Quiet in here. When you&apos;re ready,{" "}
-                <Link className="font-semibold text-cyan-300 underline-offset-4 hover:underline" to="/studio">
-                  Open {WORKSPACE_NAME}
-                </Link>{" "}
-                — new threads appear here automatically.
+              <p className="mx-auto max-w-sm text-sm leading-snug text-slate-400">
+                Empty — {" "}
+                <Link className="font-medium text-cyan-300 underline-offset-4 hover:underline" to="/studio">
+                  {WORKSPACE_NAME}
+                </Link>
               </p>
             )}
           </div>

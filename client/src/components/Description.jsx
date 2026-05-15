@@ -17,12 +17,9 @@ export default function Description() {
         className="w-full max-w-[17.5rem] rounded-2xl object-cover shadow-glow ring-1 ring-white/70 sm:max-w-xs"
       />
       <div className="max-w-md text-center md:text-left">
-        <h2 className="type-section-title">Built for real workflows</h2>
+        <h2 className="type-section-title">Built for workflows</h2>
         <p className="type-body mt-3">
-          Credits, gallery, and {WORKSPACE_NAME}, laid out like a real product—without the weekend-demo clutter.
-        </p>
-        <p className="type-body mt-3">
-          Portraits to mood boards, kept tidy with favourites—not lost in random filenames.
+          {WORKSPACE_NAME} for making, Pixorify gallery for keeping — without demo-page clutter.
         </p>
       </div>
     </motion.section>

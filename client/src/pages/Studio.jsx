@@ -294,20 +294,14 @@ export default function Studio() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-7 text-center sm:mb-9"
+          className="mb-6 text-center sm:mb-8"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300/85">
-            Creative workspace
-          </p>
-          <h1 className="mt-2.5 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Welcome to {WORKSPACE_NAME}
-          </h1>
-          <p className="type-body-dim mx-auto mt-3 max-w-2xl">
-            Create inside {WORKSPACE_NAME} — describe the scene, pick a look, and generate. Your latest render lands in
-            the main preview once it&apos;s ready.
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-white sm:text-4xl">{WORKSPACE_NAME}</h1>
+          <p className="type-body-dim mx-auto mt-2 max-w-xl">
+            Prompt, style, generate — preview below.
             {!isSignedIn ? (
-              <span className="mt-2 block border-t border-white/10 pt-3 text-slate-400">
-                Sign in to render. Credits refill at midnight IST.
+              <span className="mt-1.5 block text-slate-500">
+                Sign in to render · credits reset midnight IST
               </span>
             ) : null}
           </p>
@@ -416,19 +410,16 @@ export default function Studio() {
                   </button>
                 </div>
 
-                <div className="w-full border-t border-white/[0.08] pt-10 text-center">
-                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                    Something off?
+                <div className="w-full border-t border-white/[0.08] pt-8 text-center">
+                  <p className="text-sm text-slate-400">
+                    Off?{" "}
+                    <Link
+                      to="/feedback"
+                      className="font-semibold text-cyan-300 underline-offset-4 hover:underline"
+                    >
+                      Tell us
+                    </Link>
                   </p>
-                  <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-slate-400">
-                    Tell us what felt wrong — we actually read feedback.
-                  </p>
-                  <Link
-                    to="/feedback"
-                    className="mt-4 inline-block text-sm font-semibold text-cyan-300 underline-offset-4 hover:underline"
-                  >
-                    Leave a note
-                  </Link>
                 </div>
               </div>
             </div>
@@ -446,7 +437,7 @@ export default function Studio() {
                   </div>
                   <p className="max-w-2xl text-left text-[13px] leading-relaxed text-white/60 sm:text-sm lg:max-w-xl lg:text-right">
                     {activeStyleSample?.caption ??
-                      `Colours shift with your style in ${WORKSPACE_NAME} — hero stills stay on Home and Help.`}
+                      `Style moods for ${WORKSPACE_NAME} · hero art stays on Home.`}
                   </p>
                 </div>
               </div>
@@ -544,11 +535,11 @@ export default function Studio() {
                       ) : null}
                     </p>
                   ) : null}
-                  <p className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-3 text-[13px] leading-relaxed text-slate-500">
-                    New renders use credits; nudges afterward go through{" "}
-                    <span className="font-semibold text-slate-400">Refine</span> on the same picture.{" "}
+                  <p className="mt-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-[12px] leading-snug text-slate-500 sm:text-[13px]">
+                    New runs use credits; same-shot nudges use{" "}
+                    <span className="font-semibold text-slate-400">Refine</span>.{" "}
                     <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
-                      How credits work
+                      Credits
                     </Link>
                   </p>
                 </div>
@@ -557,7 +548,7 @@ export default function Studio() {
               {loading ? (
                 <div className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-4 text-sm text-slate-400">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-brand-cyan" />
-                  Generating in {WORKSPACE_NAME}…
+                  Rendering…
                 </div>
               ) : null}
             </div>
@@ -567,10 +558,8 @@ export default function Studio() {
       <section className="mt-16 w-full sm:mt-20">
         <div className="studio-shell mb-6 flex flex-col gap-4 rounded-[1.5rem] p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-left">
-            <h2 className="text-lg font-bold text-white sm:text-xl">Recent renders</h2>
-            <p className="text-sm text-slate-400">
-              Recent work from {WORKSPACE_NAME}. Open My gallery in Pixorify for the full archive.
-            </p>
+            <h2 className="text-lg font-bold text-white sm:text-xl">Recent</h2>
+            <p className="text-sm text-slate-400">Last runs from here · everything in Gallery</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
             <button
@@ -597,7 +586,7 @@ export default function Studio() {
         ) : history.length === 0 ? (
           <div className="rounded-[1.25rem] border border-dashed border-white/15 bg-white/[0.03] py-12 text-center text-sm text-slate-400 backdrop-blur-sm">
             {!isSignedIn ? (
-              "Sign in and your last dozen runs stack here."
+              "Sign in · recent runs land here."
             ) : historyStatus === "error" ? (
               <span className="block">
                 <span className="text-slate-300">Couldn&apos;t fetch history.</span>

@@ -45,30 +45,24 @@ export default function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.04 }}
       >
-        Thoughts in your head, pixels on the screen
+        Ideas in, pixels out
       </motion.h1>
 
       <motion.p
-        className="type-body mx-auto mt-3 max-w-xl sm:max-w-2xl"
+        className="type-body mx-auto mt-2 max-w-xl sm:max-w-2xl"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         {user ? (
-          <>
-            Credits are topped up for today — make something new, or polish a gallery thread. Refines don&apos;t use
-            your fresh-image budget the same way.
-          </>
+          <>Credits refreshed — new runs or polish a thread. Refines skim your daily budget differently.</>
         ) : (
-          <>
-            Daily credits, a gallery that remembers threads, and refines that don&apos;t feel like leaking points—all
-            after sign-in.
-          </>
+          <>Credits, gallery threads, tighter refines — after sign-in.</>
         )}
       </motion.p>
 
       <motion.div
-        className="mt-6"
+        className="mt-5 text-center sm:mt-6"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.14 }}
@@ -83,23 +77,18 @@ export default function Header() {
       </motion.div>
 
       <motion.div
-        className="mx-auto mt-9 w-full rounded-[2rem] border border-white/65 bg-white/60 p-4 text-left shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:mt-11 sm:p-6"
+        className="mx-auto mt-7 w-full rounded-[2rem] border border-white/65 bg-white/60 p-4 text-left shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:mt-9 sm:p-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.18 }}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
-            <p className="type-eyebrow-brand">Inside the box</p>
-            <h2 className="type-subsection-title mt-2">{WORKSPACE_NAME} for making, Gallery for keeping</h2>
-            <p className="type-body mt-1.5">
-              Toggle styles anytime, tuck favourites aside, PNGs when something feels done—threads stay in order without
-              mystery filenames.
+            <h2 className="type-subsection-title">{WORKSPACE_NAME} builds · Gallery keeps</h2>
+            <p className="type-body mt-1.5 text-slate-600">
+              Styles, favourites, PNGs — threads stay ordered.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">
-                {WORKSPACE_NAME}
-              </span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Styles</span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">My gallery</span>
               <span className="type-pill-muted rounded-full border border-slate-200 bg-white px-3 py-1">Downloads</span>

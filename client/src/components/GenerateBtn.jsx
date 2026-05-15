@@ -13,9 +13,9 @@ export default function GenerateBtn() {
       transition={{ duration: 0.55 }}
       className="mx-auto flex w-full flex-col items-center py-12 text-center sm:py-14"
     >
-      <h2 className="type-section-accent">Ready when you are</h2>
-      <p className="type-body mx-auto mt-3 max-w-xl">
-        Jump into {WORKSPACE_NAME}, pick a style, and ship visuals your audience will remember.
+      <h2 className="type-section-accent">Whenever you&apos;re ready</h2>
+      <p className="type-body mx-auto mt-2 max-w-lg">
+        {WORKSPACE_NAME} · pick a style · ship frames that land.
       </p>
       <Link
         to="/studio"
