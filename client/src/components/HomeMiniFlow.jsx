@@ -4,10 +4,29 @@ import { Zap } from "lucide-react";
 import { HOME_SHORTCUT_TILES, MARKETING_STYLE_TILES } from "../content/marketingShared";
 import { assets } from "../assets/assets";
 
-const journeyStrip = [
-  { n: "1", label: "Sign in", img: assets.sample_img_1 },
-  { n: "2", label: "Generate", img: assets.sample_img_2 },
-  { n: "3", label: "Refine free", img: assets.star_group },
+/** Illustration-heavy shots for 1–2; mascot for step 3 so nothing feels “random icon next to renders”. */
+const flowSteps = [
+  {
+    n: "1",
+    title: "Log in once",
+    line: "We save your credits, gallery, and threads in one place.",
+    img: assets.sample_img_1,
+    imgClass: "object-cover object-center",
+  },
+  {
+    n: "2",
+    title: "Describe & generate",
+    line: "Pick a look you like, type the scene, and let it render.",
+    img: assets.sample_img_2,
+    imgClass: "object-cover object-center",
+  },
+  {
+    n: "3",
+    title: "Refine without stress",
+    line: "Tiny changes on what you already have—same thread, still free.",
+    img: assets.home_mascot,
+    imgClass: "object-cover object-[center_20%]",
+  },
 ];
 
 export default function HomeMiniFlow() {
@@ -22,7 +41,7 @@ export default function HomeMiniFlow() {
       >
         <div className="px-1">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Shortcuts</p>
-          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Same doors as Help, fewer clicks away</h2>
+          <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">Jump to Studio, Gallery, or FAQs</h2>
         </div>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {HOME_SHORTCUT_TILES.map((link, idx) => {
@@ -72,39 +91,52 @@ export default function HomeMiniFlow() {
           aria-hidden
         />
 
-        <div className="relative text-center">
+        <div className="relative text-center sm:text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-sky">How it flows</p>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-            Three steps, none of them mysterious
+            Idea → image → tighten it up
           </h2>
-          <p className="mx-auto mt-2 max-w-lg text-sm text-slate-600 sm:text-[15px]">
-            You describe, we draft, you nudge. New ideas pull from credits; little fixes on what you already have stay
-            off the tally.
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+            Starting something brand new uses part of your daily credits. Tweaking what you&apos;ve already made with
+            Refine doesn&apos;t.
           </p>
         </div>
 
-        <div className="relative mt-6 grid gap-2 sm:grid-cols-3">
-          {journeyStrip.map(({ n, label, img }, i) => (
-            <motion.div
-              key={label}
+        <div className="relative mt-8 grid gap-4 sm:grid-cols-3">
+          {flowSteps.map(({ n, title, line, img, imgClass }, i) => (
+            <motion.article
+              key={title}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.06 * i, duration: 0.35 }}
-              className="group overflow-hidden rounded-2xl border border-slate-200/85 bg-white/90 shadow-sm ring-1 ring-slate-100/80"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/85 bg-white text-left shadow-sm ring-1 ring-slate-100/80 transition hover:border-slate-300/95 hover:shadow-md"
             >
-              <div className="relative h-28 overflow-hidden sm:h-[7.25rem]">
-                <img src={img} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-                <span className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-slate-950 text-[12px] font-black text-white ring-4 ring-white/90">
+              <div
+                className={`relative h-[8.75rem] overflow-hidden bg-gradient-to-br from-sky-50/90 to-violet-50/50 sm:h-[10rem] ${n === "3" ? "ring-1 ring-inset ring-sky-100/80" : ""}`}
+              >
+                <img
+                  src={img}
+                  alt=""
+                  className={`h-full w-full transition duration-500 group-hover:scale-[1.02] ${imgClass}`}
+                  draggable={false}
+                />
+                <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-[13px] font-black text-white shadow-md ring-[3px] ring-white">
                   {n}
                 </span>
               </div>
-              <p className="px-3 py-2 text-center text-sm font-semibold text-slate-900">{label}</p>
-            </motion.div>
+              <div className="flex flex-1 flex-col px-4 pb-4 pt-3">
+                <h3 className="text-[15px] font-bold leading-snug text-slate-900">{title}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">{line}</p>
+              </div>
+            </motion.article>
           ))}
         </div>
 
-        <div className="relative mt-8 flex justify-center gap-2 overflow-x-auto pb-1">
+        <p className="relative mt-8 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
+          Looks you can start from
+        </p>
+        <div className="relative mt-2 flex justify-center gap-2 overflow-x-auto pb-1 sm:gap-3">
           {MARKETING_STYLE_TILES.map((tile) => (
             <motion.div
               key={tile.label}
@@ -129,21 +161,28 @@ export default function HomeMiniFlow() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="relative mt-6 flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-amber-100/90 bg-gradient-to-r from-amber-50/80 via-white/90 to-emerald-50/70 px-4 py-3 text-center text-[13px] text-slate-700 shadow-inner sm:text-sm"
+          className="relative mt-7 rounded-2xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 via-white to-cyan-50/40 px-4 py-3.5 text-center shadow-inner sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-3 sm:text-left"
         >
-          <span className="inline-flex items-center gap-1.5 font-semibold text-slate-800">
+          <span className="inline-flex items-center justify-center gap-2">
             <Zap className="h-4 w-4 shrink-0 text-amber-500" aria-hidden />
-            Typical free day: lots of refinements possible; roughly ten wholly new renders if each costs 10 credits.
+            <span className="text-[13px] leading-relaxed text-slate-700 sm:text-sm">
+              On the usual free allowance you can create about{" "}
+              <strong className="font-semibold text-slate-900">ten new images</strong> each day (10 credits apiece out of a
+              100‑credit pool). Tweaks on the same run with Refine don&apos;t run the meter twice.
+            </span>
           </span>
-          <Link to="/help" className="font-semibold text-brand-cyan underline-offset-4 hover:underline">
-            Full maths on Help
+          <Link
+            to="/help"
+            className="mt-3 block shrink-0 text-center text-[13px] font-semibold text-brand-cyan underline-offset-4 hover:underline sm:mt-0 sm:inline-block"
+          >
+            See how credits reset on Help
           </Link>
         </motion.div>
 
         <p className="relative mt-5 text-center text-xs text-slate-500">
-          Still reading?
-          <Link to="/help" className="ms-2 font-semibold text-brand-cyan underline-offset-4 hover:underline">
-            Help explains the dusty corners too
+          Need timezones or edge cases spelled out?
+          <Link to="/help" className="ms-1 font-semibold text-brand-cyan underline-offset-4 hover:underline">
+            Read Help
           </Link>
           .
         </p>
