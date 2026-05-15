@@ -44,7 +44,7 @@ export default function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, delay: 0.04 }}
       >
-        From prompt to image — fast, calm, and under control
+        Thoughts become pictures without the scramble
       </motion.h1>
 
       <motion.p
@@ -54,9 +54,9 @@ export default function Header() {
         transition={{ duration: 0.4, delay: 0.1 }}
       >
         {user ? (
-          "100 daily credits refresh every day. Keep everything in your gallery."
+          <>You’ve got today’s credit pool—splash it on new art, keep threads in your gallery, polish with free refines.</>
         ) : (
-          <>Sign in for daily credits, your gallery, and seamless generations.</>
+          <>Sign in to unlock daily credits, stash every thread, and riff on results without watching the meter twitch.</>
         )}
       </motion.p>
 
@@ -83,11 +83,11 @@ export default function Header() {
       >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-sky">What you get</p>
-            <h2 className="mt-2 text-xl font-extrabold text-slate-900 sm:text-2xl">Create, save, and reuse</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-sky">Starter kit</p>
+            <h2 className="mt-2 text-xl font-extrabold text-slate-900 sm:text-2xl">Make it, keep it, remix it</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Use the Studio to generate in different looks, then manage everything inside My gallery—favorite the
-              best and download PNGs anytime.
+              Studio is the playground, My gallery is the scrapbook—jump between styles, heart the keepers, snag PNGs,
+              and revisit every refine like a highlight reel.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">Studio</span>

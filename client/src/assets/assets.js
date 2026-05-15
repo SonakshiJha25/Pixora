@@ -53,22 +53,25 @@ export const assets = {
 }
 
 export const stepsData = [
-    {
-      title: 'Describe Your Vision',
-      description: 'In the studio, type what you want to see—subject, light, mood, a color palette, or a full scene. The clearer the brief, the closer the result.',
-      icon: step_icon_1,
-    },
-    {
-      title: 'Watch the Magic',
-      description: 'Pick a style, hit generate, and Pixorify returns an image in moments. Tweak the prompt and try again until it feels right.',
-      icon: step_icon_2,
-    },
-    {
-      title: 'Save & download',
-      description: 'When you are happy, download the file from the studio, or open My gallery to find past runs, favorite the best, and re-download as a PNG any time.',
-      icon: credit_star,
-    },
-  ];
+  {
+    title: "Tell us what you’re picturing",
+    description:
+      "Describe the vibe like you’re texting a chatty illustrator—mention light, mood, palette, characters. Little details make the leap from “fine” to “wow”.",
+    icon: step_icon_1,
+  },
+  {
+    title: "Generate, grin, tweak",
+    description:
+      "Dial in a style, smash generate, and watch pixels appear. Want another angle? Change the prompt or linger on your favourite frame and refine it—those follow-ups skip your credit meter.",
+    icon: step_icon_2,
+  },
+  {
+    title: "Save what sparks joy",
+    description:
+      "PNG downloads whenever you fancy, plus My gallery hoards threads, favourites, and reruns—like a sticker book you’ll actually reopen.",
+    icon: credit_star,
+  },
+];
 
 export const testimonialsData = [
     {
