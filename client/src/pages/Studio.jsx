@@ -486,14 +486,6 @@ export default function Studio() {
                   >
                     Refine this image
                   </button>
-                  <button
-                    type="button"
-                    disabled={loading || refineSubmitting}
-                    onClick={() => setRefinePanelOpen(true)}
-                    className="inline-flex items-center justify-center rounded-full border border-transparent px-6 py-2 text-center text-sm font-semibold text-cyan-300/95 underline-offset-4 hover:underline disabled:opacity-50"
-                  >
-                    Edit again
-                  </button>
                 </div>
 
                 <div className="w-full border-t border-white/[0.08] pt-6 text-center">
