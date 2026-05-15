@@ -13,6 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import HelpContactForm from "../components/HelpContactForm.jsx";
+import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
 import { SITE } from "../lib/site.js";
 import { assets } from "../assets/assets.js";
@@ -192,8 +193,8 @@ export default function Help() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <div className="relative mx-auto w-full max-w-4xl overflow-x-hidden px-2 pb-28 pt-6 sm:px-4">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[120vw] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,_rgba(165,243,252,0.35),transparent_62%)]" />
+    <MarketingPageShell className="pb-28 pt-6 sm:pt-8">
+      <div className="relative mx-auto w-full max-w-4xl px-2 sm:px-4">
 
       {/* Hero */}
       <motion.section
@@ -453,6 +454,7 @@ export default function Help() {
           ← Back home
         </Link>
       </p>
-    </div>
+      </div>
+    </MarketingPageShell>
   );
 }

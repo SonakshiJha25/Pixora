@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { AppContext } from "../context/AppContext";
+import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { getToken } from "../utils/token.js";
 
 export default function Feedback() {
@@ -19,7 +19,7 @@ export default function Feedback() {
 
     const trimmed = message.trim();
     if (!trimmed) {
-      setErrorMessage("Please enter your feedback.");
+      setErrorMessage("Write at least a line — rough notes totally count.");
       return;
     }
 
@@ -39,7 +39,7 @@ export default function Feedback() {
       const { data } = await api.post("/api/feedback", body, { headers });
 
       if (data.success) {
-        setSuccessMessage("Feedback submitted successfully");
+        setSuccessMessage("Sent — thanks for taking the time.");
         setMessage("");
         setRating("");
       } else {
@@ -53,23 +53,25 @@ export default function Feedback() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-lg px-2 pb-24 pt-10 sm:px-4">
+    <MarketingPageShell className="pb-28 pt-8 sm:pt-11">
+      <div className="mx-auto w-full max-w-lg px-4 sm:px-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-cyan">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky">
           Feedback
         </p>
-        <h1 className="mt-2 text-center text-3xl font-bold text-slate-900">Tell us what you think</h1>
-        <p className="mx-auto mt-2 max-w-md text-center text-sm text-slate-600">
-          Your input helps us improve Pixorify.
+        <h1 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-slate-900">We actually read these</h1>
+        <p className="mx-auto mt-3 max-w-md text-center text-sm leading-relaxed text-slate-600">
+          Rant, rave, typo report — whatever helps you feel heard. Anonymous-ish: add a rating if you want, skip it if
+          you don&apos;t.
         </p>
 
         <form
           onSubmit={onSubmit}
-          className="mt-10 space-y-5 rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-lg backdrop-blur"
+          className="mt-10 space-y-5 rounded-[1.75rem] border border-white/70 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-xl ring-1 ring-slate-200/50"
         >
           {successMessage ? (
             <p className="rounded-xl bg-emerald-50 px-4 py-3 text-center text-sm font-medium text-emerald-800">
@@ -91,7 +93,7 @@ export default function Feedback() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={5}
-              placeholder="What worked well? What could be better?"
+              placeholder="e.g. loved the anime style but credits confused me..."
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-cyan focus:outline-none focus:ring-2 focus:ring-brand-cyan/30"
               disabled={loading}
             />
@@ -122,16 +124,17 @@ export default function Feedback() {
             disabled={loading}
             className="btn-primary w-full rounded-xl py-3 text-sm font-semibold disabled:opacity-60"
           >
-            {loading ? "Sending…" : "Send"}
+            {loading ? "Sending…" : "Send note"}
           </button>
 
           <p className="text-center text-sm">
             <Link to="/studio" className="font-semibold text-brand-cyan underline-offset-4 hover:underline">
-              ← Back to Studio
+              ← Studio
             </Link>
           </p>
         </form>
       </motion.div>
-    </div>
+      </div>
+    </MarketingPageShell>
   );
 }

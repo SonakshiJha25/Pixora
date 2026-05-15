@@ -42,6 +42,9 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/65 p-3 backdrop-blur-md sm:p-6">
       <button type="button" className="absolute inset-0" aria-label="Close" onClick={onClose} />
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gallery-thread-modal-title"
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.25 }}
@@ -49,8 +52,12 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
       >
         <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Refinement chain</h2>
-            <p className="text-xs text-slate-500">Original and each edit, in order</p>
+            <h2 id="gallery-thread-modal-title" className="text-lg font-bold text-slate-900">
+              This thread
+            </h2>
+            <p className="text-xs text-slate-500">
+              Top to bottom: what you generated first, then each refine along the same idea.
+            </p>
           </div>
           <button
             type="button"
@@ -68,10 +75,12 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
             </div>
           ) : error ? (
             <p className="py-10 text-center text-sm text-slate-600">
-              We couldn&apos;t load this chain. Try again later.
+              Couldn&apos;t load versions for this thread. Check your connection or try again in a bit.
             </p>
           ) : thread.length === 0 ? (
-            <p className="py-10 text-center text-sm text-slate-500">Nothing here yet.</p>
+            <p className="py-10 text-center text-sm text-slate-500">
+              Nothing to show yet — weird, but harmless.
+            </p>
           ) : (
             <ul className="flex flex-col gap-2">
               {thread.map((item, idx) => (
@@ -86,10 +95,10 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
                     </div>
                     <div className="border-t border-slate-200/70 bg-white/90 px-3 py-2.5 text-left">
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        {idx === 0 ? "Original" : `Edit ${idx}`}
+                        {idx === 0 ? "First render" : `Tweak ${idx}`}
                         {item.isEdit ? (
                           <span className="ml-2 rounded-full bg-cyan-50 px-2 py-0.5 font-medium normal-case tracking-normal text-brand-cyan">
-                            Refinement
+                            Refine
                           </span>
                         ) : null}
                       </p>
