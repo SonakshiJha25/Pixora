@@ -82,14 +82,14 @@ const Login = () => {
     },[])
 
   return (
-    <div className='fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/60 backdrop-blur-md'>
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/55 p-4">
         <motion.form onSubmit={onSubmitHandler}
-            initial={{ opacity: 0.2, y: 50 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0.15, y: 12 }}
+            transition={{ duration: 0.25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
 
-        className='relative bg-white/95 border border-white p-10 rounded-2xl text-slate-500 shadow-2xl max-w-md w-[92vw]'>
+        className='relative max-w-md w-[92vw] rounded-2xl border border-slate-200 bg-white p-10 text-slate-600 shadow-card'>
             <h1 className='text-center text-2xl text-neutral-700 font-medium'>{state}</h1>
             <p className='text-sm'>
               {state === 'Login'

@@ -35,12 +35,12 @@ export default function ConfirmModal({
   if (!open) return null;
 
   const confirmClass = danger
-    ? "bg-gradient-to-r from-rose-600 to-rose-700 hover:brightness-105"
-    : "bg-gradient-to-r from-brand-cyan to-brand-sky hover:brightness-105";
+    ? "bg-rose-700 hover:bg-rose-600"
+    : "bg-slate-900 hover:bg-slate-800";
 
   return (
     <div
-      className="fixed inset-0 z-[96] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[96] flex items-center justify-center bg-slate-900/55 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
@@ -51,14 +51,12 @@ export default function ConfirmModal({
         initial={{ opacity: 0, y: 24, scale: 0.92 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="relative z-[97] w-full max-w-md overflow-hidden rounded-3xl border border-white/40 bg-white/95 p-8 text-center shadow-2xl"
+        className="relative z-[97] w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-card"
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ring-1 ring-white ${
-            danger
-              ? "bg-gradient-to-br from-rose-100 to-orange-100 text-rose-600"
-              : "bg-gradient-to-br from-sky-100 to-cyan-100 text-brand-cyan"
+          className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ${
+            danger ? "bg-rose-50 text-rose-600" : "bg-slate-100 text-slate-700"
           }`}
           aria-hidden
         >
@@ -91,7 +89,7 @@ export default function ConfirmModal({
           <button
             type="button"
             onClick={onConfirm}
-            className={`inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white shadow-glow sm:w-auto ${confirmClass}`}
+            className={`inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition sm:w-auto ${confirmClass}`}
           >
             {confirmLabel}
           </button>

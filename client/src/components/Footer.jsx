@@ -16,8 +16,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-auto border-t border-slate-200/70 bg-white/60 py-4 backdrop-blur-md">
-      <div className="mx-auto flex w-full flex-col items-stretch justify-between gap-3 px-1 sm:flex-row sm:items-center sm:gap-4 sm:px-0">
+    <footer className="mt-auto border-t border-slate-200/80 bg-white py-5">
+      <div className="mx-auto flex w-full flex-col items-stretch justify-between gap-4 px-1 sm:flex-row sm:items-center sm:gap-4 sm:px-0">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-2.5">
           {[
             {
@@ -85,7 +85,7 @@ export default function Footer() {
           <button
             type="button"
             onClick={goHomeTop}
-            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan sm:justify-end"
+            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35 sm:justify-end"
           >
             <span className="overflow-hidden rounded-2xl">
               <BrandLogo variant="footer" alt="Pixorify" />
@@ -93,19 +93,19 @@ export default function Footer() {
             <span className="font-display text-sm font-bold text-slate-900 sm:text-[15px]">{SITE.name}</span>
           </button>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 sm:justify-end">
-            <a className="font-semibold text-brand-sky hover:underline" href={`mailto:${SITE.helpEmail}`}>
+            <a className="font-medium text-slate-700 hover:underline" href={`mailto:${SITE.helpEmail}`}>
               {SITE.helpEmail}
             </a>
             <span className="text-slate-300">·</span>
-            <Link className="font-semibold text-slate-600 hover:text-brand-cyan" to="/help">
+            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/help">
               Help
             </Link>
             <span className="text-slate-300">·</span>
-            <Link className="font-semibold text-slate-600 hover:text-brand-cyan" to="/gallery">
+            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/gallery">
               Gallery
             </Link>
             <span className="text-slate-300">·</span>
-            <Link className="font-semibold text-slate-600 hover:text-brand-cyan" to="/pricing">
+            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/pricing">
               Pricing
             </Link>
           </div>

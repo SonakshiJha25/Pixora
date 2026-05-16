@@ -51,11 +51,11 @@ export const STUDIO_STYLE_SAMPLES = [
 
 /** Subtle idle-state gradients in Studio (no big shared marketing PNGs). */
 export const STUDIO_STYLE_MOODS = {
-  realistic: "from-slate-600/35 via-slate-950/95 to-[#020510]",
-  anime: "from-sky-500/18 via-slate-950/92 to-[#050a14]",
-  cyberpunk: "from-cyan-500/22 via-slate-950/90 to-[#03080f]",
-  fantasy: "from-amber-400/12 via-slate-950/40 to-[#040b0e]",
-  minimal: "from-slate-400/15 via-slate-900/95 to-[#060608]",
+  realistic: "from-slate-800/40 via-[#161920] to-[#0f1218]",
+  anime: "from-slate-800/38 via-[#151820] to-[#0f1218]",
+  cyberpunk: "from-slate-700/35 via-[#141820] to-[#10141a]",
+  fantasy: "from-slate-800/32 via-[#161820] to-[#101418]",
+  minimal: "from-slate-800/42 via-[#14161c] to-[#101114]",
 };
 
 /** Home hero: what Pixorify offers (product-focused copy). */

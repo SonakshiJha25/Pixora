@@ -30,8 +30,8 @@ const App = () => {
 
   return (
     <div
-      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[820ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-        isDarkWorkspace ? "bg-studio-app" : "bg-mesh"
+      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[900ms] ease-[cubic-bezier(0.25,1,0.3,1)] ${
+        isDarkWorkspace ? "bg-studio-app" : "bg-market"
       }`}
     >
       <Toaster position="bottom-right" theme={isDarkWorkspace ? "dark" : "light"} richColors closeButton />
@@ -51,11 +51,11 @@ const App = () => {
         >
           <motion.div
             key={isStudioRoute ? "workspace-studio" : isDarkWorkspace ? "workspace-gallery" : "marketing"}
-            initial={{ opacity: isStudioRoute ? 0.82 : 0.9, y: isStudioRoute ? 20 : 6 }}
+            initial={{ opacity: isStudioRoute ? 0.92 : 0.97, y: isStudioRoute ? 8 : 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: isStudioRoute ? 0.74 : isDarkWorkspace ? 0.48 : 0.42,
-              ease: [0.22, 1, 0.36, 1],
+              duration: isStudioRoute ? 0.52 : isDarkWorkspace ? 0.4 : 0.32,
+              ease: [0.25, 1, 0.3, 1],
             }}
             className="flex flex-1 flex-col"
           >

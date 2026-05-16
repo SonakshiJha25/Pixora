@@ -30,7 +30,7 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
 
   return (
     <div
-      className="fixed inset-0 z-[95] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[95] flex items-center justify-center bg-slate-900/50 p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -44,9 +44,9 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
         initial={{ opacity: 0, y: 24, scale: 0.92 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="relative z-[96] w-full max-w-md overflow-hidden rounded-3xl border border-white/40 bg-white/95 p-8 text-center shadow-2xl"
+        className="relative z-[96] w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-card"
       >
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-rose-100 to-orange-100 ring-1 ring-white">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 ring-1 ring-rose-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 64 64"
@@ -71,7 +71,7 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
           You&apos;ve used up your daily image credits. Your pool refills at the next calendar{" "}
           <strong>{tzPhrase}</strong> (00:00).
         </p>
-        <div className="mt-5 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-cyan-100">
+        <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-700">
           You get <span className="font-bold text-slate-900">100 credits</span> per day.
           Each image costs <span className="font-bold text-slate-900">10 credits</span> —
           that&apos;s <span className="font-bold text-slate-900">10 free images</span> daily.
@@ -79,13 +79,11 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
         <Link
           to="/pricing"
           onClick={onClose}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-sky px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-105"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         >
           Upgrade
         </Link>
-        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
-          Stay curious. More inspiration arrives tomorrow ✨
-        </p>
+        <p className="mt-3 text-[11px] leading-relaxed text-slate-500">Your balance returns at the next reset.</p>
       </motion.div>
     </div>
   );

@@ -19,42 +19,30 @@ export const MARKETING_STYLE_TILES = [
   { img: assets.style_minimal, label: "Minimal", studioStyle: "minimal" },
 ];
 
-/** Home-only shortcuts (overlap with Help, tighter copy). */
+/** Home shortcuts — one quiet surface (no rainbow tile gradients) */
 export const HOME_SHORTCUT_TILES = [
   {
     to: "/studio",
     title: WORKSPACE_NAME,
-    desc: "Write a prompt, pick a style, and render your first frame.",
+    desc: "Write a prompt, pick a style, render your frame.",
     icon: Wand2,
-    grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
-    border: "border-cyan-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(34,211,238,0.35)]",
   },
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "Browse threads, favourites, and PNGs in one calm grid.",
+    desc: "Threads and favourites in one grid.",
     icon: LayoutGrid,
-    grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
-    border: "border-violet-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(167,139,250,0.35)]",
   },
   {
     to: "/pricing",
     title: "Plans",
-    desc: "See what Free covers today and where Pro steps in.",
+    desc: "Free today, room to grow when you need it.",
     icon: Sparkles,
-    grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
-    border: "border-amber-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(251,191,36,0.4)]",
   },
   {
     to: "/help",
     title: "Help",
-    desc: "Credits, IST resets, refinements, contact — all explained slowly.",
+    desc: "Credits, resets, refinements, and contact.",
     icon: CircleHelp,
-    grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
-    border: "border-rose-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(251,113,133,0.35)]",
   },
 ];

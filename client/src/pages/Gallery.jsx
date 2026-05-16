@@ -72,9 +72,9 @@ export default function Gallery() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[2rem] border border-white/70 bg-white/65 px-8 py-10 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:py-11"
+            className="rounded-2xl border border-slate-200/90 bg-white px-8 py-10 shadow-card sm:py-11"
           >
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-cyan/20 to-brand-sky/15 text-brand-cyan ring-1 ring-white/80">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-700">
               <LayoutGrid className="h-6 w-6" strokeWidth={2} aria-hidden />
             </span>
             <h1 className="type-page-title mt-5">Your Pixorify gallery</h1>
@@ -116,13 +116,13 @@ export default function Gallery() {
             <span className="font-medium text-slate-300">Open thread</span>, hearts land in Saved for quick recall.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
-            <Link to="/studio" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
+            <Link to="/studio" className="font-medium text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
               ← {WORKSPACE_NAME}
             </Link>
             <span className="text-slate-600" aria-hidden>
               ·
             </span>
-            <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 transition hover:text-cyan-300 hover:underline">
+            <Link to="/help" className="font-medium text-slate-500 underline-offset-4 transition hover:text-slate-200 hover:underline">
               How credits work
             </Link>
           </div>
@@ -132,10 +132,10 @@ export default function Gallery() {
           <button
             type="button"
             onClick={() => setView("all")}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition duration-300 ${
+            className={`rounded-full px-5 py-2 text-sm font-medium transition ${
               view === "all"
-                ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
-                : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+                ? "bg-white/[0.09] text-slate-100 ring-1 ring-white/15"
+                : "border border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/14 hover:text-slate-200"
             }`}
           >
             All threads
@@ -143,14 +143,14 @@ export default function Gallery() {
           <button
             type="button"
             onClick={() => setView("favorites")}
-            className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition duration-300 ${
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition ${
               view === "favorites"
-                ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
-                : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+                ? "bg-white/[0.09] text-slate-100 ring-1 ring-white/15"
+                : "border border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/14 hover:text-slate-200"
             }`}
           >
             <Heart
-              className={`h-3.5 w-3.5 ${view === "favorites" ? "fill-cyan-400 text-cyan-300" : "text-cyan-400/70"}`}
+              className={`h-3.5 w-3.5 ${view === "favorites" ? "fill-slate-200 text-slate-200" : "text-slate-500"}`}
               strokeWidth={2}
               aria-hidden
             />
@@ -170,17 +170,17 @@ export default function Gallery() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search prompts and refinements…"
-              className="w-full rounded-2xl border border-white/10 bg-white/[0.06] py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-500 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] outline-none ring-0 transition focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-500/20"
+              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none ring-0 transition focus:border-white/18 focus:ring-1 focus:ring-white/10"
             />
           </label>
           <div className="flex flex-wrap justify-center gap-2">
             <button
               type="button"
               onClick={() => setStyleFilter(null)}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition duration-300 sm:text-sm ${
+              className={`rounded-full px-4 py-1.5 text-xs font-medium transition sm:text-sm ${
                 styleFilter === null
-                  ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
-                  : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+                  ? "bg-white/[0.09] text-slate-100 ring-1 ring-white/15"
+                  : "border border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/14 hover:text-slate-200"
               }`}
             >
               All styles
@@ -193,10 +193,10 @@ export default function Gallery() {
                   key={v}
                   type="button"
                   onClick={() => setStyleFilter(on ? null : v)}
-                  className={`rounded-full px-4 py-1.5 text-xs font-semibold transition duration-300 sm:text-sm ${
+                  className={`rounded-full px-4 py-1.5 text-xs font-medium transition sm:text-sm ${
                     on
-                      ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
-                      : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+                      ? "bg-white/[0.09] text-slate-100 ring-1 ring-white/15"
+                      : "border border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/14 hover:text-slate-200"
                   }`}
                 >
                   {s.label}
@@ -213,7 +213,7 @@ export default function Gallery() {
             count={6}
           />
         ) : showEmptyGrid ? (
-          <div className="rounded-[1.85rem] border border-dashed border-white/12 bg-white/[0.03] px-6 py-12 text-center shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
+          <div className="rounded-xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-12 text-center">
             {historyStatus === "error" && history.length === 0 ? (
               <div className="mx-auto max-w-sm px-2">
                 <p className="font-display text-base font-semibold text-slate-200">Gallery is taking a breath</p>
@@ -223,7 +223,7 @@ export default function Gallery() {
                 <button
                   type="button"
                   onClick={() => fetchHistory()}
-                  className="mx-auto mt-6 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white"
+                  className="mx-auto mt-6 rounded-full border border-white/[0.12] bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/22 hover:bg-white/[0.09]"
                 >
                   Try again
                 </button>
@@ -240,7 +240,7 @@ export default function Gallery() {
                     setSearch("");
                     setStyleFilter(null);
                   }}
-                  className="mx-auto mt-6 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white"
+                  className="mx-auto mt-6 rounded-full border border-white/[0.12] bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/22 hover:bg-white/[0.09]"
                 >
                   Clear search & style
                 </button>
@@ -251,7 +251,7 @@ export default function Gallery() {
                 <button
                   type="button"
                   onClick={() => setView("all")}
-                  className="font-medium text-slate-200 underline underline-offset-2 hover:text-cyan-300"
+                  className="font-medium text-slate-200 underline underline-offset-2 hover:text-white"
                 >
                   All threads
                 </button>
@@ -262,7 +262,7 @@ export default function Gallery() {
                 <p className="font-display text-base font-semibold text-slate-200">Your gallery is ready for its first piece</p>
                 <p className="mx-auto mt-2 max-w-sm text-sm text-slate-400">
                   Create in{" "}
-                  <Link className="font-semibold text-cyan-300 underline-offset-4 hover:underline" to="/studio">
+                  <Link className="font-semibold text-slate-300 underline-offset-4 hover:text-white hover:underline" to="/studio">
                     {WORKSPACE_NAME}
                   </Link>{" "}
                   — threads and favourites show up here automatically.
@@ -286,11 +286,11 @@ export default function Gallery() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, ease: "easeOut" }}
-                    className="studio-shell flex flex-col items-center gap-5 rounded-[1.85rem] p-5 ring-1 ring-white/[0.05]"
+                    className="studio-shell flex flex-col items-center gap-5 rounded-2xl p-5"
                   >
                     <div className="relative w-full max-w-[280px]">
                       {group.refinements > 0 ? (
-                        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-slate-950/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-200 shadow-lg backdrop-blur-md">
+                        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/[0.08] bg-[#13151c]/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
                           +{group.refinements} refine{group.refinements === 1 ? "" : "s"}
                         </span>
                       ) : null}
@@ -306,10 +306,10 @@ export default function Gallery() {
                           e.stopPropagation();
                           toggleFavorite(group.latest);
                         }}
-                        className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
+                        className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg transition duration-300 active:scale-95 hover:-translate-y-px ${
                           group.latest.isFavorite
-                            ? "border-cyan-400/45 bg-slate-950/75 text-cyan-300"
-                            : "border-white/15 bg-slate-950/55 text-slate-300 hover:border-cyan-400/35 hover:bg-slate-900/65 hover:text-white"
+                            ? "border-white/25 bg-[#171a22] text-slate-100"
+                            : "border-white/12 bg-[#171a22]/90 text-slate-400 hover:border-white/20 hover:text-slate-200"
                         }`}
                         aria-label={group.latest.isFavorite ? "Remove from saved" : "Save to favorites"}
                         title={group.latest.isFavorite ? "Saved" : "Save"}
@@ -321,7 +321,7 @@ export default function Gallery() {
                     <button
                       type="button"
                       onClick={() => setThreadBrowseId(String(group.latest._id))}
-                      className="btn-primary studio-glow w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
+                      className="btn-primary w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
                     >
                       Open thread
                     </button>
@@ -329,14 +329,14 @@ export default function Gallery() {
                     <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
                   <Link
                     to={`/studio?continue=${group.latest._id}`}
-                    className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-100 shadow-sm transition duration-300 hover:border-cyan-400/45 hover:bg-cyan-500/14 hover:text-white"
+                    className="rounded-full border border-[rgba(90,143,163,0.35)] bg-[rgba(90,143,163,0.12)] px-3 py-2 text-xs font-semibold text-slate-100 transition hover:border-[rgba(106,159,179,0.45)] hover:bg-[rgba(90,143,163,0.18)]"
                   >
                     Continue editing
                   </Link>
                       <a
                         href={resolveImageUrl(group.latest.imageUrl)}
                         download={`pixorify-${group.latest._id}.png`}
-                        className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-slate-100 shadow-sm transition duration-300 hover:border-cyan-400/35 hover:bg-white/[0.09]"
+                        className="rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/18 hover:bg-white/[0.08]"
                       >
                         Download PNG
                       </a>

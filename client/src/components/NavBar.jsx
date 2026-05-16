@@ -60,15 +60,15 @@ export default function NavBar() {
     <header
       className={
         isWorkspaceNav
-          ? "sticky top-0 z-40 w-full border-b border-white/[0.1] bg-slate-950/78 shadow-[0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
-          : "sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/80 shadow-sm backdrop-blur-xl"
+          ? "sticky top-0 z-40 w-full border-b border-white/[0.06] bg-[#13151c]/88 backdrop-blur-md"
+          : "sticky top-0 z-40 w-full border-b border-slate-200/70 bg-[#fdfcfa]/90 backdrop-blur-md"
       }
     >
       <div className="mx-auto flex w-full items-center justify-between gap-3 py-2.5">
         <button
           type="button"
-          className={`flex min-w-0 cursor-pointer items-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan ${
-            isWorkspaceNav ? "focus-visible:ring-cyan-400/50" : ""
+          className={`flex min-w-0 cursor-pointer items-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/40 ${
+            isWorkspaceNav ? "focus-visible:ring-slate-500/40" : ""
           }`}
           onClick={goHomeTop}
         >
@@ -133,8 +133,8 @@ export default function NavBar() {
                 onClick={() => setProfileOpen((v) => !v)}
                 className={
                   isWorkspaceNav
-                    ? "flex max-w-[200px] items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] py-1 pl-2 pr-1.5 text-left shadow-none transition hover:border-cyan-400/35"
-                    : "flex max-w-[200px] items-center gap-2 rounded-full border border-slate-200 bg-white/90 py-1 pl-2 pr-1.5 text-left shadow-sm transition hover:border-brand-cyan/40"
+                    ? "flex max-w-[200px] items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] py-1 pl-2 pr-1.5 text-left shadow-none transition hover:border-white/15"
+                    : "flex max-w-[200px] items-center gap-2 rounded-full border border-slate-200/90 bg-white py-1 pl-2 pr-1.5 text-left shadow-sm transition hover:border-slate-300"
                 }
                 aria-expanded={profileOpen}
               >
@@ -159,8 +159,8 @@ export default function NavBar() {
                 onClick={() => setProfileOpen((v) => !v)}
                 className={
                   isWorkspaceNav
-                    ? "flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] py-1 pl-2 pr-1.5 shadow-none transition hover:border-cyan-400/35"
-                    : "flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 py-1 pl-2 pr-1.5 shadow-sm"
+                    ? "flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] py-1 pl-2 pr-1.5 shadow-none transition hover:border-white/15"
+                    : "flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-2 pr-1.5 shadow-sm"
                 }
                 aria-expanded={profileOpen}
               >
@@ -179,8 +179,8 @@ export default function NavBar() {
               <div
                 className={
                   isWorkspaceNav
-                    ? "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-white/12 bg-slate-950/95 py-1 shadow-2xl shadow-black/60 backdrop-blur-xl"
-                    : "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-xl"
+                    ? "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1a1d26] py-1 shadow-xl"
+                    : "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200/90 bg-white py-1 shadow-lg"
                 }
               >
                 {user ? (
@@ -242,8 +242,8 @@ export default function NavBar() {
             type="button"
             className={
               isWorkspaceNav
-                ? "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/12 bg-white/[0.05] text-slate-200 md:hidden"
-                : "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 md:hidden"
+                ? "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-slate-300 md:hidden"
+                : "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-800 md:hidden"
             }
             aria-expanded={menuOpen}
             aria-label="Menu"
@@ -258,8 +258,8 @@ export default function NavBar() {
         <div
           className={
             isWorkspaceNav
-              ? "border-t border-white/10 bg-slate-950/95 py-3 shadow-inner shadow-black/40 backdrop-blur-xl md:hidden"
-              : "border-t border-slate-100 bg-white/98 py-3 shadow-inner md:hidden"
+              ? "border-t border-white/[0.06] bg-[#13151c]/95 py-3 md:hidden"
+              : "border-t border-slate-100 bg-white py-3 md:hidden"
           }
         >
           <div className="mx-auto flex w-full flex-col gap-1">

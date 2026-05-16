@@ -9,23 +9,25 @@ module.exports = {
       },
       colors: {
         brand: {
-          /** Deep indigo canvas — aligns with logo night sky */
-          navy: "#12061f",
-          /** Electric cyan — logo frame left / accents */
-          cyan: "#22d3ee",
-          /** Vibrant magenta-pink — logo frame right; pairs with cyan in CTAs */
-          sky: "#f472b6",
-          violet: "#a855f7",
-          indigo: "#4c1d95",
+          /** Deep charcoal-navy workspace base */
+          navy: "#171b26",
+          /** Muted cyan highlight — restrained, not neon */
+          cyan: "#5a8fa3",
+          /** Dusty indigo accents (marketing & links) */
+          sky: "#6b7399",
+          violet: "#5a586d",
+          indigo: "#3a455a",
         },
       },
       boxShadow: {
-        glow: "0 18px 50px -20px rgba(14,165,233,0.22), 0 16px 40px -24px rgba(15,23,42,0.12)",
-        card: "0 12px 40px -12px rgba(76, 29, 149, 0.1)",
+        glow: "0 10px 36px -20px rgba(30,41,59,0.14)",
+        card: "0 10px 32px -12px rgba(15,23,42,0.07)",
       },
       backgroundImage: {
-        mesh:
-          "radial-gradient(780px circle at 12% 8%, rgba(56,189,248,0.16), transparent 46%), radial-gradient(640px circle at 92% 4%, rgba(165,180,252,0.12), transparent 42%), radial-gradient(560px circle at 48% 100%, rgba(129,140,248,0.09), transparent 48%), radial-gradient(900px circle at 50% 120%, rgba(248,250,252,0.94), transparent 55%)",
+        /** Calm landing wash — warm white to cool grey (no saturated mesh blobs) */
+        market:
+          "linear-gradient(178deg, #fdfcfa 0%, #f8f9fc 46%, #f2f4f8 100%)",
+        mesh: "linear-gradient(178deg, #fdfcfa 0%, #f8f9fc 46%, #f2f4f8 100%)",
       },
     },
   },

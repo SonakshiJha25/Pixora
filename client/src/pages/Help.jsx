@@ -24,36 +24,24 @@ const quickLinks = [
     title: WORKSPACE_NAME,
     desc: `Prompts, styles, and downloads — everything happens inside ${WORKSPACE_NAME}.`,
     icon: Wand2,
-    grad: "from-cyan-500/15 via-sky-400/10 to-blue-500/15",
-    border: "border-cyan-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(34,211,238,0.35)]",
   },
   {
     to: "/gallery",
     title: "Gallery",
-    desc: "See every thread, favourite the hits, and export PNGs without hunting folders.",
+    desc: "Threads, favourites, and exports in one place.",
     icon: LayoutGrid,
-    grad: "from-violet-500/12 via-purple-400/10 to-fuchsia-500/12",
-    border: "border-violet-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(167,139,250,0.35)]",
   },
   {
     to: "/pricing",
     title: "Pricing",
-    desc: "Compare allowances, learn what Pro unlocks later, then jump back to creating.",
+    desc: "Plans and allowances at a glance.",
     icon: Sparkles,
-    grad: "from-amber-400/14 via-orange-300/12 to-pink-400/14",
-    border: "border-amber-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(251,191,36,0.4)]",
   },
   {
     to: "/feedback",
     title: "Feedback",
-    desc: "Something confusing, broken, or half-baked? Tell us plainly — humans read these.",
+    desc: "Something off? Tell us — a human reads these.",
     icon: Heart,
-    grad: "from-rose-400/14 via-red-300/12 to-orange-400/14",
-    border: "border-rose-200/70",
-    hoverRing: "hover:shadow-[0_0_0_1px_rgba(251,113,133,0.35)]",
   },
 ];
 
@@ -232,7 +220,7 @@ export default function Help() {
             </Link>
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/90 px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400/55 hover:bg-white hover:text-slate-900 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+              className="group inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-400 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35"
             >
               <MessageCircleHeart className="h-4 w-4 shrink-0 text-rose-400 transition group-hover:scale-[1.05]" aria-hidden />
               Message us
@@ -244,7 +232,7 @@ export default function Help() {
                 key={t.label}
                 to={`/studio?style=${encodeURIComponent(t.studioStyle)}`}
                 title={`Open ${WORKSPACE_NAME} with ${t.label} selected`}
-                className="group relative shrink-0 overflow-hidden rounded-2xl border border-white shadow-md ring-1 ring-slate-200/70 transition hover:-translate-y-1 hover:shadow-lg hover:ring-2 hover:ring-cyan-400/35"
+                className="group relative shrink-0 overflow-hidden rounded-2xl border border-slate-200/85 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md"
               >
                 <img
                   src={t.img}
@@ -275,7 +263,7 @@ export default function Help() {
             <a
               href="#contact"
               aria-label="Jump to the message form at the bottom of this page"
-              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-2xl bg-gradient-to-r from-cyan-400/72 via-fuchsia-500/72 to-violet-500/70 px-5 py-2.5 text-center shadow-lg shadow-slate-900/15 transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/45"
+              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-xl bg-slate-900 px-5 py-2.5 text-center text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/35"
             >
               Someone actually reads messages
             </a>
@@ -304,17 +292,14 @@ export default function Help() {
               >
                 <Link
                   to={link.to}
-                  className={`hover:-translate-y-1 group relative flex gap-3 overflow-hidden rounded-[1.25rem] border bg-gradient-to-br ${link.grad} p-4 shadow-card transition hover:shadow-xl ${link.border} ${link.hoverRing}`}
+                  className="marketing-surface-hover group relative flex gap-3 rounded-2xl border border-slate-200/85 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-card"
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/92 text-brand-cyan shadow-inner ring-1 ring-white transition group-hover:scale-105">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-700 transition group-hover:bg-white">
                     <Icon className="h-6 w-6" strokeWidth={2} />
                   </span>
                   <span className="min-w-0">
                     <span className="type-tile-title-lg">{link.title}</span>
                     <span className="type-body-tight mt-1 block">{link.desc}</span>
-                  </span>
-                  <span className="pointer-events-none absolute bottom-3 right-4 text-2xl opacity-30 transition group-hover:opacity-50">
-                    ↗
                   </span>
                 </Link>
               </motion.li>

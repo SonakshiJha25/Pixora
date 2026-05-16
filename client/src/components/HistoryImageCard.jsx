@@ -40,8 +40,8 @@ export default function HistoryImageCard({
   const openHitBottom = hasActionStrip ? "bottom-[3.45rem]" : "bottom-0";
 
   const tileClass = isWs
-    ? "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-[1.25rem] border border-white/[0.085] bg-slate-950/45 shadow-[0_20px_52px_-34px_rgba(0,0,0,0.9)] shadow-black/65 ring-1 ring-white/[0.04] transition duration-500 ease-out hover:-translate-y-0.5 hover:border-cyan-400/28 hover:shadow-[0_28px_64px_-36px_rgba(6,182,212,0.12),0_0_0_1px_rgba(34,211,238,0.1)] hover:ring-cyan-400/18"
-    : "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-[1.25rem] border border-white/40 bg-slate-100 shadow-lg ring-1 ring-slate-900/5 transition duration-400 ease-out hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-xl hover:ring-sky-400/25";
+    ? "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#14161d] shadow-[0_14px_40px_-28px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-[1px] hover:border-white/15"
+    : "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:-translate-y-[1px] hover:border-slate-300";
 
   const open = () => {
     if (!interactive) return;
@@ -71,8 +71,8 @@ export default function HistoryImageCard({
           <img
             src={src}
             alt={item.promptRaw || "Generated image"}
-            className={`absolute inset-0 h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              hover ? "scale-[1.06] brightness-[1.04]" : "scale-100"
+            className={`absolute inset-0 h-full w-full object-cover transition duration-500 ease-out ${
+              hover ? "scale-[1.03]" : "scale-100"
             }`}
             loading="lazy"
             decoding="async"
@@ -97,7 +97,7 @@ export default function HistoryImageCard({
               type="button"
               aria-label={promptShort ? `Open preview: ${promptShort}` : "Open image preview"}
               className={`absolute inset-x-0 top-0 z-[5] bg-transparent outline-none ring-0 transition focus-visible:ring-2 ${
-                isWs ? "focus-visible:ring-cyan-400/55" : "focus-visible:ring-sky-400/55"
+                isWs ? "focus-visible:ring-white/30" : "focus-visible:ring-slate-400/40"
               } ${openHitBottom}`}
               onClick={open}
             />
@@ -111,7 +111,7 @@ export default function HistoryImageCard({
                     href={dl}
                     download={`pixorify-${item._id}.png`}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-white/[0.06] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-cyan-400/35 hover:bg-white/[0.09]"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-white/18 hover:bg-white/[0.09]"
                   >
                     <Download className="size-3.5 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                     Save
@@ -120,7 +120,7 @@ export default function HistoryImageCard({
                 {typeof onContinueEdit === "function" ? (
                   <button
                     type="button"
-                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-cyan-400/25 bg-cyan-500/15 py-1.5 text-[10px] font-semibold text-cyan-50 transition hover:border-cyan-300/45 hover:bg-cyan-500/22"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-[#5a8fa3]/28 bg-[#5a8fa3]/14 py-1.5 text-[10px] font-semibold text-slate-100 transition hover:border-[#6a9fb3]/40 hover:bg-[#5a8fa3]/22"
                     onClick={(e) => {
                       e.stopPropagation();
                       onContinueEdit(item);
@@ -179,7 +179,7 @@ export default function HistoryImageCard({
         <span
           className={`absolute right-2 top-2 z-[7] inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-md ${
             isWs
-              ? "border-cyan-400/38 bg-slate-950/72 text-base text-cyan-200"
+              ? "border-white/22 bg-[#171a22]/95 text-lg text-slate-200"
               : "border-rose-200/55 bg-white/95 text-sm text-rose-500"
           }`}
           aria-label="Favorited"

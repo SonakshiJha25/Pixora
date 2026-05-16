@@ -25,10 +25,10 @@ const STYLE_SHORT_LABEL = {
 };
 
 const GENERATION_STAGE_HINTS = [
-  "Analyzing prompt…",
-  "Generating composition…",
-  "Enhancing details…",
-  "Finalizing artwork…",
+  "Analyzing your prompt…",
+  "Composing the scene…",
+  "Refining details…",
+  "Finalizing the artwork…",
 ];
 
 function getSpeechRecognitionCtor() {
@@ -36,17 +36,14 @@ function getSpeechRecognitionCtor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
-/** Dual-ring cyan orbit — workspace loading (not generic browser spinner text). */
+/** Quiet progress — single restrained ring */
 function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
   return (
     <div className={`relative shrink-0 ${sizeClass}`} aria-hidden="true">
-      <div className="absolute inset-0 rounded-full bg-sky-500/15 blur-lg" />
-      <div className="absolute inset-[3px] rounded-full border-[2.5px] border-white/10" />
-      <div className="absolute inset-[3px] animate-spin rounded-full border-[2.5px] border-transparent border-t-cyan-400 border-r-cyan-400/55 [animation-duration:900ms]" />
-      <div className="absolute inset-[9px] animate-spin rounded-full border-2 border-transparent border-b-sky-400 border-l-sky-300/50 [animation-duration:620ms] [animation-direction:reverse]" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="size-2 rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.95)]" />
-      </div>
+      <div
+        className={`animate-spin rounded-full border-2 border-white/10 border-t-slate-400/80 ${sizeClass}`}
+        style={{ animationDuration: "950ms" }}
+      />
     </div>
   );
 }
@@ -433,25 +430,8 @@ export default function Studio() {
       : image;
 
   return (
-    <div className="relative w-full overflow-hidden pb-28 pt-5 sm:pt-8">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[#06030e]" aria-hidden />
-      <div
-        className="pointer-events-none absolute left-[-18%] top-[-6%] h-[min(380px,50vh)] w-[min(620px,90vw)] rounded-full bg-indigo-500/[0.05] blur-[110px]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute bottom-[-8%] right-[-14%] h-[min(360px,45vh)] w-[min(520px,85vw)] rounded-full bg-cyan-400/[0.09] blur-[105px]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute right-[-12%] top-[20%] h-[min(280px,35vh)] w-[min(420px,70vw)] rounded-full bg-violet-600/[0.06] blur-[100px]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.11] sm:opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:44px_44px]"
-        aria-hidden
-      />
-
+    <div className="relative w-full overflow-hidden pb-24 pt-5 sm:pt-8">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[#13151c]" aria-hidden />
       <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-24">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -465,7 +445,7 @@ export default function Studio() {
           <div className="min-w-0">
             <h1 className="font-display mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
             <p className="type-body-dim mx-auto mt-1.5 max-w-lg sm:mx-0">
-              Pair a cinematic style with a deliberate prompt — we render it below so you can download or refine further.
+              Pair a deliberate style with a clear prompt — results land below for download or refinement.
               {!isSignedIn ? (
                 <span className="mt-1.5 block text-slate-500">
                   Sign in first to spend credits; balances refresh at midnight IST.
@@ -490,10 +470,7 @@ export default function Studio() {
                   return (
                     <div key={String(slot._id)} className="flex w-full flex-col items-center">
                       {idx > 0 ? (
-                        <div
-                          className="flex justify-center py-2 text-cyan-300/80"
-                          aria-hidden
-                        >
+                        <div className="flex justify-center py-2 text-slate-600" aria-hidden>
                           <ArrowDown className="h-5 w-5" strokeWidth={2} />
                         </div>
                       ) : null}
@@ -502,8 +479,8 @@ export default function Studio() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, ease: "easeOut" }}
-                        className={`studio-shell studio-glow relative inline-block w-full max-w-fit overflow-hidden rounded-3xl p-2 ${
-                          isLatest ? "ring-2 ring-cyan-400/50" : "opacity-[0.9]"
+                        className={`studio-shell relative inline-block w-full max-w-fit overflow-hidden rounded-2xl p-1.5 sm:p-2 ${
+                          isLatest ? "ring-1 ring-white/25" : "opacity-[0.92]"
                         }`}
                       >
                         <img
@@ -516,7 +493,7 @@ export default function Studio() {
                           }`}
                         />
                         {(loading || refineSubmitting) && isLatest ? (
-                          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-slate-950/55 backdrop-blur-[2px]">
+                          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#13151c]/65">
                             <motion.div
                               initial={{ opacity: 0.85, scale: 0.96 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -524,7 +501,7 @@ export default function Studio() {
                               className="flex flex-col items-center px-4"
                             >
                               <StudioOrbitSpinner sizeClass="h-14 w-14 sm:h-[4.25rem] sm:w-[4.25rem]" />
-                              <p className="mt-3 max-w-[14rem] text-center text-[11px] font-medium leading-snug tracking-tight text-cyan-50/95 sm:text-xs">
+                              <p className="mt-3 max-w-[14rem] text-center text-[11px] font-medium leading-snug text-slate-200 sm:text-xs">
                                 {GENERATION_STAGE_HINTS[loadingStage]}
                               </p>
                             </motion.div>
@@ -565,7 +542,7 @@ export default function Studio() {
                   <a
                     href={downloadHref || "#"}
                     download="pixorify-image.png"
-                    className={`inline-flex items-center justify-center rounded-full border border-white/20 bg-white/[0.08] px-8 py-3 text-center text-sm font-semibold text-white shadow-inner transition hover:border-cyan-300/35 hover:bg-white/[0.12] ${
+                    className={`inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] ${
                       !downloadHref ? "pointer-events-none opacity-40" : ""
                     }`}
                   >
@@ -578,7 +555,7 @@ export default function Studio() {
                       setRefineParentId(null);
                       setRefinePanelOpen(true);
                     }}
-                    className="inline-flex items-center justify-center rounded-full border border-cyan-400/35 bg-gradient-to-r from-cyan-500/15 to-sky-500/10 px-8 py-3 text-center text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-300/55"
+                    className="inline-flex items-center justify-center rounded-full border border-[#5a8fa3]/40 bg-[#5a8fa3]/10 px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-[#6a9fb3]/55 hover:bg-[#5a8fa3]/14"
                   >
                     Refine this image
                   </button>
@@ -589,7 +566,7 @@ export default function Studio() {
                     Off?{" "}
                     <Link
                       to="/feedback"
-                      className="font-semibold text-cyan-300 underline-offset-4 hover:underline"
+                      className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline"
                     >
                       Tell us
                     </Link>
@@ -599,11 +576,13 @@ export default function Studio() {
             </div>
           ) : (
             <div className="w-full space-y-7">
-              <div
-                className={`relative isolate min-h-[132px] overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br p-5 sm:min-h-[150px] sm:p-7 lg:aspect-[24/5] lg:min-h-0 ${moodGrad}`}
-              >
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_35%,rgba(255,255,255,0.09),transparent_50%)]" />
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_92%_78%,rgba(34,211,238,0.08),transparent_45%)]" />
+                <div
+                  className={`relative isolate min-h-[132px] overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br p-5 sm:min-h-[150px] sm:p-7 lg:aspect-[24/5] lg:min-h-0 ${moodGrad}`}
+                >
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_30%,rgba(255,255,255,0.06),transparent_52%)]"
+                    aria-hidden
+                  />
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:items-center">
                   <div className="text-left">
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">Idle canvas</p>
@@ -629,10 +608,10 @@ export default function Studio() {
                           onClick={() => setStyle(item)}
                           aria-pressed={style === item}
                           title={item}
-                          className={`group relative h-[3.25rem] w-[2.75rem] shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/55 sm:h-16 sm:w-[3.35rem] ${
+                          className={`group relative h-[3.25rem] w-[2.75rem] shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 sm:h-16 sm:w-[3.35rem] ${
                             style === item
-                              ? "border-cyan-400/75 ring-2 ring-cyan-400/30"
-                              : "border-white/10 opacity-80 hover:border-white/25 hover:opacity-100"
+                              ? "border-white/35 ring-1 ring-white/20"
+                              : "border-white/10 opacity-80 hover:border-white/20 hover:opacity-100"
                           }`}
                         >
                           {thumb ? (
@@ -654,7 +633,7 @@ export default function Studio() {
 
                 <div className="min-w-0 flex-1 lg:pt-0">
                   <p className="type-studio-eyebrow mb-3">Prompt</p>
-                  <div className="studio-prompt-shell p-4 shadow-[0_28px_80px_-54px_rgba(0,0,0,0.65)] ring-1 ring-white/[0.05] sm:p-5">
+                  <div className="studio-prompt-shell p-4 sm:p-5">
                     <div className="flex min-h-[56px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end">
                       <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
                         <textarea
@@ -662,7 +641,7 @@ export default function Studio() {
                           onChange={(e) => setInput(e.target.value)}
                           rows={2}
                           placeholder="Describe a scene, light, palette, mood — specificity helps."
-                          className="min-h-[52px] min-w-0 flex-1 resize-none rounded-xl border border-white/[0.1] bg-slate-950/40 px-3 py-2.5 text-[15px] leading-relaxed text-slate-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] placeholder:text-slate-500 focus:border-sky-400/35 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
+                          className="min-h-[52px] min-w-0 flex-1 resize-none rounded-xl border border-white/[0.08] bg-[#0f1116]/90 px-3 py-2.5 text-[15px] leading-relaxed text-slate-100 placeholder:text-slate-500 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/15"
                         />
                         <button
                           type="button"
@@ -677,10 +656,10 @@ export default function Studio() {
                           }
                           aria-label={isListening ? "Stop voice input" : "Start voice input"}
                           aria-pressed={isListening}
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/45 disabled:cursor-not-allowed disabled:opacity-40 ${
+                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:cursor-not-allowed disabled:opacity-40 ${
                             isListening
-                              ? "scale-[1.02] border-cyan-400/55 bg-cyan-950/40 text-cyan-100 shadow-[0_0_24px_-4px_rgba(34,211,238,0.35)]"
-                              : "border-white/15 bg-white/[0.07] text-slate-300 hover:border-white/25 hover:bg-white/10"
+                              ? "border-[#5a8fa3]/50 bg-[#5a8fa3]/12 text-slate-100"
+                              : "border-white/12 bg-white/[0.06] text-slate-400 hover:border-white/20 hover:bg-white/[0.09]"
                           }`}
                         >
                           <Mic className="h-5 w-5" strokeWidth={2} aria-hidden />
@@ -689,7 +668,7 @@ export default function Studio() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className={`btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3 ${loading ? "" : "studio-glow"}`}
+                        className={`btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3`}
                       >
                         {loading ? "Working…" : "Generate"}
                       </button>
@@ -702,7 +681,7 @@ export default function Studio() {
                     <p className="mt-2 text-center text-xs text-amber-200/90 sm:text-left">{speechError}</p>
                   ) : null}
                   {isListening ? (
-                    <p className="mt-2 text-center text-xs font-medium text-cyan-200 sm:text-left">
+                    <p className="mt-2 text-center text-xs font-medium text-slate-300 sm:text-left">
                       Listening…
                       {transcript ? (
                         <span className="mt-1 block font-normal text-slate-400">&ldquo;{transcript}&rdquo;</span>
@@ -712,7 +691,7 @@ export default function Studio() {
                   <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
                     New runs cost credits; <span className="font-medium text-slate-400">Refine this image</span> keeps tiny
                     follow-ups on the same thread without another full charge — read{" "}
-                    <Link to="/help" className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
+                    <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
                       Help
                     </Link>{" "}
                     for the nuance.
@@ -728,12 +707,12 @@ export default function Studio() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35 }}
-                  className="studio-glow mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-cyan-400/28 bg-slate-950/55 px-6 py-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:flex-row sm:gap-5"
+                  className="mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-white/[0.08] bg-[#171a22]/90 px-6 py-6 sm:flex-row sm:gap-5"
                 >
                   <StudioOrbitSpinner />
                   <div className="text-center sm:text-left">
-                    <p className="text-xs font-semibold tracking-tight text-cyan-50 sm:text-sm">Generating</p>
-                    <p className="mt-1 max-w-[12rem] text-[11px] font-medium leading-snug text-cyan-100/85 sm:max-w-none sm:text-xs">
+                    <p className="text-xs font-semibold tracking-tight text-slate-200 sm:text-sm">Generating</p>
+                    <p className="mt-1 max-w-[12rem] text-[11px] font-medium leading-snug text-slate-400 sm:max-w-none sm:text-xs">
                       {GENERATION_STAGE_HINTS[loadingStage]}
                     </p>
                   </div>
@@ -755,13 +734,13 @@ export default function Studio() {
             <button
               type="button"
               onClick={() => fetchHistory()}
-              className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-slate-100 shadow-sm transition hover:border-cyan-400/30"
+              className="rounded-full border border-white/[0.1] bg-white/[0.05] px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/18"
             >
               Refresh
             </button>
             <Link
               to="/gallery"
-              className="text-sm font-semibold text-cyan-300 underline-offset-4 hover:underline"
+              className="text-sm font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline"
             >
               Open gallery →
             </Link>
@@ -774,7 +753,7 @@ export default function Studio() {
             count={8}
           />
         ) : history.length === 0 ? (
-          <div className="rounded-[1.25rem] border border-dashed border-white/15 bg-white/[0.03] py-12 text-center text-sm text-slate-400 backdrop-blur-sm">
+          <div className="rounded-xl border border-dashed border-white/[0.1] bg-white/[0.02] py-12 text-center text-sm text-slate-500">
             {!isSignedIn ? (
               "Sign in · recent runs land here."
             ) : historyStatus === "error" ? (
@@ -784,7 +763,7 @@ export default function Studio() {
                 <button
                   type="button"
                   onClick={() => fetchHistory()}
-                  className="mx-auto mt-4 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/35 hover:text-white"
+                  className="mx-auto mt-4 rounded-full border border-white/[0.1] bg-white/[0.05] px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/20"
                 >
                   Try again
                 </button>
@@ -811,7 +790,7 @@ export default function Studio() {
 
       {lightbox ? (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
           role="dialog"
           aria-modal="true"
         >
@@ -821,9 +800,9 @@ export default function Studio() {
             aria-label="Close"
             onClick={() => setLightbox(null)}
           />
-          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-[1.25rem] border border-white/15 bg-slate-900/96 shadow-2xl shadow-black/50 ring-1 ring-white/[0.06] backdrop-blur-md">
+          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-xl border border-white/[0.1] bg-[#1c1f28] shadow-2xl">
             <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
-            <div className="space-y-3 border-t border-white/[0.07] bg-slate-950/80 p-5 text-left text-sm text-white/90 backdrop-blur-sm">
+            <div className="space-y-3 border-t border-white/[0.06] bg-[#181b24] p-5 text-left text-sm text-slate-200">
               <p className="font-medium leading-snug text-white">{lightbox.promptRaw}</p>
               <p className="text-xs text-white/55">
                 {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style}
@@ -833,13 +812,13 @@ export default function Studio() {
                   <a
                     href={resolveImageUrl(lightbox.imageUrl)}
                     download={`pixorify-${lightbox._id}.png`}
-                    className="inline-flex flex-1 items-center justify-center rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-cyan-400/35 hover:bg-white/[0.11]"
+                    className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/18"
                   >
                     Download PNG
                   </a>
                   <button
                     type="button"
-                    className="inline-flex flex-1 items-center justify-center rounded-xl border border-cyan-400/35 bg-cyan-500/15 px-4 py-2.5 text-sm font-semibold text-cyan-50 transition hover:border-cyan-300/50 hover:bg-cyan-500/22"
+                    className="inline-flex flex-1 items-center justify-center rounded-lg border border-[#5a8fa3]/35 bg-[#5a8fa3]/12 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-[#6a9fb3]/45"
                     onClick={() => {
                       const item = lightbox;
                       setLightbox(null);
