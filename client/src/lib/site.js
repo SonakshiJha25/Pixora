@@ -29,17 +29,17 @@ export const STUDIO_STYLE_SAMPLES = [
   },
   {
     label: "Anime",
-    caption: "Clean lines, illustration",
+    caption: "Soft spring colour · gentle mood",
     image: assets.style_anime,
   },
   {
     label: "Cyberpunk",
-    caption: "Neon, glass, grime",
+    caption: "Pastel glow · soft contrast",
     image: assets.style_cyberpunk,
   },
   {
     label: "Fantasy",
-    caption: "Drama, epic mood",
+    caption: "Quiet sky · ethereal light",
     image: assets.style_fantasy,
   },
   {
@@ -58,25 +58,25 @@ export const STUDIO_STYLE_MOODS = {
   minimal: "from-slate-800/42 via-[#14161c] to-[#101114]",
 };
 
-/** Home hero: what Pixorify offers (product-focused copy). */
+/** Home hero carousel — calm, high-aesthetic stills (no busy or harsh stock). */
 export const HERO_SLIDES = [
   {
     image:
-      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1920&q=85&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=85&auto=format&fit=crop",
     kicker: "What is Pixorify",
     title: "Create images from text",
     sub: `Prompts & styles in Pixora Studio · threads in ${SITE.name} gallery`,
   },
   {
     image:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=85&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1920&q=85&auto=format&fit=crop",
     kicker: "Credits & limits",
     title: "10 credits refresh every day on Free",
     sub: "Spend in Pixora Studio · balance in your profile · scale on Pro",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1920&q=85&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=85&auto=format&fit=crop",
     kicker: "Styles",
     title: "Realistic, anime, cyberpunk, and more",
     sub: "Pick a look so results feel intentional—not random.",

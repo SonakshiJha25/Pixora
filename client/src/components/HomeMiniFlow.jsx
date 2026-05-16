@@ -22,7 +22,7 @@ const flowSteps = [
     n: "3",
     title: "Refine in place",
     line: "Small edits stay on the same thread — shaping, not restarting.",
-    img: assets.style_cyberpunk,
+    img: assets.style_minimal,
     imgClass: "object-cover object-center",
   },
 ];
