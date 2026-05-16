@@ -26,7 +26,11 @@ const userSchema = new mongoose.Schema(
         return new Date(getNextIstMidnightUtcMs(Date.now()));
       },
     },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    /**
+     * Wall-clock moment of the most recent daily refill (set when credits reset to the daily pool).
+     * Optional for legacy users until their first rollover after deploy.
+     */
+    lastCreditResetAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

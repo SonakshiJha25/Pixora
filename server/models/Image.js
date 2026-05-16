@@ -36,6 +36,13 @@ const imageSchema = new mongoose.Schema(
       index: true,
     },
     isEdit: { type: Boolean, default: false },
+    /** Distinct from legacy rows: explicit kind for API/analytics (`isEdit` remains the thread link). */
+    generationKind: {
+      type: String,
+      enum: ["generate", "refine"],
+      default: "generate",
+      index: true,
+    },
     /** User instruction for this refinement (edits only). */
     editPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
     /** Root generation prompt for the whole thread (copied on each edit). */

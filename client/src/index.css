@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -13,19 +13,19 @@
   }
   /** Immersive workspace — indigo base, cyan + magenta accents (brand mark) */
   .bg-studio-app {
-    background-color: #06030e;
+    background-color: #05060f;
     background-image:
-      radial-gradient(ellipse 120% 70% at 50% -12%, rgba(244, 114, 182, 0.1), transparent 52%),
-      radial-gradient(ellipse 90% 55% at 100% 0%, rgba(34, 211, 238, 0.08), transparent 48%),
-      radial-gradient(ellipse 50% 45% at 0% 100%, rgba(168, 85, 247, 0.1), transparent 50%);
+      radial-gradient(ellipse 120% 70% at 50% -14%, rgba(56, 189, 248, 0.12), transparent 54%),
+      radial-gradient(ellipse 90% 55% at 100% 0%, rgba(99, 102, 241, 0.08), transparent 50%),
+      radial-gradient(ellipse 50% 45% at 0% 100%, rgba(168, 85, 247, 0.07), transparent 52%);
   }
   ::selection {
-    @apply bg-fuchsia-500/25 text-brand-navy;
+    @apply bg-sky-500/25 text-slate-900;
   }
 }
 
 @layer components {
-  /* Display headings: Outfit · Body & UI: Plus Jakarta Sans */
+  /* Headings use font-display; body/UI use font-sans — both Plus Jakarta Sans via Tailwind theme. */
   .type-eyebrow-brand {
     @apply font-display text-[11px] font-bold uppercase tracking-[0.22em] text-brand-sky;
   }
@@ -109,7 +109,7 @@
     @apply border border-white/70 bg-white/75 shadow-card backdrop-blur-xl;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-gradient-to-r from-cyan-400 via-brand-cyan to-fuchsia-500 font-semibold text-white shadow-glow transition hover:brightness-105 active:scale-[0.99];
+    @apply inline-flex items-center justify-center bg-gradient-to-r from-slate-700 via-sky-600 to-cyan-500 font-semibold text-white shadow-md shadow-sky-900/20 transition hover:brightness-[1.04] active:scale-[0.995];
   }
   .nav-link {
     @apply rounded-full px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-white/80 hover:text-brand-navy sm:text-sm;
@@ -128,9 +128,9 @@
   }
   .studio-glow {
     box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.14),
-      0 0 52px -8px rgba(244, 114, 182, 0.24),
-      0 0 40px -12px rgba(34, 211, 238, 0.15);
+      0 0 0 1px rgba(125, 211, 252, 0.12),
+      0 28px 64px -32px rgba(15, 23, 42, 0.75),
+      0 0 48px -20px rgba(34, 211, 238, 0.2);
   }
   .studio-prompt-shell {
     @apply rounded-[1.35rem] border border-white/[0.1] bg-white/[0.05] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-sm;

@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import BrandLogo from "./BrandLogo.jsx";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
-import CreditsResetCountdown from "./CreditsResetCountdown.jsx";
+import NavbarCredits from "./NavbarCredits.jsx";
 import { scrollPageTop } from "../lib/navigation";
-import { Zap } from "lucide-react";
 import {
   CREDITS_PER_IMAGE,
   DAILY_CREDITS_LIMIT,
@@ -73,11 +73,7 @@ export default function NavBar() {
           onClick={goHomeTop}
         >
           <span className="shrink-0 overflow-hidden rounded-2xl sm:rounded-[0.875rem]">
-            <img
-              src={assets.brandMark}
-              alt="Pixorify"
-              className="h-9 w-9 rounded-[13px] object-cover sm:h-10 sm:w-10 sm:rounded-[14px]"
-            />
+            <BrandLogo variant="nav" alt="Pixorify" />
           </span>
           <span
             className={`truncate font-display text-base font-bold tracking-tight sm:text-lg ${
@@ -112,59 +108,12 @@ export default function NavBar() {
 
         <div className="flex items-center gap-2">
           {user ? (
-            <button
-              type="button"
-              className={
-                isWorkspaceNav
-                  ? "inline-flex flex-col items-center gap-px rounded-full border border-white/12 bg-gradient-to-r from-slate-900/90 to-slate-800/70 px-2 py-1 text-[11px] shadow-none ring-1 ring-white/10 transition hover:ring-cyan-400/35 sm:gap-0.5 sm:px-3 sm:text-xs"
-                  : "inline-flex flex-col items-center gap-px rounded-full border border-slate-200 bg-gradient-to-r from-sky-50 to-cyan-50 px-2 py-1 text-[11px] shadow-sm ring-1 ring-cyan-100/70 transition hover:brightness-[1.03] hover:ring-brand-cyan/35 sm:gap-0.5 sm:px-3 sm:text-xs"
-              }
-              title={`${normalizeCreditsPoints(credit)} credits · pool refills at midnight IST`}
-              aria-label={`${normalizeCreditsPoints(credit)} credits — tap for account`}
-              onClick={() => setProfileOpen(true)}
-            >
-              <span className="inline-flex items-start gap-1.5">
-                <Zap
-                  className={`mt-0.5 size-3.5 shrink-0 stroke-[2] sm:size-4 ${
-                    isWorkspaceNav
-                      ? "fill-cyan-400/15 stroke-cyan-300/90"
-                      : "fill-brand-cyan/20 stroke-brand-cyan"
-                  }`}
-                  aria-hidden
-                />
-                <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-                  <span
-                    className={`flex flex-wrap items-baseline gap-x-1 leading-none ${
-                      isWorkspaceNav ? "text-slate-100" : "text-slate-900"
-                    }`}
-                  >
-                    <span className="text-[13px] font-bold tabular-nums sm:text-sm">
-                      {normalizeCreditsPoints(credit)}
-                    </span>
-                    <span
-                      className={`text-[9px] font-semibold uppercase tracking-wide ${
-                        isWorkspaceNav ? "text-slate-400" : "text-slate-500"
-                      }`}
-                    >
-                      credits
-                    </span>
-                  </span>
-                  <span
-                    className={`max-w-[6.85rem] truncate text-[8.5px] font-medium leading-tight sm:max-w-[7.25rem] sm:text-[9px] ${
-                      isWorkspaceNav ? "text-slate-500" : "text-slate-600"
-                    }`}
-                  >
-                    <span className="opacity-75">Daily · </span>
-                    <CreditsResetCountdown
-                      nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
-                      showIstSuffix={false}
-                      as="span"
-                      className="inline"
-                    />
-                  </span>
-                </span>
-              </span>
-            </button>
+            <NavbarCredits
+              workspace={isWorkspaceNav}
+              credits={credit}
+              nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
+              onPress={() => setProfileOpen(true)}
+            />
           ) : null}
           <button
             type="button"

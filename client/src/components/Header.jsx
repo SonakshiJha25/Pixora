@@ -16,14 +16,14 @@ export default function Header() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
-      className="relative mx-auto grid w-full gap-8 rounded-[1.65rem] border border-white/65 bg-white/60 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:grid-cols-[1.05fr_0.95fr] sm:items-center sm:gap-10 sm:p-8"
+      className="relative mx-auto grid w-full gap-10 rounded-[1.75rem] border border-white/55 bg-white/65 p-6 shadow-xl shadow-slate-900/[0.045] backdrop-blur-xl sm:grid-cols-[1.06fr_0.94fr] sm:items-center sm:gap-12 sm:p-9"
     >
       <div className="order-2 text-left sm:order-1">
         <p className="font-display inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-600">
           <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Creative AI
         </p>
 
-        <h1 className="type-page-title mt-3 max-w-xl sm:mt-4">Ideas in, pixels out</h1>
+        <h1 className="type-hero-title mt-3 max-w-xl sm:mt-4">Ideas in, pixels out</h1>
 
         <p className="type-body mt-2 max-w-lg text-slate-700 sm:mt-3">
           {user ? (
@@ -137,12 +137,9 @@ export default function Header() {
           </motion.div>
         </div>
 
-        <Link
-          to="/help#contact"
-          className="type-promo-caption relative z-10 mx-auto mt-4 block w-full max-w-md cursor-pointer rounded-2xl bg-gradient-to-r from-cyan-400/72 via-fuchsia-500/72 to-violet-500/70 px-5 py-2.5 text-center shadow-lg shadow-slate-900/15 transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/45 sm:ml-auto sm:mr-0"
-        >
-          Someone actually reads messages
-        </Link>
+        <p className="type-meta mx-auto mb-6 mt-8 max-w-sm text-center leading-relaxed text-slate-600 sm:ml-auto sm:mr-0 sm:text-left">
+          Calm previews — sign in opens your daily studio credits and synced gallery.
+        </p>
       </div>
     </motion.section>
   );

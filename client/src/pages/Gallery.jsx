@@ -1,7 +1,7 @@
-import { useContext, useMemo, useState } from "react";
+import { Fragment, useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { Heart, LayoutGrid } from "lucide-react";
+import { Heart, LayoutGrid, Search } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import ConfirmModal from "../components/ConfirmModal";
@@ -9,8 +9,8 @@ import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import GalleryThreadModal from "../components/GalleryThreadModal.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { resolveImageUrl } from "../config/api.js";
-import { groupGalleryItems, threadMatchesFavoriteFilter } from "../lib/groupGalleryThreads.js";
-import { WORKSPACE_NAME } from "../lib/site.js";
+import { groupGalleryItems, groupThreadsByCalendarDay, threadMatchesFavoriteFilter, threadSearchHaystack } from "../lib/groupGalleryThreads.js";
+import { STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
@@ -18,12 +18,31 @@ export default function Gallery() {
   const [threadBrowseId, setThreadBrowseId] = useState(null);
   const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
   const [view, setView] = useState("all");
+  const [search, setSearch] = useState("");
+  const [styleFilter, setStyleFilter] = useState(null);
+
+  const searchNorm = search.trim().toLowerCase();
 
   const groups = useMemo(() => groupGalleryItems(history), [history]);
-  const visibleGroups = useMemo(() => {
+  const viewFiltered = useMemo(() => {
     if (view === "favorites") return groups.filter(threadMatchesFavoriteFilter);
     return groups;
   }, [groups, view]);
+
+  const filteredGroups = useMemo(() => {
+    let g = viewFiltered;
+    if (styleFilter) {
+      g = g.filter((x) => String(x.latest.style || "").toLowerCase() === styleFilter);
+    }
+    if (searchNorm) {
+      g = g.filter((x) => threadSearchHaystack(x).includes(searchNorm));
+    }
+    return g;
+  }, [viewFiltered, styleFilter, searchNorm]);
+
+  const daySections = useMemo(() => groupThreadsByCalendarDay(filteredGroups), [filteredGroups]);
+  const hasThreadsInView = viewFiltered.length > 0;
+  const filtersExcludeAll = hasThreadsInView && filteredGroups.length === 0;
 
   const run = async (id, fn) => {
     setBusyId(id);
@@ -80,7 +99,7 @@ export default function Gallery() {
   }
 
   const showSkeleton = historyStatus === "loading" && history.length === 0;
-  const showEmptyGrid = !showSkeleton && visibleGroups.length === 0;
+  const showEmptyGrid = !showSkeleton && filteredGroups.length === 0;
 
   return (
     <div className="relative w-full pb-28 pt-8 sm:pt-10">
@@ -139,6 +158,54 @@ export default function Gallery() {
           </button>
         </div>
 
+        <div className="mx-auto mb-10 max-w-2xl space-y-4">
+          <label className="relative block text-left">
+            <Search
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+              strokeWidth={2}
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search prompts and refinements…"
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.06] py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-500 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] outline-none ring-0 transition focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-500/20"
+            />
+          </label>
+          <div className="flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setStyleFilter(null)}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition duration-300 sm:text-sm ${
+                styleFilter === null
+                  ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
+                  : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+              }`}
+            >
+              All styles
+            </button>
+            {STUDIO_STYLE_SAMPLES.map((s) => {
+              const v = s.label.toLowerCase();
+              const on = styleFilter === v;
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setStyleFilter(on ? null : v)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-semibold transition duration-300 sm:text-sm ${
+                    on
+                      ? "bg-cyan-500/18 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.35)] backdrop-blur-sm"
+                      : "border border-white/10 bg-white/[0.04] text-slate-300 backdrop-blur-sm hover:border-cyan-400/25 hover:text-white"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {showSkeleton ? (
           <GalleryGridSkeleton
             workspace
@@ -159,6 +226,23 @@ export default function Gallery() {
                   className="mx-auto mt-6 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white"
                 >
                   Try again
+                </button>
+              </div>
+            ) : filtersExcludeAll ? (
+              <div className="mx-auto max-w-sm px-2">
+                <p className="font-display text-base font-semibold text-slate-200">Nothing matches those filters</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                  Try a different search, pick another style, or clear filters to see everything in this tab.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setStyleFilter(null);
+                  }}
+                  className="mx-auto mt-6 rounded-full border border-cyan-400/35 bg-cyan-500/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white"
+                >
+                  Clear search & style
                 </button>
               </div>
             ) : view === "favorites" ? (
@@ -188,71 +272,86 @@ export default function Gallery() {
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleGroups.map((group) => (
-              <motion.li
-                layout
-                key={group.key}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className="studio-shell flex flex-col items-center gap-5 rounded-[1.85rem] p-5 ring-1 ring-white/[0.05]"
-              >
-                <div className="relative w-full max-w-[280px]">
-                  {group.refinements > 0 ? (
-                    <span className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-slate-950/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-200 shadow-lg backdrop-blur-md">
-                      +{group.refinements} refine{group.refinements === 1 ? "" : "s"}
-                    </span>
-                  ) : null}
-                  <HistoryImageCard
-                    item={group.latest}
-                    onOpen={() => setThreadBrowseId(String(group.latest._id))}
-                    showFavoritePip={false}
-                    surface="workspace"
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(group.latest);
-                    }}
-                    className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
-                      group.latest.isFavorite
-                        ? "border-cyan-400/45 bg-slate-950/75 text-cyan-300"
-                        : "border-white/15 bg-slate-950/55 text-slate-300 hover:border-cyan-400/35 hover:bg-slate-900/65 hover:text-white"
-                    }`}
-                    aria-label={group.latest.isFavorite ? "Remove from saved" : "Save to favorites"}
-                    title={group.latest.isFavorite ? "Saved" : "Save"}
+            {daySections.map((section) => (
+              <Fragment key={section.sortKey}>
+                <li className="col-span-full">
+                  <h2 className="mb-1 text-center font-display text-[11px] font-bold uppercase tracking-[0.28em] text-slate-500 sm:mb-2 sm:text-left sm:text-xs sm:tracking-[0.22em]">
+                    {section.heading}
+                  </h2>
+                </li>
+                {section.groups.map((group) => (
+                  <motion.li
+                    layout
+                    key={group.key}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className="studio-shell flex flex-col items-center gap-5 rounded-[1.85rem] p-5 ring-1 ring-white/[0.05]"
                   >
-                    ♥
-                  </button>
-                </div>
+                    <div className="relative w-full max-w-[280px]">
+                      {group.refinements > 0 ? (
+                        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-slate-950/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-200 shadow-lg backdrop-blur-md">
+                          +{group.refinements} refine{group.refinements === 1 ? "" : "s"}
+                        </span>
+                      ) : null}
+                      <HistoryImageCard
+                        item={group.latest}
+                        onOpen={() => setThreadBrowseId(String(group.latest._id))}
+                        showFavoritePip={false}
+                        surface="workspace"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(group.latest);
+                        }}
+                        className={`absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border text-lg shadow-lg backdrop-blur-md transition duration-300 active:scale-95 hover:-translate-y-0.5 ${
+                          group.latest.isFavorite
+                            ? "border-cyan-400/45 bg-slate-950/75 text-cyan-300"
+                            : "border-white/15 bg-slate-950/55 text-slate-300 hover:border-cyan-400/35 hover:bg-slate-900/65 hover:text-white"
+                        }`}
+                        aria-label={group.latest.isFavorite ? "Remove from saved" : "Save to favorites"}
+                        title={group.latest.isFavorite ? "Saved" : "Save"}
+                      >
+                        ♥
+                      </button>
+                    </div>
 
-                <button
-                  type="button"
-                  onClick={() => setThreadBrowseId(String(group.latest._id))}
-                  className="btn-primary studio-glow w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
-                >
-                  Open thread
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => setThreadBrowseId(String(group.latest._id))}
+                      className="btn-primary studio-glow w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
+                    >
+                      Open thread
+                    </button>
 
-                <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
-                  <a
-                    href={resolveImageUrl(group.latest.imageUrl)}
-                    download={`pixorify-${group.latest._id}.png`}
-                    className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-slate-100 shadow-sm transition duration-300 hover:border-cyan-400/35 hover:bg-white/[0.09]"
+                    <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
+                  <Link
+                    to={`/studio?continue=${group.latest._id}`}
+                    className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-100 shadow-sm transition duration-300 hover:border-cyan-400/45 hover:bg-cyan-500/14 hover:text-white"
                   >
-                    Download PNG
-                  </a>
-                  <button
-                    type="button"
-                    disabled={busyId === group.latest._id}
-                    className="rounded-full border border-white/10 bg-transparent px-3 py-2 text-xs font-semibold text-slate-400 shadow-sm transition duration-300 hover:border-slate-500/45 hover:bg-white/[0.04] hover:text-slate-200 disabled:opacity-50"
-                    onClick={() => setPendingDeleteItem(group.latest)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </motion.li>
+                    Continue editing
+                  </Link>
+                      <a
+                        href={resolveImageUrl(group.latest.imageUrl)}
+                        download={`pixorify-${group.latest._id}.png`}
+                        className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-slate-100 shadow-sm transition duration-300 hover:border-cyan-400/35 hover:bg-white/[0.09]"
+                      >
+                        Download PNG
+                      </a>
+                      <button
+                        type="button"
+                        disabled={busyId === group.latest._id}
+                        className="rounded-full border border-white/10 bg-transparent px-3 py-2 text-xs font-semibold text-slate-400 shadow-sm transition duration-300 hover:border-slate-500/45 hover:bg-white/[0.04] hover:text-slate-200 disabled:opacity-50"
+                        onClick={() => setPendingDeleteItem(group.latest)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </motion.li>
+                ))}
+              </Fragment>
             ))}
           </ul>
         )}

@@ -102,6 +102,7 @@ export const editImage = asyncHandler(async (req, res) => {
     parentImageId: parent._id,
     threadRootId,
     isEdit: true,
+    generationKind: "refine",
     editPrompt: trimmed,
     originalPrompt,
   });

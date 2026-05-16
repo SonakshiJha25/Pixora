@@ -5,7 +5,7 @@ import { SITE } from '../lib/site.js'
 import { normalizeCreditsPoints } from '../lib/credits.js'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'motion/react'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 const Login = () => {
 
@@ -61,7 +61,7 @@ const Login = () => {
                     state === 'Login'
                         ? `Welcome back, ${response.data.user.name}`
                         : `Welcome, ${response.data.user.name}`,
-                    { toastId: 'welcome-toast' }
+                    { id: 'welcome-toast' }
                 );
             } else {
                 toast.error(response.data.message || 'Something went wrong');

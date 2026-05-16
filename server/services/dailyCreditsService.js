@@ -68,6 +68,7 @@ export async function ensureDailyCredits(user, { session } = {}) {
     ) {
       user.dailyCreditResetAt = new Date(canonicalNext);
       user.credits = DAILY_CREDITS;
+      user.lastCreditResetAt = new Date(nowMs);
       nextMs = canonicalNext;
       dirty = true;
       logInfo(
@@ -80,6 +81,7 @@ export async function ensureDailyCredits(user, { session } = {}) {
       guard += 1;
       const oldCredits = snapCreditsToLedger(user.credits);
       user.credits = DAILY_CREDITS;
+      user.lastCreditResetAt = new Date(nowMs);
       const following = getNextIstMidnightUtcMs(nowMs);
       user.dailyCreditResetAt = new Date(following);
       nextMs = following;

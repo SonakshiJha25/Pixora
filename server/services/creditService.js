@@ -79,6 +79,7 @@ export async function deductCreditAndSaveImage({
           provider,
           parentImageId: null,
           isEdit: false,
+          generationKind: "generate",
           editPrompt: null,
           originalPrompt: prompt.trim(),
         },

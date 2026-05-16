@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { Toaster } from "sonner";
 import { motion } from "motion/react";
 
 import Home from "./pages/Home";
@@ -30,11 +30,11 @@ const App = () => {
 
   return (
     <div
-      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[820ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isDarkWorkspace ? "bg-studio-app" : "bg-mesh"
       }`}
     >
-      <ToastContainer position="bottom-right" theme={isDarkWorkspace ? "dark" : "colored"} />
+      <Toaster position="bottom-right" theme={isDarkWorkspace ? "dark" : "light"} richColors closeButton />
       <div
         className={`mx-auto flex min-h-screen w-full flex-col ${
           isStudioRoute
@@ -51,10 +51,10 @@ const App = () => {
         >
           <motion.div
             key={isStudioRoute ? "workspace-studio" : isDarkWorkspace ? "workspace-gallery" : "marketing"}
-            initial={{ opacity: 0.88, y: isStudioRoute ? 12 : 6 }}
+            initial={{ opacity: isStudioRoute ? 0.82 : 0.9, y: isStudioRoute ? 20 : 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              duration: isStudioRoute ? 0.52 : isDarkWorkspace ? 0.42 : 0.36,
+              duration: isStudioRoute ? 0.74 : isDarkWorkspace ? 0.48 : 0.42,
               ease: [0.22, 1, 0.36, 1],
             }}
             className="flex flex-1 flex-col"

@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowDown, Mic } from "lucide-react";
 import { motion } from "motion/react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
@@ -12,7 +12,7 @@ import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
-import { assets } from "../assets/assets.js";
+import BrandLogo from "../components/BrandLogo.jsx";
 
 const SPEECH_AUTO_STOP_MS = 8000;
 
@@ -26,9 +26,9 @@ const STYLE_SHORT_LABEL = {
 
 const GENERATION_STAGE_HINTS = [
   "Analyzing prompt…",
-  "Shaping composition…",
-  "Painting light & color…",
-  "Finishing details…",
+  "Generating composition…",
+  "Enhancing details…",
+  "Finalizing artwork…",
 ];
 
 function getSpeechRecognitionCtor() {
@@ -40,7 +40,7 @@ function getSpeechRecognitionCtor() {
 function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
   return (
     <div className={`relative shrink-0 ${sizeClass}`} aria-hidden="true">
-      <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg" />
+      <div className="absolute inset-0 rounded-full bg-sky-500/15 blur-lg" />
       <div className="absolute inset-[3px] rounded-full border-[2.5px] border-white/10" />
       <div className="absolute inset-[3px] animate-spin rounded-full border-[2.5px] border-transparent border-t-cyan-400 border-r-cyan-400/55 [animation-duration:900ms]" />
       <div className="absolute inset-[9px] animate-spin rounded-full border-2 border-transparent border-b-sky-400 border-l-sky-300/50 [animation-duration:620ms] [animation-direction:reverse]" />
@@ -100,6 +100,8 @@ export default function Studio() {
     historyStatus,
   } = useContext(AppContext);
 
+  const navigate = useNavigate();
+
   const authToken = getToken()?.trim() ?? "";
   const isSignedIn = Boolean(authToken);
   const [image, setImage] = useState(null);
@@ -116,6 +118,8 @@ export default function Studio() {
   const [refinementThread, setRefinementThread] = useState([]);
   const [refinePanelOpen, setRefinePanelOpen] = useState(false);
   const [refineSubmitting, setRefineSubmitting] = useState(false);
+  /** When set, refinement POST uses this frame as parent instead of the latest in the strip. */
+  const [refineParentId, setRefineParentId] = useState(null);
   const [loadingStage, setLoadingStage] = useState(0);
 
   const recognitionRef = useRef(null);
@@ -144,6 +148,61 @@ export default function Studio() {
     const requested = searchParams.get("style")?.toLowerCase()?.trim();
     if (requested && styles.includes(requested)) setStyle(requested);
   }, [searchParams, styles]);
+
+  const hydrateStudioThread = useCallback(
+    async (imageId) => {
+      const id = String(imageId || "").trim();
+      if (!id || !authToken) return false;
+      try {
+        const { data } = await api.get(`/api/images/thread/${id}`);
+        if (!data?.success || !Array.isArray(data.thread) || data.thread.length === 0) {
+          toast.error("We couldn't load that thread.");
+          return false;
+        }
+        const sorted = [...data.thread].sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        setRefinementThread(sorted);
+        const tail = sorted.at(-1);
+        setImage(resolveImageUrl(tail?.imageUrl || ""));
+        setIsImageLoaded(true);
+        return true;
+      } catch {
+        toast.error("We couldn't reach the studio — try again in a moment.");
+        return false;
+      }
+    },
+    [api, authToken]
+  );
+
+  useEffect(() => {
+    const c = searchParams.get("continue");
+    if (!c?.trim() || !isSignedIn) return undefined;
+    let cancelled = false;
+    (async () => {
+      const ok = await hydrateStudioThread(c.trim());
+      if (cancelled) return;
+      if (ok) {
+        toast.info("Thread loaded — ready to refine.");
+        navigate("/studio", { replace: true });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, isSignedIn, hydrateStudioThread, navigate]);
+
+  const continueConversationFromHistory = useCallback(
+    async (item) => {
+      if (!item?._id) return;
+      const ok = await hydrateStudioThread(String(item._id));
+      if (!ok) return;
+      setRefineParentId(String(item._id));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setRefinePanelOpen(true);
+    },
+    [hydrateStudioThread]
+  );
 
   const activeStyleSample = useMemo(
     () => STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === style),
@@ -297,6 +356,7 @@ export default function Studio() {
       }
       await fetchHistory();
       await fetchUserData();
+      setRefineParentId(null);
       toast.success("Saved — your frame is above. Refine, download, or open Gallery.");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
@@ -320,14 +380,21 @@ export default function Studio() {
   };
 
   const applyRefinement = async (editPrompt) => {
-    if (!latestThreadImageId) {
+    const scoped =
+      refineParentId && sortedThread.some((x) => String(x._id) === String(refineParentId))
+        ? String(refineParentId).trim()
+        : "";
+
+    const parentForEdit = (scoped || latestThreadImageId).trim();
+
+    if (!parentForEdit) {
       toast.error("No image to refine yet — generate one first.");
       return;
     }
     try {
       setRefineSubmitting(true);
       const { data } = await api.post("/api/images/edit", {
-        imageId: latestThreadImageId,
+        imageId: parentForEdit,
         editPrompt,
       });
       if (!data?.success || !data?.image) {
@@ -345,6 +412,7 @@ export default function Studio() {
       setImage(resolveImageUrl(nextImg.imageUrl));
       await fetchHistory();
       setRefinePanelOpen(false);
+      setRefineParentId(null);
       if (data.refinementMode === "duplicate_fallback") {
         toast.warning(
           "Clipdrop didn't return a new render — we saved a linked copy of your frame. Check API quota or try a simpler edit."
@@ -368,7 +436,7 @@ export default function Studio() {
     <div className="relative w-full overflow-hidden pb-28 pt-5 sm:pt-8">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[#06030e]" aria-hidden />
       <div
-        className="pointer-events-none absolute left-[-18%] top-[-6%] h-[min(380px,50vh)] w-[min(620px,90vw)] rounded-full bg-fuchsia-600/[0.07] blur-[110px]"
+        className="pointer-events-none absolute left-[-18%] top-[-6%] h-[min(380px,50vh)] w-[min(620px,90vw)] rounded-full bg-indigo-500/[0.05] blur-[110px]"
         aria-hidden
       />
       <div
@@ -392,14 +460,7 @@ export default function Studio() {
           className="mb-6 flex flex-col items-center gap-3 text-center sm:mb-8 sm:flex-row sm:justify-center sm:gap-5"
         >
           <div className="shrink-0 rounded-2xl">
-            <img
-              src={assets.brandMark}
-              alt=""
-              className="h-14 w-14 rounded-[13px] bg-slate-950 object-cover sm:h-[4.25rem] sm:w-[4.25rem] sm:rounded-[15px]"
-              width={68}
-              height={68}
-              draggable={false}
-            />
+            <BrandLogo variant="studio" alt="" width={68} height={68} draggable={false} />
           </div>
           <div className="min-w-0">
             <h1 className="font-display mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
@@ -496,6 +557,7 @@ export default function Studio() {
                       setImage(null);
                       setRefinementThread([]);
                       setRefinePanelOpen(false);
+                      setRefineParentId(null);
                     }}
                   >
                     New prompt
@@ -512,7 +574,10 @@ export default function Studio() {
                   <button
                     type="button"
                     disabled={loading || refineSubmitting}
-                    onClick={() => setRefinePanelOpen(true)}
+                    onClick={() => {
+                      setRefineParentId(null);
+                      setRefinePanelOpen(true);
+                    }}
                     className="inline-flex items-center justify-center rounded-full border border-cyan-400/35 bg-gradient-to-r from-cyan-500/15 to-sky-500/10 px-8 py-3 text-center text-sm font-semibold text-cyan-100 shadow-sm transition hover:border-cyan-300/55"
                   >
                     Refine this image
@@ -589,15 +654,15 @@ export default function Studio() {
 
                 <div className="min-w-0 flex-1 lg:pt-0">
                   <p className="type-studio-eyebrow mb-3">Prompt</p>
-                  <div className="studio-prompt-shell p-4 sm:p-4">
-                    <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
-                      <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2">
-                        <input
+                  <div className="studio-prompt-shell p-4 shadow-[0_28px_80px_-54px_rgba(0,0,0,0.65)] ring-1 ring-white/[0.05] sm:p-5">
+                    <div className="flex min-h-[56px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end">
+                      <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                        <textarea
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
-                          type="text"
-                          placeholder="Tokyo alley, drizzle, vending machine glow..."
-                          className="min-h-[48px] min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-[15px] text-slate-100 placeholder:text-slate-500 focus:border-cyan-400/35 focus:outline-none"
+                          rows={2}
+                          placeholder="Describe a scene, light, palette, mood — specificity helps."
+                          className="min-h-[52px] min-w-0 flex-1 resize-none rounded-xl border border-white/[0.1] bg-slate-950/40 px-3 py-2.5 text-[15px] leading-relaxed text-slate-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] placeholder:text-slate-500 focus:border-sky-400/35 focus:outline-none focus:ring-2 focus:ring-cyan-400/25"
                         />
                         <button
                           type="button"
@@ -729,9 +794,16 @@ export default function Studio() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {history.slice(0, 12).map((item) => (
-              <HistoryImageCard key={item._id} item={item} onOpen={setLightbox} surface="workspace" />
+              <HistoryImageCard
+                key={item._id}
+                item={item}
+                onOpen={setLightbox}
+                surface="workspace"
+                showActionBar={isSignedIn}
+                onContinueEdit={continueConversationFromHistory}
+              />
             ))}
           </div>
         )}
@@ -749,17 +821,39 @@ export default function Studio() {
             aria-label="Close"
             onClick={() => setLightbox(null)}
           />
-          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-3xl border border-white/20 bg-slate-900 shadow-2xl">
+          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-[1.25rem] border border-white/15 bg-slate-900/96 shadow-2xl shadow-black/50 ring-1 ring-white/[0.06] backdrop-blur-md">
             <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
-            <div className="space-y-2 p-5 text-left text-sm text-white/90">
-              <p className="font-medium text-white">{lightbox.promptRaw}</p>
-              <p className="text-xs text-white/60">
-                {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style} · Pixorify
+            <div className="space-y-3 border-t border-white/[0.07] bg-slate-950/80 p-5 text-left text-sm text-white/90 backdrop-blur-sm">
+              <p className="font-medium leading-snug text-white">{lightbox.promptRaw}</p>
+              <p className="text-xs text-white/55">
+                {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style}
               </p>
+              {isSignedIn ? (
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <a
+                    href={resolveImageUrl(lightbox.imageUrl)}
+                    download={`pixorify-${lightbox._id}.png`}
+                    className="inline-flex flex-1 items-center justify-center rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-cyan-400/35 hover:bg-white/[0.11]"
+                  >
+                    Download PNG
+                  </a>
+                  <button
+                    type="button"
+                    className="inline-flex flex-1 items-center justify-center rounded-xl border border-cyan-400/35 bg-cyan-500/15 px-4 py-2.5 text-sm font-semibold text-cyan-50 transition hover:border-cyan-300/50 hover:bg-cyan-500/22"
+                    onClick={() => {
+                      const item = lightbox;
+                      setLightbox(null);
+                      continueConversationFromHistory(item);
+                    }}
+                  >
+                    Continue editing
+                  </button>
+                </div>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setLightbox(null)}
-                className="mt-2 w-full rounded-xl bg-white/10 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                className="w-full rounded-xl border border-white/[0.1] bg-white/[0.05] py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
               >
                 Close
               </button>

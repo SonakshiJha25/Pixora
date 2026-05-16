@@ -10,6 +10,21 @@ const PLACEHOLDERS = [
   "Give it a calmer, matte finish",
 ];
 
+const QUICK_ACTIONS = [
+  "Warm rim light from camera-left",
+  "Lift shadows slightly, keep highlights",
+  "Sharpen the subject, soften the backdrop",
+  "Cooler colour grade, film contrast",
+  "Crop feel: a touch tighter on the hero subject",
+];
+
+function appendInstruction(prev, line) {
+  const t = line.trim();
+  const base = prev.trim();
+  if (!base) return t;
+  return `${base}, ${t}`;
+}
+
 function usePlaceholderRotate(active) {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
@@ -108,6 +123,19 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 placeholder={ph}
                 className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none ring-0 transition placeholder:text-slate-400 focus:border-brand-cyan/50 focus:ring-2 focus:ring-brand-cyan/20 disabled:opacity-60"
               />
+              <div className="mt-3 flex flex-wrap gap-2">
+                {QUICK_ACTIONS.map((line) => (
+                  <button
+                    key={line}
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => setText((p) => appendInstruction(p, line))}
+                    className="rounded-full border border-slate-200/90 bg-slate-50 px-3 py-1.5 text-left text-[11px] font-medium leading-snug text-slate-700 shadow-sm transition hover:border-brand-cyan/35 hover:bg-white hover:text-slate-900 disabled:pointer-events-none disabled:opacity-50 sm:text-xs"
+                  >
+                    {line}
+                  </button>
+                ))}
+              </div>
               <p className="mt-2 text-[10px] leading-snug text-slate-500 sm:text-[11px]">{footerHint}</p>
             </div>
 

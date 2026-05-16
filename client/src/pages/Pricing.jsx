@@ -58,7 +58,7 @@ export default function Pricing() {
                 <span className="mt-0.5 text-emerald-500" aria-hidden>
                   ✓
                 </span>
-                <span>All moods · private gallery · PNG downloads</span>
+                <span>Private gallery · IST daily credits · conversational refinements</span>
               </li>
             </ul>
             <button
@@ -75,9 +75,9 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.08 }}
-            className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-brand-cyan/40 bg-gradient-to-br from-white via-cyan-50/30 to-sky-50/40 p-5 shadow-xl shadow-cyan-500/15 ring-2 ring-cyan-200/45 backdrop-blur-xl sm:p-6"
+            className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-sky-300/65 bg-white/82 p-5 shadow-xl shadow-sky-500/12 ring-1 ring-sky-200/65 backdrop-blur-xl sm:p-6"
           >
-            <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-brand-cyan to-brand-sky px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+            <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
               Sweet spot
             </span>
             <p className="type-price-tier">Creator</p>
@@ -104,12 +104,12 @@ export default function Pricing() {
                 <span className="mt-0.5 text-brand-cyan" aria-hidden>
                   ✓
                 </span>
-                <span>Sharper exports when we flip the toggle (roadmap)</span>
+                <span>Higher fidelity exports · priority lane (when live)</span>
               </li>
             </ul>
             <Link
               to="/coming-soon?channel=pricing"
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-sky py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-[1.04]"
+              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 py-3 text-sm font-semibold text-white shadow-md shadow-sky-600/25 transition hover:brightness-[1.04]"
             >
               Notify me
               <span aria-hidden="true">→</span>

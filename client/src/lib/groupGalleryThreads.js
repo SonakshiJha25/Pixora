@@ -50,3 +50,52 @@ export function groupGalleryItems(items) {
 export function threadMatchesFavoriteFilter(group) {
   return group.versions.some((v) => v.isFavorite);
 }
+
+/** Lowercased text blob for client-side gallery search across a thread. */
+export function threadSearchHaystack(group) {
+  const parts = [];
+  for (const v of group.versions) {
+    if (v.originalPrompt) parts.push(String(v.originalPrompt));
+    if (v.prompt) parts.push(String(v.prompt));
+    if (v.editPrompt) parts.push(String(v.editPrompt));
+    if (v.promptEnhanced) parts.push(String(v.promptEnhanced));
+    if (Array.isArray(v.tags)) parts.push(...v.tags.map(String));
+  }
+  return parts.join("\n").toLowerCase();
+}
+
+/** Group already-sorted thread groups under calendar headings (newest days first). */
+export function groupThreadsByCalendarDay(groups) {
+  if (!Array.isArray(groups) || groups.length === 0) return [];
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const map = new Map();
+  const dayKeys = [];
+
+  for (const g of groups) {
+    const d = new Date(g.latest.createdAt);
+    const sortKey = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    if (!map.has(sortKey)) {
+      map.set(sortKey, []);
+      dayKeys.push(sortKey);
+    }
+    map.get(sortKey).push(g);
+  }
+
+  dayKeys.sort((a, b) => b.localeCompare(a));
+
+  return dayKeys.map((k) => {
+    const dayGroups = map.get(k) || [];
+    const sampleIso = dayGroups[0]?.latest?.createdAt;
+    const heading = sampleIso
+      ? new Date(sampleIso).toLocaleDateString(undefined, {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : k;
+
+    return { sortKey: k, heading, groups: dayGroups };
+  });
+}

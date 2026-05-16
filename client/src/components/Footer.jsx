@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import BrandLogo from "./BrandLogo.jsx";
 import { assets } from "../assets/assets";
 import { SITE, CLIPDROP_ATTRIBUTION } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
@@ -87,7 +88,7 @@ export default function Footer() {
             className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan sm:justify-end"
           >
             <span className="overflow-hidden rounded-2xl">
-              <img src={assets.brandMark} alt="Pixorify" className="h-9 w-9 rounded-[13px] object-cover" />
+              <BrandLogo variant="footer" alt="Pixorify" />
             </span>
             <span className="font-display text-sm font-bold text-slate-900 sm:text-[15px]">{SITE.name}</span>
           </button>

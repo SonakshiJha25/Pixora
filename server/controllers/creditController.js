@@ -19,6 +19,9 @@ const sanitizeUser = (user) => ({
   credits: user.credits,
   creditBalance: user.credits,
   dailyCreditResetAt: resetIsoFromUser(user),
+  lastCreditResetAt: user.lastCreditResetAt ? user.lastCreditResetAt.toISOString() : null,
+  /** Alias of `dailyCreditResetAt` for clients that expect this name. */
+  nextCreditResetAt: resetIsoFromUser(user),
 });
 
 export const getCredits = asyncHandler(async (req, res) => {
@@ -37,6 +40,8 @@ export const getCredits = asyncHandler(async (req, res) => {
     creditsPerImage: getCreditsPerImage(),
     nextResetAt,
     dailyCreditResetAt: nextResetAt,
+    lastCreditResetAt: user.lastCreditResetAt ? user.lastCreditResetAt.toISOString() : null,
+    nextCreditResetAt: nextResetAt,
     dailyResetTimezone: getCreditsResetTimezoneLabel(),
     user: sanitizeUser(user),
   });

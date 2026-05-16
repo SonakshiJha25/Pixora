@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { AppContext } from "../context/AppContext";
 
 /** Support message form (posted to feedback API — same behaviour as legacy home Help block). */
