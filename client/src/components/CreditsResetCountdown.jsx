@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { formatResetsInCountdown, getNextIstMidnightUtcMs } from "../lib/nextDailyReset.js";
+import { formatResetsInCountdown } from "../lib/nextDailyReset.js";
 
-/** Use API `nextResetAt` when still in the future; if it is stale (midnight passed, refetch pending), show “Resets soon”. */
+/**
+ * Tick using API `dailyCreditResetAt` / nextResetAt only — no frontend-computed reset instant.
+ */
 function computeLabel(nextResetAtIso) {
   const now = Date.now();
   if (nextResetAtIso && typeof nextResetAtIso === "string") {
@@ -13,12 +15,11 @@ function computeLabel(nextResetAtIso) {
       return "Resets soon";
     }
   }
-  const target = getNextIstMidnightUtcMs();
-  return formatResetsInCountdown(target - now);
+  return null;
 }
 
 /**
- * Live countdown to the next IST (Asia/Kolkata) calendar midnight — matches daily credit rollover.
+ * Countdown uses server-sent next reset ISO; missing/stale iso → neutral copy until refetch.
  */
 export default function CreditsResetCountdown({
   className = "",
@@ -26,25 +27,31 @@ export default function CreditsResetCountdown({
   showIstSuffix = true,
   nextResetAtIso = null,
 }) {
-  const [label, setLabel] = useState(() => computeLabel(nextResetAtIso));
+  const [computed, setComputed] = useState(() => computeLabel(nextResetAtIso));
 
   useEffect(() => {
-    const tick = () => setLabel(computeLabel(nextResetAtIso));
+    const tick = () => setComputed(computeLabel(nextResetAtIso));
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [nextResetAtIso]);
 
+  if (computed == null) {
+    return (
+      <Tag
+        className={className.trim()}
+        aria-live="polite"
+        title="Next refill time arrives from your account sync with the server."
+      >
+        Daily refill · IST
+      </Tag>
+    );
+  }
+
   return (
-    <Tag
-      className={className.trim()}
-      aria-live="polite"
-      title="Daily credits refill at midnight India Standard Time (IST)."
-    >
-      {label}
-      {showIstSuffix ? (
-        <span className="font-normal text-slate-400"> · IST</span>
-      ) : null}
+    <Tag className={className.trim()} aria-live="polite" title="Credits refresh on the schedule returned by Pixora.">
+      {computed}
+      {showIstSuffix ? <span className="font-normal text-slate-400"> · IST</span> : null}
     </Tag>
   );
 }

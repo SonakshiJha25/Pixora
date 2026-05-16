@@ -3,7 +3,6 @@ import axios from "axios";
 import { getApiBase } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
-import { getNextCalendarBoundaryIso } from "../lib/nextDailyReset.js";
 
 export const AppContext = createContext();
 
@@ -84,8 +83,7 @@ const AppContextProvider = ({ children }) => {
         (typeof nextApi === "string" && nextApi.trim() !== "" ? nextApi.trim() : null) ??
         (typeof u?.dailyCreditResetAt === "string" && u.dailyCreditResetAt.trim() !== ""
           ? u.dailyCreditResetAt.trim()
-          : null) ??
-        getNextCalendarBoundaryIso();
+          : null);
       setDailyCreditSchedule({
         timezone: data?.dailyResetTimezone ?? "IST",
         nextResetAtIso: nextIso,
@@ -100,8 +98,8 @@ const AppContextProvider = ({ children }) => {
   scheduleRef.current = dailyCreditSchedule;
 
   /**
-   * After local countdown crosses IST midnight, poll /api/user/credits until Mongo rollover is visible.
-   * Longer window than a few seconds — server clock, network, and handler ordering can delay the first good read.
+   * After API `dailyCreditResetAt` passes (`nextResetAtIso`), repeatedly GET `/api/user/credits`;
+   * balance only updates from response — never from client rollover math.
    */
   const rolloverPrefetchRef = useRef({ iso: null, attempts: 0 });
   const ROLLOVER_POLL_MS = 2000;
