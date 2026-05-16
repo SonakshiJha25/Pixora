@@ -2,7 +2,7 @@ import express from "express";
 import { body } from "express-validator";
 import { registerUser, loginUser, getMe } from "../controllers/authController.js";
 import { getCredits } from "../controllers/creditController.js";
-import userAuth from "../middlewares/auth.js";
+import authedCredits from "../middlewares/authedCredits.js";
 import validate from "../middlewares/validate.js";
 
 const userRouter = express.Router();
@@ -24,8 +24,8 @@ userRouter.post(
   loginUser
 );
 
-userRouter.get("/me", userAuth, getMe);
-userRouter.get("/credits", userAuth, getCredits);
-userRouter.post("/credits", userAuth, getCredits);
+userRouter.get("/me", ...authedCredits, getMe);
+userRouter.get("/credits", ...authedCredits, getCredits);
+userRouter.post("/credits", ...authedCredits, getCredits);
 
 export default userRouter;

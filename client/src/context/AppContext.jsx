@@ -91,15 +91,21 @@ const AppContextProvider = ({ children }) => {
         nextResetAtIso: nextIso,
       });
     } catch (error) {
-      logout();
+      // 401 is handled by the axios interceptor as well; never clear the session on network/5xx.
+      if (error?.response?.status === 401) logout();
     }
   }, [api, logout]);
 
   const scheduleRef = useRef(dailyCreditSchedule);
   scheduleRef.current = dailyCreditSchedule;
 
-  /** Server applies daily refill when GET /api/user/credits runs after IST midnight — refresh ASAP (within a few seconds). */
+  /**
+   * After local countdown crosses IST midnight, poll /api/user/credits until Mongo rollover is visible.
+   * Longer window than a few seconds — server clock, network, and handler ordering can delay the first good read.
+   */
   const rolloverPrefetchRef = useRef({ iso: null, attempts: 0 });
+  const ROLLOVER_POLL_MS = 2000;
+  const ROLLOVER_MAX_ATTEMPTS = 90;
 
   useEffect(() => {
     if (!token) return undefined;
@@ -115,14 +121,14 @@ const AppContextProvider = ({ children }) => {
         rolloverPrefetchRef.current = { iso, attempts: 0 };
       }
       const st = rolloverPrefetchRef.current;
-      if (now >= resetMs && st.attempts < 5) {
+      if (now >= resetMs && st.attempts < ROLLOVER_MAX_ATTEMPTS) {
         st.attempts += 1;
         fetchUserData();
       }
     };
 
     tick();
-    const id = window.setInterval(tick, 1000);
+    const id = window.setInterval(tick, ROLLOVER_POLL_MS);
     return () => window.clearInterval(id);
   }, [token, fetchUserData]);
 

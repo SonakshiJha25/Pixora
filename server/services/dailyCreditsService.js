@@ -6,6 +6,13 @@ const DAY_MS = 86400000;
 /** India Standard Time = UTC+5:30 (no DST). All daily resets use IST midnight only (calendar, not rolling 24h). */
 const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
 
+/** Integer bucket for which IST calendar day a UTC instant falls into (deterministic daily rollover). */
+export function istCalendarDayIndexUtc(utcMs = Date.now()) {
+  const t = typeof utcMs === "number" ? utcMs : new Date(utcMs).getTime();
+  if (!Number.isFinite(t)) return Math.floor((Date.now() + IST_OFFSET_MS) / DAY_MS);
+  return Math.floor((t + IST_OFFSET_MS) / DAY_MS);
+}
+
 /**
  * UTC instant (ms) of the next 00:00 IST strictly after `fromMs`.
  */
@@ -33,16 +40,27 @@ function formatCreditLogUser(user) {
 }
 
 /**
- * Ensures daily pool matches IST midnight cutover and credits snap to ledger.
- * `dailyCreditResetAt` holds the UTC instant of the upcoming IST midnight when credits reset.
- *
- * Refills when `now >= dailyCreditResetAt` (missed rollovers converge in one refill to the daily pool), and repairs
- * schedules that drift days into the future (common cause of “timer rolled but balance stayed 0”).
+ * Migrate legacy docs: derive last IST pool bucket from legacy `dailyCreditResetAt`.
+ * Before that instant → assume pool matches today's IST bucket; once past → previous bucket triggers rollover next line.
+ */
+function deriveInitialDailyPoolDayFromLegacy(user, nowMs, currKey) {
+  if (!user.dailyCreditResetAt) return currKey;
+  const n = new Date(user.dailyCreditResetAt).getTime();
+  if (!Number.isFinite(n)) return currKey;
+  if (nowMs < n) return currKey;
+  return currKey - 1;
+}
+
+/**
+ * IST calendar-day rollover in MongoDB (source of truth). Also keeps `dailyCreditResetAt`
+ * aligned as the upcoming IST midnight for API/countdown UX.
  */
 export async function ensureDailyCredits(user, { session } = {}) {
   const saveOpts = session ? { session } : {};
   let dirty = false;
   const nowMs = Date.now();
+  const userIdShort = user?._id != null ? String(user._id) : "?";
+  const who = formatCreditLogUser(user);
 
   const snapped = snapCreditsToLedger(user.credits);
   if (snapped !== user.credits) {
@@ -50,46 +68,58 @@ export async function ensureDailyCredits(user, { session } = {}) {
     dirty = true;
   }
 
+  const currKey = istCalendarDayIndexUtc(nowMs);
+  console.log("[Credits] Checking credit reset for user", userIdShort, who);
+
+  let poolDay =
+    typeof user.dailyPoolIstDay === "number" && Number.isFinite(user.dailyPoolIstDay)
+      ? user.dailyPoolIstDay
+      : null;
+
+  if (poolDay === null || poolDay === undefined) {
+    poolDay = deriveInitialDailyPoolDayFromLegacy(user, nowMs, currKey);
+    user.dailyPoolIstDay = poolDay;
+    dirty = true;
+  }
+
   let nextMs = user.dailyCreditResetAt ? new Date(user.dailyCreditResetAt).getTime() : NaN;
+  const canonicalNext = getNextIstMidnightUtcMs(nowMs);
+  const STUCK_ZERO_SCHEDULE_EPS_MS = 60 * 1000;
 
-  const who = formatCreditLogUser(user);
+  if (
+    snapCreditsToLedger(user.credits) === 0 &&
+    Number.isFinite(nextMs) &&
+    nextMs > canonicalNext + STUCK_ZERO_SCHEDULE_EPS_MS
+  ) {
+    user.dailyCreditResetAt = new Date(canonicalNext);
+    user.credits = DAILY_CREDITS;
+    user.dailyPoolIstDay = currKey;
+    user.lastCreditResetAt = new Date(nowMs);
+    dirty = true;
+    nextMs = canonicalNext;
+    console.log("[Credits] Repaired skewed zero-balance reset schedule → user", userIdShort);
+    logInfo(
+      `[Credit Reset — schedule repair]\nUser: ${who}\nReason: 0 credits but dailyCreditResetAt was ahead of IST\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
+    );
+  }
 
-  if (!Number.isFinite(nextMs)) {
+  if (!Number.isFinite(nextMs) || !user.dailyCreditResetAt) {
     user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
     dirty = true;
-  } else {
-    const canonicalNext = getNextIstMidnightUtcMs(nowMs);
-    /** Stuck-at-zero UX: tolerate only sub-minute skew vs the true next IST boundary. Anything further ahead is repaired. */
-    const STUCK_ZERO_SCHEDULE_EPS_MS = 60 * 1000;
+  }
 
-    if (
-      snapCreditsToLedger(user.credits) === 0 &&
-      nextMs > canonicalNext + STUCK_ZERO_SCHEDULE_EPS_MS
-    ) {
-      user.dailyCreditResetAt = new Date(canonicalNext);
-      user.credits = DAILY_CREDITS;
-      user.lastCreditResetAt = new Date(nowMs);
-      nextMs = canonicalNext;
-      dirty = true;
-      logInfo(
-        `[Credit Reset — schedule repair]\nUser: ${who}\nReason: 0 credits but dailyCreditResetAt was not the next IST midnight; realigned\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
-      );
-    }
-
-    let guard = 0;
-    while (nowMs >= nextMs && guard < 16) {
-      guard += 1;
-      const oldCredits = snapCreditsToLedger(user.credits);
-      user.credits = DAILY_CREDITS;
-      user.lastCreditResetAt = new Date(nowMs);
-      const following = getNextIstMidnightUtcMs(nowMs);
-      user.dailyCreditResetAt = new Date(following);
-      nextMs = following;
-      dirty = true;
-      logInfo(
-        `[Credit Reset]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
-      );
-    }
+  if (currKey > poolDay) {
+    const oldCredits = snapCreditsToLedger(user.credits);
+    user.credits = DAILY_CREDITS;
+    user.dailyPoolIstDay = currKey;
+    user.lastCreditResetAt = new Date(nowMs);
+    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
+    dirty = true;
+    console.log("[Credits] Credits reset successfully — user:", userIdShort, "was", oldCredits, "→", user.credits);
+    console.log("[Credits] Next reset at:", user.dailyCreditResetAt.toISOString());
+    logInfo(
+      `[Credit Reset IST day]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nPool IST day idx: ${currKey}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
+    );
   }
 
   if (dirty) {

@@ -14,14 +14,14 @@ import {
   toggleFavoriteImage,
   toggleImagePublic,
 } from "../controllers/imageController.js";
-import userAuth from "../middlewares/auth.js";
+import authedCredits from "../middlewares/authedCredits.js";
 import validate from "../middlewares/validate.js";
 
 const imageRouter = express.Router();
 
 imageRouter.post(
   "/generate-image",
-  userAuth,
+  ...authedCredits,
   [
     body("prompt").isLength({ min: 3, max: 1000 }),
     body("style").optional().isString(),
@@ -34,7 +34,7 @@ imageRouter.post(
 
 imageRouter.post(
   "/generate",
-  userAuth,
+  ...authedCredits,
   [
     body("prompt").isLength({ min: 3, max: 1000 }),
     body("style").optional().isString(),
@@ -47,7 +47,7 @@ imageRouter.post(
 
 imageRouter.post(
   "/edit",
-  userAuth,
+  ...authedCredits,
   [
     body("imageId").customSanitizer((v) => (v == null ? "" : String(v).trim())).isMongoId(),
     body("editPrompt").isLength({ min: 3, max: 1000 }),
@@ -58,21 +58,21 @@ imageRouter.post(
 
 imageRouter.get(
   "/thread/:imageId",
-  userAuth,
+  ...authedCredits,
   [param("imageId").isMongoId(), validate],
   getImageThread
 );
 
-imageRouter.get("/history", userAuth, getMyImages);
+imageRouter.get("/history", ...authedCredits, getMyImages);
 /** Alias for gallery clients — same handler as /history, newest first for logged-in user only. */
-imageRouter.get("/my-images", userAuth, getMyImages);
-imageRouter.post("/cleanup-broken", userAuth, cleanupBrokenImages);
-imageRouter.delete("/:imageId", userAuth, deleteImage);
-imageRouter.patch("/:imageId/favorite", userAuth, toggleFavoriteImage);
-imageRouter.patch("/:imageId/visibility", userAuth, toggleImagePublic);
+imageRouter.get("/my-images", ...authedCredits, getMyImages);
+imageRouter.post("/cleanup-broken", ...authedCredits, cleanupBrokenImages);
+imageRouter.delete("/:imageId", ...authedCredits, deleteImage);
+imageRouter.patch("/:imageId/favorite", ...authedCredits, toggleFavoriteImage);
+imageRouter.patch("/:imageId/visibility", ...authedCredits, toggleImagePublic);
 imageRouter.get("/gallery/public", getPublicGallery);
-imageRouter.post("/gallery/:imageId/like", userAuth, likePublicImage);
+imageRouter.post("/gallery/:imageId/like", ...authedCredits, likePublicImage);
 imageRouter.get("/prompt/styles", getPromptStyles);
-imageRouter.post("/prompt/enhance", userAuth, [body("prompt").isLength({ min: 3, max: 1000 }), validate], previewEnhancedPrompt);
+imageRouter.post("/prompt/enhance", ...authedCredits, [body("prompt").isLength({ min: 3, max: 1000 }), validate], previewEnhancedPrompt);
 
 export default imageRouter;

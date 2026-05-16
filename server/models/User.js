@@ -13,11 +13,16 @@ const userSchema = new mongoose.Schema(
       maxlength: 254,
     },
     password: { type: String, required: true, select: false },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     /** Daily pool in points; allowed 0–100 in steps of 10 (snapCreditsToLedger). */
     credits: { type: Number, required: true, default: 100, min: 0 },
     /**
-     * Next calendar reset at IST midnight (stored as UTC Date).
-     * When now >= dailyCreditResetAt → credits refill to daily pool + field advances.
+     * IST "bucket" day index used for rollover: floor((utcMs + 5h30m) / 864e5).
+     * When this is behind today's bucket, refill credits to daily pool once (calendar day boundary).
+     */
+    dailyPoolIstDay: { type: Number, default: null },
+    /**
+     * Next IST midnight UTC instant (human/API countdown). Updated when the pool resets.
      */
     dailyCreditResetAt: {
       type: Date,
