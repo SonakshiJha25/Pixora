@@ -20,3 +20,9 @@ Thumbs.db
 /pixorify logo.png
 
 server/public/generated/*.png
+
+# Local Python vendor drop (Clipdrop experiments — not app source)
+server/_pyclipdrop_tmp/
+
+# Duplicate ChatGPT uploads at photos root (canonical copies live in photos/hero/)
+photos/ChatGPT*.png

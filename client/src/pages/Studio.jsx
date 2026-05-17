@@ -1,5 +1,6 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { ArrowDown, Mic } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -8,21 +9,18 @@ import HistoryImageCard from "../components/HistoryImageCard";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import LimitReachedModal from "../components/LimitReachedModal";
 import RefineImagePanel from "../components/RefineImagePanel.jsx";
+import DownloadPngButton from "../components/DownloadPngButton.jsx";
+import BrandLogo from "../components/BrandLogo.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
-import BrandLogo from "../components/BrandLogo.jsx";
+import { STYLE_KEYS, STYLE_META, labelForStyleKey } from "../lib/styleTypes.js";
+import { scrollPageTop } from "../lib/navigation.js";
 
 const SPEECH_AUTO_STOP_MS = 8000;
-
-const STYLE_SHORT_LABEL = {
-  realistic: "Photo",
-  anime: "Anime",
-  cyberpunk: "Neon",
-  fantasy: "Fantasy",
-  minimal: "Clean",
-};
+const PROMPT_FIELD_MIN_PX = 44;
+const PROMPT_FIELD_MAX_PX = 288;
 
 const GENERATION_STAGE_HINTS = [
   "Analyzing your prompt…",
@@ -49,6 +47,47 @@ function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
 }
 
 /** Map /api/images/edit errors to clear toasts (server sends { error: { code, message, details } }). */
+function isAxiosAbortError(error) {
+  return (
+    axios.isCancel?.(error) === true ||
+    error?.code === "ERR_CANCELED" ||
+    error?.name === "CanceledError" ||
+    error?.name === "AbortError"
+  );
+}
+
+function threadLoadToastFromAxiosError(error) {
+  if (isAxiosAbortError(error)) return;
+  const status = error?.response?.status;
+  const code = error?.response?.data?.error?.code;
+  const msg =
+    typeof error?.response?.data?.error?.message === "string"
+      ? error.response.data.error.message.trim()
+      : "";
+
+  if (status === 401) {
+    toast.error("Your session expired — sign in again to continue editing.");
+    return;
+  }
+  if (status === 403) {
+    toast.error("You can't open this picture—it may belong to someone else.");
+    return;
+  }
+  if (status === 400 && code === "VALIDATION_ERROR") {
+    toast.error("That link isn’t valid — use Continue editing from Gallery again.");
+    return;
+  }
+  if (status === 404 || code === "IMAGE_NOT_FOUND") {
+    toast.error("That render isn’t available anymore — it may have been removed.");
+    return;
+  }
+  if (!error?.response) {
+    toast.error("We couldn’t reach the studio — check that the API is running, then try again.");
+    return;
+  }
+  toast.error(msg || "We couldn't load those versions — try again.");
+}
+
 function refinementToastFromApiError(error) {
   const payload = error?.response?.data;
   const errObj = payload?.error ?? (payload?.success === false ? payload : null);
@@ -66,21 +105,21 @@ function refinementToastFromApiError(error) {
   switch (code) {
     case "CLIPDROP_ERROR":
     case "CLIPDROP_EMPTY":
-      return apiMsg || "Clipdrop failed for this refine — check API key, quota, or try a shorter instruction.";
+      return "Clipdrop couldn't finish this tweak — check API key, quota, or try a simpler instruction.";
     case "CLIPDROP_NOT_CONFIGURED":
-      return "Server is missing CLIPDROP_API — refinement needs the same key as Generate.";
+      return "Editing needs the Clipdrop API key on the server (same as Generate).";
     case "EDIT_FAILED":
     case "EDIT_SOURCE_READ_FAILED":
-      return apiMsg || "Couldn't read or re-save your last image (storage or URL). Try generating again, then refine.";
+      return apiMsg || "We couldn't read or save your last image. Try generating again, then edit.";
     case "STORAGE_UPLOAD_FAILED":
     case "STORAGE_NOT_CONFIGURED":
       return apiMsg || "Could not save image on the server — check Cloudinary or disk storage.";
     case "IMAGE_NOT_FOUND":
-      return "That image is gone — run Generate again, then use Refine this image.";
+      return "That image isn't there anymore — create a fresh one, then use Refine this image.";
     case "VALIDATION_ERROR":
       return detailFromArray || apiMsg || "Invalid request — check instruction length and try again.";
     default:
-      return detailFromArray || apiMsg || "Refine didn't complete — try again.";
+      return detailFromArray || apiMsg || "Couldn't finish editing — please try again.";
   }
 }
 
@@ -98,6 +137,7 @@ export default function Studio() {
   } = useContext(AppContext);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const authToken = getToken()?.trim() ?? "";
   const isSignedIn = Boolean(authToken);
@@ -106,7 +146,6 @@ export default function Studio() {
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState("");
   const [style, setStyle] = useState("realistic");
-  const [lightbox, setLightbox] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
@@ -120,6 +159,20 @@ export default function Studio() {
   const [loadingStage, setLoadingStage] = useState(0);
 
   const recognitionRef = useRef(null);
+  const promptRef = useRef(null);
+
+  const syncPromptHeight = useCallback(() => {
+    const el = promptRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const next = Math.min(Math.max(el.scrollHeight, PROMPT_FIELD_MIN_PX), PROMPT_FIELD_MAX_PX);
+    el.style.height = `${next}px`;
+    el.style.overflowY = el.scrollHeight > PROMPT_FIELD_MAX_PX ? "auto" : "hidden";
+  }, []);
+
+  useLayoutEffect(() => {
+    syncPromptHeight();
+  }, [input, syncPromptHeight]);
 
   const sortedThread = useMemo(
     () =>
@@ -138,7 +191,7 @@ export default function Studio() {
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
 
-  const styles = useMemo(() => ["realistic", "anime", "cyberpunk", "fantasy", "minimal"], []);
+  const styles = STYLE_KEYS;
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -146,65 +199,98 @@ export default function Studio() {
     if (requested && styles.includes(requested)) setStyle(requested);
   }, [searchParams, styles]);
 
+  /** Every studio landing starts at the header — strip legacy #compose bookmarks. */
+  useEffect(() => {
+    const onStudio = location.pathname === "/studio" || location.pathname === "/result";
+    if (!onStudio) return;
+
+    if (location.hash) {
+      navigate({ pathname: location.pathname, search: location.search }, { replace: true });
+    }
+    scrollPageTop(false);
+  }, [location.pathname, location.search, location.hash, navigate]);
+
   const hydrateStudioThread = useCallback(
-    async (imageId) => {
-      const id = String(imageId || "").trim();
-      if (!id || !authToken) return false;
+    async (imageId, options = {}) => {
+      const { signal } = options;
+      const id = String(imageId ?? "").trim();
+      if (!id || !authToken) return { ok: false };
+
       try {
-        const { data } = await api.get(`/api/images/thread/${id}`);
+        const { data } = await api.get(`/api/images/thread/${encodeURIComponent(id)}`, { signal });
+
         if (!data?.success || !Array.isArray(data.thread) || data.thread.length === 0) {
-          toast.error("We couldn't load that thread.");
-          return false;
+          toast.error("We couldn't load that picture's versions.");
+          return { ok: false };
         }
+
         const sorted = [...data.thread].sort(
           (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
-        setRefinementThread(sorted);
         const tail = sorted.at(-1);
+        const styleFromFrame = tail?.style;
+        if (typeof styleFromFrame === "string" && styles.includes(styleFromFrame)) {
+          setStyle(styleFromFrame);
+        }
+
+        setRefinementThread(sorted);
         setImage(resolveImageUrl(tail?.imageUrl || ""));
         setIsImageLoaded(true);
-        return true;
-      } catch {
-        toast.error("We couldn't reach the studio — try again in a moment.");
-        return false;
+
+        return { ok: true, sorted, tail };
+      } catch (err) {
+        if (isAxiosAbortError(err)) return { ok: false, canceled: true };
+        threadLoadToastFromAxiosError(err);
+        return { ok: false };
       }
     },
-    [api, authToken]
+    [api, authToken, styles]
   );
 
   useEffect(() => {
-    const c = searchParams.get("continue");
-    if (!c?.trim() || !isSignedIn) return undefined;
-    let cancelled = false;
+    const c = searchParams.get("continue")?.trim();
+    if (!c || !isSignedIn) return undefined;
+
+    const ac = new AbortController();
+
     (async () => {
-      const ok = await hydrateStudioThread(c.trim());
-      if (cancelled) return;
-      if (ok) {
-        toast.info("Thread loaded — ready to refine.");
-        navigate("/studio", { replace: true });
-      }
+      const r = await hydrateStudioThread(c, { signal: ac.signal });
+      if (ac.signal.aborted || r.canceled) return;
+      if (!r.ok || !r.tail?._id) return;
+
+      navigate("/studio", { replace: true });
+      setRefineParentId(String(r.tail._id));
+      setRefinePanelOpen(true);
+      scrollPageTop(true);
+      toast.success("Pick up where you left off — small edits here usually skip a full charge.");
     })();
-    return () => {
-      cancelled = true;
-    };
+
+    return () => ac.abort();
   }, [searchParams, isSignedIn, hydrateStudioThread, navigate]);
 
   const continueConversationFromHistory = useCallback(
     async (item) => {
       if (!item?._id) return;
-      const ok = await hydrateStudioThread(String(item._id));
-      if (!ok) return;
+      const r = await hydrateStudioThread(String(item._id));
+      if (!r.ok || r.canceled) return;
       setRefineParentId(String(item._id));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollPageTop(true);
       setRefinePanelOpen(true);
     },
     [hydrateStudioThread]
   );
 
-  const activeStyleSample = useMemo(
-    () => STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === style),
-    [style]
+  /** Recent grid: tap image → Gallery with this thread/modal opener (not in-place lightbox). */
+  const openRecentInGallery = useCallback(
+    (item) => {
+      const id = item?._id != null ? String(item._id).trim() : "";
+      if (!id) return;
+      navigate(`/gallery?thread=${encodeURIComponent(id)}`);
+    },
+    [navigate]
   );
+
+  const activeStyleSample = useMemo(() => STUDIO_STYLE_SAMPLES.find((s) => s.id === style), [style]);
 
   const moodGrad = STUDIO_STYLE_MOODS[style] ?? STUDIO_STYLE_MOODS.realistic;
 
@@ -354,7 +440,7 @@ export default function Studio() {
       await fetchHistory();
       await fetchUserData();
       setRefineParentId(null);
-      toast.success("Saved — your frame is above. Refine, download, or open Gallery.");
+      toast.success("Saved — scroll up to review. You can tweak, download, or open Gallery.");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
 
@@ -415,7 +501,7 @@ export default function Studio() {
           "Clipdrop didn't return a new render — we saved a linked copy of your frame. Check API quota or try a simpler edit."
         );
       } else {
-        toast.success("Refined — newest version is on top of the thread.");
+        toast.success("Edit saved — newest version appears at the bottom of your timeline.");
       }
     } catch (error) {
       toast.error(refinementToastFromApiError(error));
@@ -424,40 +510,39 @@ export default function Studio() {
     }
   };
 
-  const downloadHref =
-    sortedThread.length > 0
-      ? resolveImageUrl(sortedThread[sortedThread.length - 1]?.imageUrl)
-      : image;
+  const latestFrame = sortedThread.length > 0 ? sortedThread[sortedThread.length - 1] : null;
+  const downloadImageId =
+    latestFrame?._id != null ? String(latestFrame._id) : "";
+  const downloadImageUrl = latestFrame?.imageUrl || image;
+  const previewSrc = downloadImageUrl ? resolveImageUrl(downloadImageUrl) : "";
 
   return (
     <div className="relative w-full overflow-hidden pb-24 pt-5 sm:pt-8">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[#13151c]" aria-hidden />
       <div className="relative mx-auto w-full max-w-[1920px] px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-24">
         <motion.div
+          id="studio-top"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="mb-6 flex flex-col items-center gap-3 text-center sm:mb-8 sm:flex-row sm:justify-center sm:gap-5"
+          className="mb-6 flex flex-col items-center gap-2.5 text-center sm:mb-8 sm:gap-3"
         >
-          <div className="shrink-0 rounded-2xl">
-            <BrandLogo variant="studio" alt="" width={68} height={68} draggable={false} />
-          </div>
-          <div className="min-w-0">
-            <h1 className="font-display mt-0 text-2xl font-bold tracking-tight text-white sm:text-3xl">{WORKSPACE_NAME}</h1>
-            <p className="type-body-dim mx-auto mt-1.5 max-w-lg sm:mx-0">
-              Pair a deliberate style with a clear prompt — results land below for download or refinement.
-              {!isSignedIn ? (
-                <span className="mt-1.5 block text-slate-500">
-                  Sign in first to spend credits; balances refresh at midnight IST.
-                </span>
-              ) : null}
-            </p>
-          </div>
+          <BrandLogo variant="studio" />
+          <h1 className="type-studio-title">{WORKSPACE_NAME}</h1>
+          <p className="type-studio-lede mx-auto sm:max-w-xl">
+            Choose a style, describe your scene plainly, then look below for your image and edits.
+            {!isSignedIn ? (
+              <span className="mt-1.5 block text-slate-500">
+                Sign in to use credits; your balance resets at midnight India time.
+              </span>
+            ) : null}
+          </p>
         </motion.div>
 
         <motion.form
+          id="studio-compose"
           onSubmit={onSubmitHandler}
-          className="relative w-full"
+          className="relative w-full scroll-mt-20"
           initial={{ opacity: 0.75, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -526,7 +611,7 @@ export default function Studio() {
                 <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
                   <button
                     type="button"
-                    className="btn-primary rounded-full px-8 py-3 text-center text-sm font-semibold shadow-md transition hover:opacity-95"
+                    className="btn-primary rounded-full px-6 py-2 text-center text-[13px] font-semibold shadow-md shadow-pastel-cyan/25 transition hover:opacity-95"
                     disabled={loading || refineSubmitting}
                     onClick={() => {
                       setIsImageLoaded(false);
@@ -539,15 +624,13 @@ export default function Studio() {
                   >
                     New prompt
                   </button>
-                  <a
-                    href={downloadHref || "#"}
-                    download="pixorify-image.png"
-                    className={`inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] ${
-                      !downloadHref ? "pointer-events-none opacity-40" : ""
-                    }`}
-                  >
-                    Download PNG
-                  </a>
+                  <DownloadPngButton
+                    imageId={downloadImageId}
+                    imageUrl={downloadImageUrl}
+                    filename="pixorify-image.png"
+                    disabled={!downloadImageId && !downloadImageUrl}
+                    className="inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-40"
+                  />
                   <button
                     type="button"
                     disabled={loading || refineSubmitting}
@@ -575,40 +658,44 @@ export default function Studio() {
               </div>
             </div>
           ) : (
-            <div className="w-full space-y-7">
+            <motion.div className="w-full space-y-5 sm:space-y-6">
                 <div
-                  className={`relative isolate min-h-[132px] overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br p-5 sm:min-h-[150px] sm:p-7 lg:aspect-[24/5] lg:min-h-0 ${moodGrad}`}
+                  className={`relative isolate min-h-[min(42vh,280px)] overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br p-5 sm:min-h-[min(38vh,320px)] sm:p-6 md:min-h-[300px] ${moodGrad}`}
                 >
                   <div
                     className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_30%,rgba(255,255,255,0.06),transparent_52%)]"
                     aria-hidden
                   />
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:items-center">
+                <div className="relative flex min-h-[inherit] flex-col justify-between gap-4 sm:flex-row sm:items-end sm:justify-between">
                   <div className="text-left">
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">Idle canvas</p>
-                    <p className="mt-1 text-lg font-bold capitalize tracking-tight text-white sm:text-xl">{style}</p>
+                    <p className="mt-1 text-lg font-bold tracking-tight text-white sm:text-xl">
+                      {labelForStyleKey(style)}
+                    </p>
                   </div>
-                  <p className="max-w-xl text-left text-xs leading-snug text-white/55 sm:text-[13px] lg:max-w-md lg:text-right">
+                  <p className="max-w-xl text-left text-xs leading-snug text-white/55 sm:text-[13px] md:max-w-md md:text-right">
                     {activeStyleSample?.caption ??
                       `Style moods for ${WORKSPACE_NAME} · hero art stays on Home.`}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
-                <div className="min-w-0 flex-1 lg:max-w-xl">
-                  <p className="type-studio-eyebrow mb-3">Styles</p>
-                  <div className="flex flex-wrap gap-2 sm:gap-2.5">
+              <motion.div className="studio-compose-block mx-auto w-full max-w-5xl">
+                <motion.div className="grid items-end gap-5 md:grid-cols-[minmax(0,13.75rem)_minmax(0,1fr)] md:gap-6 lg:gap-8">
+                  <div className="min-w-0 text-left">
+                    <p className="type-studio-eyebrow mb-2.5 text-left">Styles</p>
+                    <div className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
                     {styles.map((item) => {
-                      const thumb = STUDIO_STYLE_SAMPLES.find((s) => s.label.toLowerCase() === item)?.image;
+                      const meta = STYLE_META[item];
+                      const thumb = meta?.image;
                       return (
                         <button
                           key={item}
                           type="button"
                           onClick={() => setStyle(item)}
                           aria-pressed={style === item}
-                          title={item}
-                          className={`group relative h-[3.25rem] w-[2.75rem] shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 sm:h-16 sm:w-[3.35rem] ${
+                          title={meta?.label ?? item}
+                          className={`group relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 sm:h-[3.75rem] sm:w-[3.75rem] ${
                             style === item
                               ? "border-white/35 ring-1 ring-white/20"
                               : "border-white/10 opacity-80 hover:border-white/20 hover:opacity-100"
@@ -622,27 +709,31 @@ export default function Studio() {
                               draggable={false}
                             />
                           ) : null}
-                          <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pb-0.5 pt-3 text-center text-[8px] font-semibold capitalize text-white sm:text-[9px]">
-                            {STYLE_SHORT_LABEL[item]}
+                          <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pb-0.5 pt-3 text-center text-[8px] font-semibold text-white sm:text-[9px]">
+                            {meta?.label ?? item}
                           </span>
                         </button>
                       );
                     })}
+                    </div>
                   </div>
-                </div>
 
-                <div className="min-w-0 flex-1 lg:pt-0">
-                  <p className="type-studio-eyebrow mb-3">Prompt</p>
-                  <div className="studio-prompt-shell p-4 sm:p-5">
-                    <div className="flex min-h-[56px] min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end">
-                      <div className="flex min-h-[52px] min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-                        <textarea
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          rows={2}
-                          placeholder="Describe a scene, light, palette, mood — specificity helps."
-                          className="min-h-[52px] min-w-0 flex-1 resize-none rounded-xl border border-white/[0.08] bg-[#0f1116]/90 px-3 py-2.5 text-[15px] leading-relaxed text-slate-100 placeholder:text-slate-500 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/15"
-                        />
+                  <div className="min-w-0">
+                    <p className="type-studio-eyebrow mb-2.5 text-left">Prompt</p>
+                    <div className="studio-prompt-shell p-3 sm:p-4">
+                      <div className="flex min-w-0 flex-col gap-2.5 sm:flex-row sm:items-end sm:gap-3">
+                      <textarea
+                        ref={promptRef}
+                        value={input}
+                        onChange={(e) => {
+                          setInput(e.target.value);
+                          requestAnimationFrame(syncPromptHeight);
+                        }}
+                        rows={1}
+                        placeholder="Describe a scene, light, palette, mood — specificity helps."
+                        className="studio-prompt-input studio-prompt-input--auto min-h-0 w-full flex-1 resize-none rounded-xl border border-white/[0.08] bg-[#0f1116]/90 px-3 py-2.5 text-[13px] font-normal leading-relaxed tracking-tight text-slate-100 placeholder:text-slate-500 placeholder:font-normal focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/15 sm:text-[14px]"
+                      />
+                      <div className="flex shrink-0 items-center justify-end gap-2 sm:pb-0.5">
                         <button
                           type="button"
                           onClick={toggleVoiceInput}
@@ -656,48 +747,51 @@ export default function Studio() {
                           }
                           aria-label={isListening ? "Stop voice input" : "Start voice input"}
                           aria-pressed={isListening}
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:cursor-not-allowed disabled:opacity-40 ${
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:cursor-not-allowed disabled:opacity-40 ${
                             isListening
                               ? "border-[#5a8fa3]/50 bg-[#5a8fa3]/12 text-slate-100"
                               : "border-white/12 bg-white/[0.06] text-slate-400 hover:border-white/20 hover:bg-white/[0.09]"
                           }`}
                         >
-                          <Mic className="h-5 w-5" strokeWidth={2} aria-hidden />
+                          <Mic className="h-4 w-4" strokeWidth={2} aria-hidden />
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="btn-primary shrink-0 rounded-full px-6 py-2.5 text-[13px] font-semibold leading-none shadow-md shadow-pastel-cyan/25 disabled:opacity-60 sm:min-w-[7.5rem]"
+                        >
+                          {loading ? "Working…" : "Generate"}
                         </button>
                       </div>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className={`btn-primary shrink-0 rounded-full px-8 py-3 text-sm font-semibold disabled:opacity-60 sm:self-stretch sm:py-3`}
-                      >
-                        {loading ? "Working…" : "Generate"}
-                      </button>
+                      </div>
                     </div>
+                    {!speechSupported ? (
+                      <p className="mt-2 text-xs text-amber-200/85">Mic won&apos;t fly in this browser.</p>
+                    ) : null}
+                    {speechError ? (
+                      <p className="mt-2 text-xs text-amber-200/90">{speechError}</p>
+                    ) : null}
+                    {isListening ? (
+                      <p className="mt-2 text-xs font-medium text-slate-300">
+                        Listening…
+                        {transcript ? (
+                          <span className="mt-1 block font-normal text-slate-400">&ldquo;{transcript}&rdquo;</span>
+                        ) : null}
+                      </p>
+                    ) : null}
                   </div>
-                  {!speechSupported ? (
-                    <p className="mt-2 text-center text-xs text-amber-200/85 sm:text-left">Mic won&apos;t fly in this browser.</p>
-                  ) : null}
-                  {speechError ? (
-                    <p className="mt-2 text-center text-xs text-amber-200/90 sm:text-left">{speechError}</p>
-                  ) : null}
-                  {isListening ? (
-                    <p className="mt-2 text-center text-xs font-medium text-slate-300 sm:text-left">
-                      Listening…
-                      {transcript ? (
-                        <span className="mt-1 block font-normal text-slate-400">&ldquo;{transcript}&rdquo;</span>
-                      ) : null}
-                    </p>
-                  ) : null}
-                  <p className="mt-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
-                    New runs cost credits; <span className="font-medium text-slate-400">Refine this image</span> keeps tiny
-                    follow-ups on the same thread without another full charge — read{" "}
-                    <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
-                      Help
-                    </Link>{" "}
-                    for the nuance.
-                  </p>
-                </div>
-              </div>
+                </motion.div>
+
+                <p className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
+                  New pictures use credits from your daily balance.
+                  <span className="font-medium text-slate-400"> Refine this image</span> handles small tweaks to what you already
+                  have—often without another full charge.{" "}
+                  <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
+                    Help
+                  </Link>{" "}
+                  has the finer details.
+                </p>
+              </motion.div>
 
               {loading ? (
                 <motion.div
@@ -718,7 +812,7 @@ export default function Studio() {
                   </div>
                 </motion.div>
               ) : null}
-            </div>
+            </motion.div>
           )}
         </motion.form>
 
@@ -727,7 +821,7 @@ export default function Studio() {
           <div className="text-center sm:text-left">
             <h2 className="font-display text-base font-semibold text-white sm:text-lg">Recent</h2>
             <p className="mt-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
-              A quick skim of renders from this session — open Gallery for favourites, PNGs, and full threads.
+              Tap any tile to jump to Gallery and browse every saved version alongside PNG downloads and starred picks.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
@@ -742,7 +836,7 @@ export default function Studio() {
               to="/gallery"
               className="text-sm font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline"
             >
-              Open gallery →
+              Open my gallery →
             </Link>
           </div>
         </div>
@@ -755,7 +849,7 @@ export default function Studio() {
         ) : history.length === 0 ? (
           <div className="rounded-xl border border-dashed border-white/[0.1] bg-white/[0.02] py-12 text-center text-sm text-slate-500">
             {!isSignedIn ? (
-              "Sign in · recent runs land here."
+              "Sign in and your newest pictures will appear here."
             ) : historyStatus === "error" ? (
               <span className="mx-auto block max-w-sm">
                 <span className="font-medium text-slate-300">Your recent work isn&apos;t loading right now.</span>
@@ -778,7 +872,8 @@ export default function Studio() {
               <HistoryImageCard
                 key={item._id}
                 item={item}
-                onOpen={setLightbox}
+                onOpen={openRecentInGallery}
+                openActionLabel={`View versions in Gallery: ${item.promptRaw || item.prompt || "image"}`.slice(0, 120)}
                 surface="workspace"
                 showActionBar={isSignedIn}
                 onContinueEdit={continueConversationFromHistory}
@@ -788,62 +883,9 @@ export default function Studio() {
         )}
       </section>
 
-      {lightbox ? (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
-          role="dialog"
-          aria-modal="true"
-        >
-          <button
-            type="button"
-            className="absolute inset-0 h-full w-full cursor-default"
-            aria-label="Close"
-            onClick={() => setLightbox(null)}
-          />
-          <div className="relative z-[71] w-full max-w-lg overflow-hidden rounded-xl border border-white/[0.1] bg-[#1c1f28] shadow-2xl">
-            <img src={resolveImageUrl(lightbox.imageUrl)} alt="" className="max-h-[60vh] w-full object-contain" />
-            <div className="space-y-3 border-t border-white/[0.06] bg-[#181b24] p-5 text-left text-sm text-slate-200">
-              <p className="font-medium leading-snug text-white">{lightbox.promptRaw}</p>
-              <p className="text-xs text-white/55">
-                {new Date(lightbox.createdAt).toLocaleString()} · {lightbox.style}
-              </p>
-              {isSignedIn ? (
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <a
-                    href={resolveImageUrl(lightbox.imageUrl)}
-                    download={`pixorify-${lightbox._id}.png`}
-                    className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.06] px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-white/18"
-                  >
-                    Download PNG
-                  </a>
-                  <button
-                    type="button"
-                    className="inline-flex flex-1 items-center justify-center rounded-lg border border-[#5a8fa3]/35 bg-[#5a8fa3]/12 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-[#6a9fb3]/45"
-                    onClick={() => {
-                      const item = lightbox;
-                      setLightbox(null);
-                      continueConversationFromHistory(item);
-                    }}
-                  >
-                    Continue editing
-                  </button>
-                </div>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => setLightbox(null)}
-                className="w-full rounded-xl border border-white/[0.1] bg-white/[0.05] py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       <RefineImagePanel
         open={refinePanelOpen}
-        previewSrc={downloadHref}
+        previewSrc={previewSrc}
         onClose={() => !refineSubmitting && setRefinePanelOpen(false)}
         onApply={applyRefinement}
         submitting={refineSubmitting}

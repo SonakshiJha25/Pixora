@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import { motion } from "motion/react";
@@ -17,10 +17,22 @@ import Footer from "./components/Footer";
 import Login from "./components/Login";
 import { AppContext } from "./context/AppContext";
 import { MARKETING_CONTENT_MAX_WIDTH_CLASS } from "./content/marketingShared.js";
+import { SITE } from "./lib/site.js";
+import { scrollPageTop } from "./lib/navigation.js";
 
 const App = () => {
   const { showLogin, token } = useContext(AppContext);
+
+  useEffect(() => {
+    document.title = SITE.browserTitle;
+  }, []);
   const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/studio" || location.pathname === "/result") {
+      scrollPageTop(false);
+    }
+  }, [location.pathname, location.search]);
   const isHome = location.pathname === "/";
   const isStudioRoute =
     location.pathname === "/studio" || location.pathname === "/result";
@@ -30,23 +42,23 @@ const App = () => {
 
   return (
     <div
-      className={`min-h-screen overflow-x-hidden transition-[background-color] duration-[900ms] ease-[cubic-bezier(0.25,1,0.3,1)] ${
+      className={`flex min-h-screen flex-col overflow-x-hidden transition-[background-color] duration-[900ms] ease-[cubic-bezier(0.25,1,0.3,1)] ${
         isDarkWorkspace ? "bg-studio-app" : "bg-market"
       }`}
     >
       <Toaster position="bottom-right" theme={isDarkWorkspace ? "dark" : "light"} richColors closeButton />
+      <NavBar />
       <div
-        className={`mx-auto flex min-h-screen w-full flex-col ${
+        className={`mx-auto flex w-full flex-1 flex-col ${
           isStudioRoute
             ? "max-w-none px-0"
             : `${MARKETING_CONTENT_MAX_WIDTH_CLASS} px-5 sm:px-8 lg:px-10`
         }`}
       >
-        <NavBar />
         {showLogin && <Login />}
         <main
           className={`flex flex-1 flex-col ${
-            isHome ? "" : isStudioRoute ? "w-full items-stretch" : "items-center"
+            isHome ? "w-full items-center" : isStudioRoute ? "w-full items-stretch" : "items-center"
           }`}
         >
           <motion.div
@@ -74,8 +86,10 @@ const App = () => {
             </Routes>
           </motion.div>
         </main>
-        {!isDarkWorkspace ? <Footer /> : null}
       </div>
+      {!isStudioRoute && !(isGallery && Boolean(String(token || "").trim())) ? (
+        <Footer />
+      ) : null}
     </div>
   );
 };

@@ -13,28 +13,35 @@ import {
   Zap,
 } from "lucide-react";
 import HelpContactForm from "../components/HelpContactForm.jsx";
+import { TipBrandCardGrid } from "../components/TipsCarousel.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import { HeroDecorBleed } from "../components/MarketingDecorPieces.jsx";
 import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
 import { SITE, WORKSPACE_NAME } from "../lib/site.js";
 import { assets } from "../assets/assets.js";
+import { photos } from "../lib/photos.js";
+
+/** Uniform inset + rounded art inside journey banners. */
+const JOURNEY_IMG =
+  "h-full w-full max-h-full max-w-full rounded-xl object-contain object-center";
 
 const quickLinks = [
   {
     to: "/studio",
     title: WORKSPACE_NAME,
-    desc: `Prompts, styles, and downloads — everything happens inside ${WORKSPACE_NAME}.`,
+    desc: `Write what you imagine, choose a style, and download from ${WORKSPACE_NAME}.`,
     icon: Wand2,
   },
   {
     to: "/gallery",
-    title: "Gallery",
-    desc: "Threads, favourites, and exports in one place.",
+    title: "My gallery",
+    desc: "Your pictures, favourites, and downloads in one place.",
     icon: LayoutGrid,
   },
   {
     to: "/pricing",
     title: "Pricing",
-    desc: "Plans and allowances at a glance.",
+    desc: "Plans at a glance in plain numbers.",
     icon: Sparkles,
   },
   {
@@ -49,27 +56,26 @@ const journey = [
   {
     n: "1",
     title: "Make an account",
-    body: "Sign in to generate, track credits, and sync your gallery.",
-    img: assets.brandMark,
+    body: `Sign in to create images, see your credits, and keep your gallery in sync.`,
+    img: assets.brandDecorCloudTablet,
     bannerClass:
-      "bg-gradient-to-br from-[#140828] via-violet-950/80 to-slate-900 ring-1 ring-inset ring-white/10",
-    imgClass: "object-contain object-center p-5 sm:p-6",
+      "bg-gradient-to-br from-pastel-mist via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-cyan/35",
   },
   {
     n: "2",
-    title: `Work in ${WORKSPACE_NAME}`,
-    body: `Choose a style, describe the scene clearly, and generate your first image.`,
-    img: assets.style_realistic,
-    bannerClass: "bg-gradient-to-br from-sky-50/95 to-slate-100/90 ring-1 ring-inset ring-slate-200/60",
-    imgClass: "object-cover object-[center_40%]",
+    title: `Create in ${WORKSPACE_NAME}`,
+    body: `Choose a style, describe your scene plainly, then create your picture.`,
+    img: photos.helpJourneyStudioDesk,
+    bannerClass:
+      "bg-gradient-to-br from-[#f3eeff] via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-lilac/35",
   },
   {
     n: "3",
-    title: "Refine without spending credits",
-    body: "Refine tweaks the current frame on the same thread — not a new credit charge.",
-    img: assets.home_mascot,
-    bannerClass: "bg-gradient-to-br from-cyan-50/90 to-violet-50/70 ring-1 ring-inset ring-white/60",
-    imgClass: "object-cover object-[center_22%]",
+    title: "Polish without a full rerun",
+    body: "Use Refine for gentle fixes on the image you already have—they usually skip the heavier credit cost of starting over.",
+    img: assets.brandDecorKittenCloud,
+    bannerClass:
+      "bg-gradient-to-br from-pastel-sky/45 via-[#FBF9FF] to-[#fdf4fc] ring-1 ring-inset ring-[#F6B6E8]/35",
   },
 ];
 
@@ -78,60 +84,39 @@ const creditCards = [
     title: "Credits",
     body: (
       <>
-        ~<strong>100</strong> credits daily; new images ~<strong>10</strong> each (~<strong>10</strong>/day). Refills{" "}
-        <strong>midnight IST</strong>.
+        ~<strong>100</strong> credits every day for new pictures; each new creation is often ~<strong>10</strong> credits (so about{" "}
+        <strong>10</strong> a day fits). Credits refill around <strong>midnight India time (IST)</strong>.
       </>
     ),
     icon: Zap,
-    bg: "from-amber-50 via-white to-amber-50/40",
-    border: "border-amber-100/90",
+    bg: "from-pastel-mist via-white to-[#eaf8ff]/90",
+    border: "border-pastel-sky/50",
   },
   {
     title: "Refine",
     body: (
       <>
-        Iterations on the same thread use <strong>Refine</strong> — skips the extra per-image credit.
+        Small changes on the same picture use <strong>Refine</strong> instead of firing a pricey brand-new generation.
       </>
     ),
     icon: Sparkles,
-    bg: "from-emerald-50 via-white to-cyan-50/50",
-    border: "border-emerald-100/80",
-  },
-];
-
-const tipCards = [
-  {
-    emoji: "🎬",
-    title: "Say what you’d point a camera at",
-    text: "Concrete beats moody: “wet road, orange streetlights” > “cool vibe”.",
-    tone: "from-sky-50 to-blue-50/80",
-  },
-  {
-    emoji: "✍️",
-    title: "One fix, then the next",
-    text: "One change per refine works better than a laundry list.",
-    tone: "from-fuchsia-50 to-violet-50/70",
-  },
-  {
-    emoji: "📂",
-    title: "Gallery keeps the order",
-    text: "Threads stack versions top to bottom — easy to scan.",
-    tone: "from-lime-50 to-teal-50/70",
+    bg: "from-white via-pastel-mist to-pastel-sky/35",
+    border: "border-pastel-lilac/40",
   },
 ];
 
 const funFacts = [
   {
     emoji: "🌙",
-    text: "Daily refill at midnight IST (calendar day, not 24h from last visit).",
+    text: "Daily refill at midnight India time (calendar day—not 24 hours from your last visit).",
   },
   {
     emoji: "🧊",
-    text: `New prompt in ${WORKSPACE_NAME} = new run + credits. Refine = same thread, no extra charge.`,
+    text: `A brand-new idea in ${WORKSPACE_NAME} uses credits like a fresh picture. Refine adjusts what you already have—usually lighter.`,
   },
   {
     emoji: "✨",
-    text: "Brand-new compositions spend daily balance; same-thread refines usually don’t.",
+    text: "New scenes pull from today's allowance; polishing the same image is usually gentler on credits.",
   },
 ];
 
@@ -141,16 +126,16 @@ const faqs = [
     a: "~10 new images/day at 10 credits each from 100. Out of credits? You can still refine existing work.",
   },
   {
-    q: "When do my credits come back?",
-    a: "Midnight India time — new calendar day, fresh balance.",
+    q: "When do credits come back?",
+    a: "At midnight India time you get that day's full balance—we go by calendar days, not a rolling 24-hour clock.",
   },
   {
-    q: `What counts as refine versus hitting generate in ${WORKSPACE_NAME}?`,
-    a: `Refine = small steps on that thread. A brand-new idea in ${WORKSPACE_NAME} is a new run and spends credits.`,
+    q: `What is the difference between Refine and a new picture in ${WORKSPACE_NAME}?`,
+    a: `Refine adjusts the image you already started. Starting a totally new prompt is a fresh run and uses more credits.`,
   },
   {
-    q: "Older thumbs suddenly look broken?",
-    a: "Deploys can clear temp URLs; rows may persist. Host needs durable storage.",
+    q: "Why might an older thumbnail stop loading?",
+    a: "After some updates preview links expire. Try opening the image again—but if originals never show up, mail us via Help and we’ll dig in.",
   },
   {
     q: "Do I need to sign in?",
@@ -189,7 +174,7 @@ function FaqItem({ item, open, onToggle }) {
 }
 
 export default function Help() {
-  const [openFaq, setOpenFaq] = useState(0);
+  const [openFaq, setOpenFaq] = useState(-1);
 
   return (
     <MarketingPageShell className="pb-28 pt-6 sm:pt-8">
@@ -200,29 +185,30 @@ export default function Help() {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="relative grid gap-6 rounded-[1.65rem] border border-white/65 bg-white/60 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-xl sm:grid-cols-[1.08fr_minmax(0,0.95fr)] sm:items-center sm:gap-8 sm:p-8"
+        className="relative grid gap-6 overflow-hidden rounded-[1.65rem] border border-pastel-cyan/40 bg-white/72 p-5 shadow-[0_28px_64px_-42px_rgba(111,203,255,0.45)] backdrop-blur-xl sm:grid-cols-[1.08fr_minmax(0,0.95fr)] sm:items-center sm:gap-8 sm:p-8"
       >
-        <div>
-          <p className="font-display inline-flex items-center gap-2 rounded-full border border-cyan-200/70 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-600">
+        <HeroDecorBleed />
+        <div className="relative z-[1]">
+          <p className="font-display inline-flex items-center gap-2 rounded-full border border-pastel-cyan/45 bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-600">
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden /> Help
           </p>
           <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
           <p className="type-body mt-2 max-w-lg sm:mt-3">
-            Credits, daily limits, refinements, IST clocks, and where to message a human if something looks off.
+            Credits, daily limits, the difference between a new picture and a quick polish—and how to reach a real human if something looks wrong.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link
               to="/studio"
-              className="inline-flex rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-slate-800"
+              className="btn-primary inline-flex rounded-full px-6 py-2.5 text-sm shadow-lg transition hover:-translate-y-0.5"
               title={`Open ${WORKSPACE_NAME}`}
             >
               Open {WORKSPACE_NAME}
             </Link>
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-400 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35"
+              className="group inline-flex items-center gap-2 rounded-full border border-pastel-cyan/45 bg-white/95 px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-pastel-lavender/55 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/35"
             >
-              <MessageCircleHeart className="h-4 w-4 shrink-0 text-rose-400 transition group-hover:scale-[1.05]" aria-hidden />
+              <MessageCircleHeart className="h-4 w-4 shrink-0 text-pastel-lilac transition group-hover:scale-[1.05]" aria-hidden />
               Message us
             </a>
           </div>
@@ -232,7 +218,7 @@ export default function Help() {
                 key={t.label}
                 to={`/studio?style=${encodeURIComponent(t.studioStyle)}`}
                 title={`Open ${WORKSPACE_NAME} with ${t.label} selected`}
-                className="group relative shrink-0 overflow-hidden rounded-2xl border border-slate-200/85 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md"
+                className="group relative shrink-0 overflow-hidden rounded-2xl border border-pastel-cyan/30 bg-white shadow-sm transition hover:border-pastel-sky hover:shadow-md"
               >
                 <img
                   src={t.img}
@@ -247,7 +233,7 @@ export default function Help() {
             ))}
           </div>
         </div>
-        <div className="relative flex justify-center sm:justify-end">
+        <div className="relative z-[1] flex justify-center sm:justify-end">
           <div className="flex w-full max-w-[min(100%,300px)] flex-col items-stretch sm:max-w-none">
             <motion.div
               animate={{ y: [0, -6, 0] }}
@@ -255,15 +241,15 @@ export default function Help() {
               className="relative mx-auto w-full sm:ml-auto sm:mr-0 sm:w-auto"
             >
               <img
-                src={assets.home_mascot}
-                alt="Pixorify mascot juggling pixels"
-                className="mx-auto max-h-[220px] w-auto max-w-full rounded-[1.5rem] object-contain shadow-2xl ring-6 ring-white/80 sm:max-h-[260px]"
+                src={assets.brandDecorCloudTablet}
+                alt="Pixorify character sketching glowing ideas"
+                className="mx-auto max-h-[220px] w-auto max-w-full rounded-[1.5rem] object-contain shadow-2xl ring-6 ring-white/95 sm:max-h-[260px]"
               />
             </motion.div>
             <a
               href="#contact"
               aria-label="Jump to the message form at the bottom of this page"
-              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-xl bg-slate-900 px-5 py-2.5 text-center text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/35"
+              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#6FCBFF] via-[#8FD8FF] to-[#B79CFF]/90 px-5 py-2.5 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-md shadow-pastel-cyan/35 transition hover:brightness-[1.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/45 sm:text-xs sm:tracking-[0.14em]"
             >
               Someone actually reads messages
             </a>
@@ -276,7 +262,7 @@ export default function Help() {
         <div className="flex flex-wrap items-end justify-between gap-3 px-1">
           <div>
             <p className="type-eyebrow-muted">Quick links</p>
-            <h2 className="type-subsection-title mt-1">Jump</h2>
+            <h2 className="type-subsection-title mt-1">Shortcuts</h2>
           </div>
         </div>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
@@ -292,9 +278,9 @@ export default function Help() {
               >
                 <Link
                   to={link.to}
-                  className="marketing-surface-hover group relative flex gap-3 rounded-2xl border border-slate-200/85 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-card"
+                  className="marketing-surface-hover group relative flex gap-3 rounded-2xl border border-pastel-cyan/25 bg-white p-4 shadow-sm transition hover:border-pastel-sky hover:shadow-card"
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-slate-200/80 bg-slate-50 text-slate-700 transition group-hover:bg-white">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-pastel-cyan/35 bg-pastel-mist/70 text-slate-700 transition group-hover:bg-white">
                     <Icon className="h-6 w-6" strokeWidth={2} />
                   </span>
                   <span className="min-w-0">
@@ -320,17 +306,13 @@ export default function Help() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.06 * i }}
-              className="flex flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/85 bg-white/88 shadow-[0_22px_50px_-32px_rgba(15,23,42,0.45)]"
+              className="flex flex-col overflow-hidden rounded-[1.5rem] border border-pastel-cyan/28 bg-white/90 shadow-[0_26px_60px_-40px_rgba(111,203,255,0.38)]"
             >
               <div
-                className={`relative h-[7.5rem] overflow-hidden sm:h-[8.5rem] ${step.bannerClass ?? "bg-slate-100"}`}
+                className={`relative flex h-[7.5rem] items-center justify-center p-3 sm:h-[8.5rem] sm:p-3.5 ${step.bannerClass ?? "bg-slate-100"}`}
               >
-                <img
-                  src={step.img}
-                  alt=""
-                  className={`h-full w-full ${step.imgClass ?? "object-cover object-center"}`}
-                />
-                <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-[13px] font-black text-white ring-4 ring-white/90">
+                <img src={step.img} alt="" className={JOURNEY_IMG} draggable={false} />
+                <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6FCBFF] to-[#8FD8FF] text-[13px] font-black text-white shadow-sm ring-2 ring-white/95">
                   {step.n}
                 </span>
               </div>
@@ -379,7 +361,7 @@ export default function Help() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.05 * i }}
-              className="type-body-tight inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/88 px-2.5 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs"
+              className="type-body-tight inline-flex items-center gap-2 rounded-full border border-pastel-cyan/30 bg-white/92 px-2.5 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm sm:text-xs"
             >
               <span className="text-base leading-none">{f.emoji}</span>
               <span>{f.text}</span>
@@ -397,22 +379,7 @@ export default function Help() {
             <h2 className="type-subsection-title mt-0.5">Tips</h2>
           </div>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {tipCards.map((tip, idx) => (
-            <motion.div
-              key={tip.title}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.05 * idx }}
-              className={`rounded-[1.25rem] border border-white/85 bg-gradient-to-br ${tip.tone} p-5 shadow-md ring-1 ring-slate-200/65`}
-            >
-              <span className="text-2xl">{tip.emoji}</span>
-              <h3 className="type-tile-title mt-3">{tip.title}</h3>
-              <p className="type-body mt-1.5 text-slate-700">{tip.text}</p>
-            </motion.div>
-          ))}
-        </div>
+        <TipBrandCardGrid />
       </section>
 
       {/* FAQ */}
@@ -434,9 +401,9 @@ export default function Help() {
       </section>
 
       {/* Email */}
-      <section className="relative mt-11 flex flex-wrap items-center justify-between gap-4 rounded-[1.25rem] border border-sky-100/90 bg-gradient-to-r from-white via-sky-50/50 to-white p-5 shadow-inner">
+      <section className="relative mt-11 flex flex-wrap items-center justify-between gap-4 rounded-[1.25rem] border border-pastel-cyan/35 bg-gradient-to-r from-white via-[#eaf8ff]/85 to-white p-5 shadow-inner">
         <div className="flex items-start gap-4">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow ring-1 ring-sky-200/70">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow ring-1 ring-pastel-cyan/45">
             <Mail className="h-6 w-6 text-brand-cyan" strokeWidth={2} />
           </span>
           <div>

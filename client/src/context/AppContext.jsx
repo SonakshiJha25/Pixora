@@ -89,19 +89,29 @@ const AppContextProvider = ({ children }) => {
         nextResetAtIso: nextIso,
       });
     } catch (error) {
-      // 401 is handled by the axios interceptor as well; never clear the session on network/5xx.
-      if (error?.response?.status === 401) logout();
+      const status = error?.response?.status;
+      const code = error?.response?.data?.error?.code;
+      if (status === 401) logout();
+      if (status === 503 && code === "DATABASE_UNAVAILABLE") {
+        console.error(
+          "[Pixorify] Cannot sync credits — MongoDB is not connected on the server. Check server/.env MONGODB_URI."
+        );
+      } else if (!error?.response) {
+        console.error("[Pixorify] Cannot reach API for credit sync — is the backend running?");
+      }
     }
   }, [api, logout]);
 
   const scheduleRef = useRef(dailyCreditSchedule);
   scheduleRef.current = dailyCreditSchedule;
+  const creditRef = useRef(credit);
+  creditRef.current = credit;
 
   /**
-   * After API `dailyCreditResetAt` passes (`nextResetAtIso`), repeatedly GET `/api/user/credits`;
-   * balance only updates from response — never from client rollover math.
+   * After IST midnight (`nextResetAtIso` from API), poll `/api/user/credits` until the server
+   * refills the pool (rollover runs on that endpoint, not in the browser).
    */
-  const rolloverPrefetchRef = useRef({ iso: null, attempts: 0 });
+  const rolloverPrefetchRef = useRef({ iso: null, attempts: 0, lastCredit: null });
   const ROLLOVER_POLL_MS = 2000;
   const ROLLOVER_MAX_ATTEMPTS = 90;
 
@@ -110,17 +120,28 @@ const AppContextProvider = ({ children }) => {
 
     const tick = () => {
       const iso = scheduleRef.current?.nextResetAtIso;
-      if (!iso || typeof iso !== "string") return;
+      if (!iso || typeof iso !== "string") {
+        if (creditRef.current === 0) fetchUserData();
+        return;
+      }
       const resetMs = Date.parse(iso);
       if (!Number.isFinite(resetMs)) return;
 
       const now = Date.now();
-      if (rolloverPrefetchRef.current.iso !== iso) {
-        rolloverPrefetchRef.current = { iso, attempts: 0 };
-      }
       const st = rolloverPrefetchRef.current;
-      if (now >= resetMs && st.attempts < ROLLOVER_MAX_ATTEMPTS) {
-        st.attempts += 1;
+      if (st.iso !== iso || st.lastCredit !== creditRef.current) {
+        rolloverPrefetchRef.current = {
+          iso,
+          attempts: creditRef.current >= 10 && now < resetMs ? 0 : st.attempts,
+          lastCredit: creditRef.current,
+        };
+      }
+      const state = rolloverPrefetchRef.current;
+      const pastReset = now >= resetMs;
+      const stillDepleted = creditRef.current < 10;
+
+      if (pastReset && state.attempts < ROLLOVER_MAX_ATTEMPTS && (stillDepleted || state.attempts === 0)) {
+        state.attempts += 1;
         fetchUserData();
       }
     };
@@ -128,7 +149,7 @@ const AppContextProvider = ({ children }) => {
     tick();
     const id = window.setInterval(tick, ROLLOVER_POLL_MS);
     return () => window.clearInterval(id);
-  }, [token, fetchUserData]);
+  }, [token, fetchUserData, credit]);
 
   const fetchHistory = useCallback(async (opts = {}) => {
     const silent = opts.silent === true;

@@ -1,0 +1,11 @@
+Pixorify marketing — Quick tips imagery (canonical copies for carousel + Help tips)
+
+Files:
+- tip-prompt-camera-scene.png  — celestial kitten / clouds (prompts & scene specificity)
+- tip-refine-single-step.png   — cloud character + tablet ribbon art (single-step refine)
+- tip-creative-studio.png      — bunny artist at easel (optional extra slide / brand consistency)
+- tip-gallery-timeline.png   — mascot cloud holding star (gallery version order)
+
+Source art before rename: branding/decor-*.png + assets/pixorify-mascot-cloud.png.
+
+If Cursor drops a PNG into chat, paste it here as tip-user-banner.png (or similar) then import inside src/content/tipsCarousel.js.

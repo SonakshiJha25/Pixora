@@ -53,10 +53,10 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
         <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
           <div>
             <h2 id="gallery-thread-modal-title" className="text-lg font-bold text-slate-900">
-              This thread
+              Version history
             </h2>
             <p className="text-xs text-slate-500">
-              Top to bottom: what you generated first, then each refine along the same idea.
+              Your first image is at the top, with each later edit listed down the page.
             </p>
           </div>
           <button
@@ -75,7 +75,7 @@ export default function GalleryThreadModal({ open, imageId, api, onClose }) {
             </div>
           ) : error ? (
             <p className="py-10 text-center text-sm text-slate-600">
-              Couldn&apos;t load versions for this thread. Check your connection or try again in a bit.
+              Couldn&apos;t load these versions. Check your connection or try again in a bit.
             </p>
           ) : thread.length === 0 ? (
             <p className="py-10 text-center text-sm text-slate-500">

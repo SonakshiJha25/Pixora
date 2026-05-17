@@ -38,7 +38,12 @@ app.use(
   })
 );
 
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+];
 if (process.env.ALLOWED_ORIGINS) {
   for (const origin of process.env.ALLOWED_ORIGINS.split(",")) {
     const trimmed = origin.trim();

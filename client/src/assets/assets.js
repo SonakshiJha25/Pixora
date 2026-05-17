@@ -1,52 +1,29 @@
 /**
- * Remote mood imagery — soft, positive Unsplash photography (no bundled style PNGs).
- * Tiles stay on-brand: minimal, serene, pastel, cozy — never grim or “monster” energy.
+ * App asset registry — raster PNGs from repo `photos/` via `lib/photos.js`;
+ * SVG UI icons under `src/images/icons/`.
  */
 
-import brandMark from "./pixorify-brand-mark.png";
-import logo_icon from "./logo_icon.svg";
-import facebook_icon from "./facebook_icon.svg";
-import instagram_icon from "./instagram_icon.svg";
-import twitter_x_icon from "./twitter_x_icon.svg";
-import discord_icon from "./discord_icon.svg";
-import avatarDefault from "./avatar-default.svg";
-import star_icon from "./star_icon.svg";
-import rating_star from "./rating_star.svg";
-import step_icon_1 from "./step_icon_1.svg";
-import step_icon_2 from "./step_icon_2.svg";
-import email_icon from "./email_icon.svg";
-import lock_icon from "./lock_icon.svg";
-import cross_icon from "./cross_icon.svg";
-import star_group from "./star_group.png";
-import credit_star from "./credit_star.svg";
-import profile_icon from "./profile_icon.png";
-
-const IMG = {
-  style_minimal:
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=960&q=88",
-  style_realistic:
-    "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=960&q=88",
-  style_anime:
-    "https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=960&q=88",
-  /** Soft pastel gradient — evokes glow / digital mood without noir city grit */
-  style_cyberpunk:
-    "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=960&q=88",
-  style_fantasy:
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=960&q=88",
-  sample_img_1:
-    "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=960&q=88",
-  sample_img_2:
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=960&q=88",
-  home_mascot:
-    "https://images.unsplash.com/photo-1484480974693-6ca894a757d5?auto=format&fit=crop&w=960&q=88",
-  profile_img_1:
-    "https://images.unsplash.com/photo-1544005313-94ddf0286ad2?auto=format&fit=crop&w=280&h=280&q=88&crop=faces",
-  profile_img_2:
-    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=280&h=280&q=88&crop=faces",
-};
+import { photos } from "../lib/photos.js";
+import logo_icon from "../images/icons/logo_icon.svg";
+import facebook_icon from "../images/icons/facebook_icon.svg";
+import instagram_icon from "../images/icons/instagram_icon.svg";
+import twitter_x_icon from "../images/icons/twitter_x_icon.svg";
+import discord_icon from "../images/icons/discord_icon.svg";
+import avatarDefault from "../images/icons/avatar-default.svg";
+import star_icon from "../images/icons/star_icon.svg";
+import rating_star from "../images/icons/rating_star.svg";
+import step_icon_1 from "../images/icons/step_icon_1.svg";
+import step_icon_2 from "../images/icons/step_icon_2.svg";
+import email_icon from "../images/icons/email_icon.svg";
+import lock_icon from "../images/icons/lock_icon.svg";
+import cross_icon from "../images/icons/cross_icon.svg";
+import credit_star from "../images/icons/credit_star.svg";
 
 export const assets = {
-  brandMark,
+  brandMark: photos.brandMark,
+  brandDecorCloudTablet: photos.decorCloudTablet,
+  brandDecorKittenCloud: photos.decorKittenCloud,
+  brandDecorBunnyArtist: photos.decorBunnyArtist,
   logo_icon,
   facebook_icon,
   instagram_icon,
@@ -55,65 +32,68 @@ export const assets = {
   avatarDefault,
   star_icon,
   rating_star,
-  sample_img_1: IMG.sample_img_1,
-  sample_img_2: IMG.sample_img_2,
+  sample_img_1: photos.tipPromptCamera,
+  sample_img_2: photos.helpJourneyStudioDesk,
   email_icon,
   lock_icon,
   cross_icon,
-  star_group,
+  star_group: photos.starGroup,
   credit_star,
-  profile_icon,
-  style_realistic: IMG.style_realistic,
-  style_anime: IMG.style_anime,
-  style_cyberpunk: IMG.style_cyberpunk,
-  style_fantasy: IMG.style_fantasy,
-  style_minimal: IMG.style_minimal,
-  home_mascot: IMG.home_mascot,
-  profile_img_1: IMG.profile_img_1,
-  profile_img_2: IMG.profile_img_2,
+  profile_icon: photos.profileIcon,
+  style_realistic: photos.styleRealistic,
+  style_anime: photos.styleAnime,
+  style_cyberpunk: photos.styleCyberpunk,
+  style_fantasy: photos.styleFantasy,
+  style_minimal: photos.styleMinimal,
+  home_flow_refine: photos.tipRefineStep,
+  home_mascot: photos.pixorifyMascotCloud,
+  profile_img_1: photos.profileIcon,
+  profile_img_2: photos.decorBunnyArtist,
+  profile_img_3: photos.decorKittenCloud,
 };
 
 export const stepsData = [
   {
     title: "Describe the scene",
     description:
-      "Mention who is in frame, the light, and the palette — a few concrete beats over one vague adjective every time.",
+      "Start with the subject and the setting: who or what is in frame, where they are, and what the light is doing (window light, golden hour, soft studio). Mention colors and lens feel when it matters—“warm tans and deep blues” beats “nice colors.” Pixorify works best when you describe what a camera could see rather than repeating a mood adjective.",
     icon: step_icon_1,
   },
   {
-    title: "Style + generate",
+    title: "Pick a style & go",
     description:
-      "Lock a look (realistic, anime, cyberpunk, and the rest) before you hit go. Further polish lives in Refine on that same thread.",
+      "Choose realistic, anime, cyberpunk, fantasy, or minimal before you hit create—each tilts shadows, edges, and detail level so results match how you imagined the genre. First runs use your daily credits; after that, Refine tweaks the picture you already have for smaller, gentler edits so you rarely need to pay the full price of starting over.",
     icon: step_icon_2,
   },
   {
-    title: "Save what works",
-    description: "Download PNGs, star favourites, or reopen a thread when you think of the next micro-tweak.",
+    title: "Save what you love",
+    description:
+      "Download PNGs anytime, favourite versions in My gallery so the best thumbnails stay sorted, or sign in across devices so your drafts follow you. Every thread keeps versions in chronological order—you can always scroll backward to recover an older look.",
     icon: credit_star,
   },
 ];
 
 export const testimonialsData = [
   {
-    image: IMG.profile_img_1,
+    image: photos.profileIcon,
     name: "Maya Lin",
     role: "Designer",
     stars: 5,
-    text: `Pixorify fits how I work — quick first frames, then gentle refinements without starting from scratch every time.`,
+    text: `Pixorify fits how I work — quick first drafts, then gentle edits without redoing everything from zero.`,
   },
   {
-    image: IMG.profile_img_2,
+    image: photos.decorBunnyArtist,
     name: "Jordan Cole",
     role: "Content creator",
     stars: 4,
-    text: `The studio feels calm. Credits are clear, and the gallery keeps threads tidy when you're experimenting.`,
+    text: `The studio feels calm. Credits make sense to me, and my gallery stays organised when I'm trying ideas.`,
   },
   {
-    image: IMG.profile_img_1,
-    name: "Maya Lin",
-    role: "Designer",
+    image: photos.decorKittenCloud,
+    name: "Priya Nair",
+    role: "Freelance art director",
     stars: 5,
-    text: `IST resets and same-thread edits mean I spend time on taste, not on fighting the UI.`,
+    text: `Simple daily credit refresh and edits on the same picture mean I focus on creativity, not the controls.`,
   },
 ];
 

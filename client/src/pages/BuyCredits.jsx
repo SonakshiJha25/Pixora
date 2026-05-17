@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import BrandLogo from "../components/BrandLogo.jsx";
+import { Sparkles } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { motion } from "motion/react";
 import { toast } from "sonner";
@@ -59,7 +59,7 @@ export default function BuyCredits() {
           <div className="p-4 text-center">
             <p className="type-tile-title mb-px">Free</p>
             <p className="type-meta">$0 / mo</p>
-            <BrandLogo variant="inline" alt="" className="mx-auto mt-2 opacity-40" />
+            <Sparkles className="mx-auto mt-2 h-7 w-7 text-slate-300" strokeWidth={1.75} aria-hidden />
           </div>
         </div>
         <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
@@ -67,7 +67,7 @@ export default function BuyCredits() {
           <div className="p-4 text-center">
             <p className="type-tile-title mb-px">Pro</p>
             <p className="type-meta">$9 / mo (placeholder)</p>
-            <BrandLogo variant="inline" alt="" className="mx-auto mt-2" />
+            <Sparkles className="mx-auto mt-2 h-7 w-7 text-cyan-500/80" strokeWidth={1.75} aria-hidden />
           </div>
         </div>
       </div>

@@ -1,4 +1,7 @@
 import axios from "axios";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import Image from "../models/Image.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
@@ -9,6 +12,64 @@ import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { collectThreadFromAnyNode } from "../utils/imageThread.js";
 import { runImageRefinement } from "../services/refinementService.js";
 import { logInfo } from "../utils/logger.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
+
+async function loadImageBytesForDownload(storedUrl, req) {
+  const absolute = absoluteImageUrl(storedUrl, req);
+  if (!absolute || typeof absolute !== "string") {
+    throw new AppError("Invalid image URL", 400, "VALIDATION_ERROR");
+  }
+
+  if (/^https?:\/\//i.test(absolute)) {
+    try {
+      const resp = await axios.get(absolute, {
+        responseType: "arraybuffer",
+        timeout: 120_000,
+        maxContentLength: 25 * 1024 * 1024,
+      });
+      return {
+        buffer: Buffer.from(resp.data),
+        type: resp.headers["content-type"] || "image/png",
+      };
+    } catch (err) {
+      throw new AppError("Could not fetch image file for download", 502, "IMAGE_DOWNLOAD_FAILED");
+    }
+  }
+
+  const rel = absolute.startsWith("/") ? absolute : `/${absolute}`;
+  if (rel.startsWith("/generated/")) {
+    const filePath = path.join(GENERATED_DIR, path.basename(rel));
+    if (!fs.existsSync(filePath)) {
+      throw new AppError("Image file missing on server", 404, "IMAGE_FILE_NOT_FOUND");
+    }
+    return { buffer: fs.readFileSync(filePath), type: "image/png" };
+  }
+
+  throw new AppError("Unsupported image storage path", 400, "VALIDATION_ERROR");
+}
+
+/** GET /api/images/:imageId/download — attachment PNG (Cloudinary-safe). */
+export const downloadImageFile = asyncHandler(async (req, res) => {
+  const image = await Image.findOne({
+    _id: req.params.imageId,
+    userId: req.user.id,
+    deletedAt: null,
+  });
+  if (!image) {
+    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
+  }
+
+  const { buffer, type } = await loadImageBytesForDownload(image.imageUrl, req);
+  const safeName = `pixorify-${image._id}.png`;
+
+  res.setHeader("Content-Type", type.split(";")[0] || "image/png");
+  res.setHeader("Content-Disposition", `attachment; filename="${safeName}"`);
+  res.setHeader("Content-Length", String(buffer.length));
+  res.setHeader("Cache-Control", "private, no-store");
+  return res.send(buffer);
+});
 
 export const generateImage = asyncHandler(async (req, res) => {
   if (Boolean(req.body?.isRefinement)) {

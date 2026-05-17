@@ -4,13 +4,13 @@ import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 
 const FEATURES = [
-  { label: "Daily credits", free: "100", pro: "1,000" },
-  { label: "New images / day (at 10 cr. each)", free: "~10", pro: "~100" },
-  { label: "Credits per fresh image", free: "10", pro: "10" },
+  { label: "Credits per day", free: "100", pro: "1,000" },
+  { label: "Roughly how many brand-new pictures / day", free: "~10", pro: "~100" },
+  { label: "Credits per new picture", free: "10", pro: "10" },
   { label: "Output size", free: "Standard", pro: "HD (1024px+)" },
-  { label: "When the queue backs up", free: "Regular", pro: "Priority" },
+  { label: "When lots of people are creating", free: "Standard wait", pro: "Priority queue" },
   { label: "Client / commercial use", free: "Personal", pro: "Allowed (see terms)" },
-  { label: "Gallery & threads", free: "Yes", pro: "Yes" },
+  { label: "Gallery saved work", free: "Yes", pro: "Yes" },
   { label: "Styles", free: "All", pro: "All" },
   { label: "If you’re stuck", free: "Community + Help", pro: "Email-first" },
 ];
@@ -29,11 +29,11 @@ export default function PricingPro() {
         >
           <p className="type-eyebrow-muted">Pixorify Pro</p>
           <h1 className="type-page-title mt-2">
-            Free beside Pro — no mystery columns
+            Free and Pro, side by side
           </h1>
           <p className="type-body mx-auto mt-3 max-w-xl">
-            Same product, bigger daily budget. Billing isn&apos;t switched on yet; the table&apos;s here so you know what
-            you&apos;re walking into later.
+            Same app—Pro just gives you more credits each day. Billing isn&apos;t live yet; this table is here so you know
+            what to expect when it is.
           </p>
         </motion.div>
 
@@ -89,13 +89,13 @@ export default function PricingPro() {
             to="/pricing"
             className="type-link-muted"
           >
-            ← Simpler plan view
+            ← Simpler pricing page
           </Link>
           <Link
             to="/help"
             className="text-xs font-medium text-slate-500 underline-offset-4 hover:text-slate-700 hover:underline"
           >
-            Credit FAQ on Help
+            Credit answers in Help
           </Link>
         </div>
 
@@ -133,10 +133,10 @@ export default function PricingPro() {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <h2 className="type-section-accent mt-5">Checkout isn&apos;t live yet</h2>
+              <h2 className="type-section-accent mt-5">Payments aren&apos;t live yet</h2>
               <p className="type-body mt-3">
-                We&apos;re finishing payments and receipts. Until then your free tier is the full playground — poke
-                around, break things, tell us what you need.
+                We&apos;re finishing checkout and receipts. Until then the free tier is the full experience—please try things
+                out and tell us what you&apos;d pay for later.
               </p>
               <button
                 type="button"

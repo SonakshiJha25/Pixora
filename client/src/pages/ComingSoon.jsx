@@ -1,7 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useLayoutEffect, useMemo } from "react";
 import { motion } from "motion/react";
-import { assets } from "../assets/assets";
 import { SITE } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
@@ -59,12 +58,7 @@ export default function ComingSoon() {
       transition={{ duration: 0.45 }}
       className="flex w-full max-w-lg flex-col items-center px-4 pb-24 pt-16 text-center"
     >
-      <img
-        src={assets.brandMark}
-        alt="Pixorify"
-        className="h-14 w-14 rounded-2xl object-cover opacity-90"
-      />
-      <p className="type-eyebrow-brand mt-6">{SITE.name}</p>
+      <p className="type-eyebrow-brand">{SITE.name}</p>
       {variant ? (
         <p className="type-eyebrow-muted mt-3">{CHANNEL_LABEL[variant.channel]}</p>
       ) : null}

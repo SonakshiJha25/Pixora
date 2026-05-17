@@ -24,9 +24,11 @@ export default function LimitReachedModal({ open, onClose, dailyResetTimezone })
   const tzPhrase =
     dailyResetTimezone === "UTC" || dailyResetTimezone === "Etc/UTC"
       ? "midnight UTC"
+      : dailyResetTimezone === "IST" || dailyResetTimezone === "Asia/Kolkata"
+        ? "midnight India time"
       : dailyResetTimezone
         ? `midnight (${dailyResetTimezone})`
-        : "midnight (IST)";
+        : "midnight India time";
 
   return (
     <div

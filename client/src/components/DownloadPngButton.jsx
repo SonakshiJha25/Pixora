@@ -1,0 +1,46 @@
+import { useState } from "react";
+import { downloadPixorifyImage } from "../lib/downloadImage.js";
+
+/**
+ * @param {object} props
+ * @param {string} [props.imageId]
+ * @param {string} [props.imageUrl]
+ * @param {string} [props.filename]
+ * @param {string} [props.className]
+ * @param {React.ReactNode} [props.children]
+ * @param {boolean} [props.disabled]
+ */
+export default function DownloadPngButton({
+  imageId,
+  imageUrl,
+  filename,
+  className = "",
+  children = "Download PNG",
+  disabled = false,
+}) {
+  const [busy, setBusy] = useState(false);
+  const canDownload = Boolean(imageId || imageUrl);
+
+  const onClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (busy || disabled || !canDownload) return;
+    setBusy(true);
+    try {
+      await downloadPixorifyImage({ imageId, imageUrl, filename });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || busy || !canDownload}
+      className={className}
+    >
+      {busy ? "Saving…" : children}
+    </button>
+  );
+}

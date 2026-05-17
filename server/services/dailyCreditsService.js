@@ -1,9 +1,14 @@
 import { logInfo } from "../utils/logger.js";
 
+async function getUserModel() {
+  const { default: User } = await import("../models/User.js");
+  return User;
+}
+
 export const DAILY_CREDITS = 100;
 export const CREDITS_PER_IMAGE = 10;
 const DAY_MS = 86400000;
-/** India Standard Time = UTC+5:30 (no DST). Daily reset at IST midnight only. */
+/** India Standard Time = UTC+5:30 (no DST). Daily reset at 00:00 IST only. */
 const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
 
 const IST_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -51,7 +56,7 @@ function formatCreditLogUser(user) {
 }
 
 /**
- * Pure IST midnight rollover: compare stored `lastCreditResetDate` to today's IST date.
+ * IST 00:00 rollover — if stored date is not today's IST date → credits = 100.
  * @returns {{ credits: number, lastCreditResetDate: string, didReset: boolean, initialized: boolean, creditsBefore?: number }}
  */
 export function evaluateIstDailyCreditReset(
@@ -64,24 +69,15 @@ export function evaluateIstDailyCreditReset(
   const stored =
     typeof lastCreditResetDate === "string" ? lastCreditResetDate.trim() : "";
 
-  if (!isValidIstDateString(stored)) {
-    return {
-      credits,
-      lastCreditResetDate: todayIst,
-      didReset: false,
-      initialized: true,
-    };
-  }
-
-  if (stored !== todayIst) {
+  if (!isValidIstDateString(stored) || stored !== todayIst) {
     const creditsBefore = credits;
-    credits = DAILY_CREDITS;
+    const isNewDay = isValidIstDateString(stored) && stored !== todayIst;
     return {
-      credits,
+      credits: DAILY_CREDITS,
       lastCreditResetDate: todayIst,
       didReset: true,
-      initialized: false,
-      creditsBefore,
+      initialized: !isValidIstDateString(stored),
+      creditsBefore: isNewDay || !isValidIstDateString(stored) ? creditsBefore : undefined,
     };
   }
 
@@ -97,6 +93,8 @@ export function evaluateIstDailyCreditReset(
  * IST calendar-day rollover in MongoDB. Source of truth: `lastCreditResetDate` (`YYYY-MM-DD`).
  */
 export async function ensureDailyCredits(user, { session } = {}) {
+  if (!user?._id) return snapCreditsToLedger(user?.credits);
+
   const saveOpts = session ? { session } : {};
   const nowMs = Date.now();
   const userIdShort = user?._id != null ? String(user._id) : "?";
@@ -105,41 +103,51 @@ export async function ensureDailyCredits(user, { session } = {}) {
   const storedBefore = user.lastCreditResetDate ?? null;
   const creditsBefore = snapCreditsToLedger(user.credits);
 
-  console.log("[Credits] check user", userIdShort, who);
-  console.log("[Credits] current IST date:", todayIst);
-  console.log("[Credits] stored reset date:", storedBefore ?? "(none)");
-  console.log("[Credits] credits before reset:", creditsBefore);
-
   const outcome = evaluateIstDailyCreditReset(user.credits, user.lastCreditResetDate, nowMs);
 
-  user.credits = outcome.credits;
-  user.lastCreditResetDate = outcome.lastCreditResetDate;
-
+  const snapped = snapCreditsToLedger(outcome.credits);
   const dirty =
     outcome.didReset ||
     outcome.initialized ||
-    creditsBefore !== outcome.credits ||
+    creditsBefore !== snapped ||
     storedBefore !== outcome.lastCreditResetDate;
 
   if (outcome.didReset) {
-    console.log("[Credits] credits after reset:", user.credits);
     logInfo(
-      `[Credit Reset IST midnight]\nUser: ${who}\nIST today: ${todayIst}\nStored date was: ${storedBefore}\nOld Credits: ${outcome.creditsBefore}\nNew Credits: ${user.credits}`
+      `[Credit Reset IST 00:00]\nUser: ${who}\nIST today: ${todayIst}\nStored date was: ${storedBefore ?? "(none)"}\nOld credits: ${outcome.creditsBefore ?? creditsBefore}\nNew credits: ${snapped}`
     );
-  } else if (outcome.initialized) {
-    console.log("[Credits] initialized lastCreditResetDate:", user.lastCreditResetDate);
-    console.log("[Credits] credits after init (unchanged):", user.credits);
-  } else {
-    console.log("[Credits] no reset — same IST day");
-    console.log("[Credits] credits after check:", user.credits);
   }
 
   if (dirty) {
-    await user.save(saveOpts);
+    const User = await getUserModel();
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { credits: snapped, lastCreditResetDate: outcome.lastCreditResetDate } },
+      saveOpts
+    );
+    user.credits = snapped;
+    user.lastCreditResetDate = outcome.lastCreditResetDate;
+  } else {
+    user.credits = snapped;
   }
 
-  user.credits = snapCreditsToLedger(user.credits);
   return user.credits;
+}
+
+/**
+ * On API startup: anyone whose `lastCreditResetDate` is not today (IST) gets 100 credits.
+ */
+export async function refillStaleCreditPoolsForToday() {
+  const User = await getUserModel();
+  const todayIst = getIstDateString();
+  const result = await User.updateMany(
+    { lastCreditResetDate: { $ne: todayIst } },
+    { $set: { credits: DAILY_CREDITS, lastCreditResetDate: todayIst } }
+  );
+  if (result.modifiedCount > 0) {
+    logInfo(`[Credits] IST 00:00 bulk refill: ${result.modifiedCount} user(s) → ${DAILY_CREDITS} credits`);
+  }
+  return result.modifiedCount;
 }
 
 export function getDailyCreditLimit() {

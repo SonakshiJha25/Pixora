@@ -1,12 +1,18 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BrandLogo from "./BrandLogo.jsx";
-import { assets } from "../assets/assets";
 import { SITE, CLIPDROP_ATTRIBUTION } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
+/** Matches `NavBar` inner rail so logo + links line up with the header. */
+const FOOTER_INNER =
+  "mx-auto w-full max-w-[min(132rem,calc(100%-1.5rem))] px-4 sm:px-5 lg:px-8 xl:px-11 2xl:px-14";
+
+const sep = <span className="shrink-0 select-none text-slate-300" aria-hidden>·</span>;
+
+const link = "shrink-0 font-medium text-slate-600 underline-offset-4 transition hover:text-slate-900 hover:underline";
+
 export default function Footer() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const goHomeTop = () => {
     navigate({ pathname: "/", hash: "", search: "" });
@@ -16,104 +22,50 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-auto border-t border-slate-200/80 bg-white py-5">
-      <div className="mx-auto flex w-full flex-col items-stretch justify-between gap-4 px-1 sm:flex-row sm:items-center sm:gap-4 sm:px-0">
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start sm:gap-2.5">
-          {[
-            {
-              channel: "facebook",
-              label: "Facebook",
-              icon: assets.facebook_icon,
-              outer: "bg-slate-900",
-              invert: true,
-            },
-            {
-              channel: "twitter",
-              label: "X",
-              icon: assets.twitter_x_icon,
-              outer: "bg-slate-900",
-              invert: true,
-            },
-            {
-              channel: "instagram",
-              label: "Instagram",
-              icon: assets.instagram_icon,
-              outer: "bg-slate-900",
-              invert: true,
-            },
-            {
-              channel: "discord",
-              label: "Discord",
-              icon: assets.discord_icon,
-              outer: "bg-[#5865F2]",
-              invert: false,
-            },
-          ].map((s) => (
-            <Link
-              key={s.channel}
-              to={`/coming-soon?channel=${encodeURIComponent(s.channel)}`}
-              onClick={(e) => {
-                const params = new URLSearchParams(location.search);
-                const current = params.get("channel")?.toLowerCase() ?? "";
-                if (
-                  location.pathname === "/coming-soon" &&
-                  current === s.channel.toLowerCase()
-                ) {
-                  e.preventDefault();
-                  window.location.reload();
-                }
-              }}
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${s.outer} shadow-sm transition hover:opacity-90`}
-              aria-label={`${s.label} — coming soon`}
-            >
-              <span className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-white/10">
-                <img
-                  src={s.icon}
-                  alt=""
-                  className={
-                    s.invert
-                      ? "h-[18px] w-[18px] brightness-0 invert contrast-125"
-                      : "h-[18px] w-[18px]"
-                  }
-                />
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex flex-1 flex-col items-center sm:items-end sm:text-right">
+    <footer className="mt-auto w-full border-t border-pastel-cyan/35 bg-gradient-to-b from-white to-pastel-mist">
+      <div className={`${FOOTER_INNER} py-2.5 sm:py-3`}>
+        <div className="flex min-w-0 flex-nowrap items-center justify-between gap-x-3 text-[11px] leading-tight sm:text-xs sm:gap-x-4">
           <button
             type="button"
             onClick={goHomeTop}
-            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-xl text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/35 sm:justify-end"
+            className="group flex shrink-0 items-center gap-2 rounded-lg py-0.5 text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/40"
           >
-            <span className="overflow-hidden rounded-2xl">
+            <span className="shrink-0 overflow-hidden rounded-full transition group-hover:opacity-95">
               <BrandLogo variant="footer" alt="Pixorify" />
             </span>
-            <span className="font-display text-sm font-bold text-slate-900 sm:text-[15px]">{SITE.name}</span>
+            <span className="font-display font-bold text-slate-900">{SITE.name}</span>
           </button>
-          <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 sm:justify-end">
-            <a className="font-medium text-slate-700 hover:underline" href={`mailto:${SITE.helpEmail}`}>
+
+          <nav
+            className="flex min-w-0 flex-nowrap items-center justify-end gap-x-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-2.5 [&::-webkit-scrollbar]:hidden"
+            aria-label="Footer"
+          >
+            <Link to="/help#contact" className={`${link} font-semibold text-slate-700`}>
+              Contact
+            </Link>
+            {sep}
+            <a className={link} href={`mailto:${SITE.helpEmail}`}>
               {SITE.helpEmail}
             </a>
-            <span className="text-slate-300">·</span>
-            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/help">
+            {sep}
+            <Link className={link} to="/help">
               Help
             </Link>
-            <span className="text-slate-300">·</span>
-            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/gallery">
-              Gallery
+            {sep}
+            <Link className={link} to="/gallery">
+              My gallery
             </Link>
-            <span className="text-slate-300">·</span>
-            <Link className="font-medium text-slate-600 hover:text-slate-900" to="/pricing">
+            {sep}
+            <Link className={link} to="/pricing">
               Pricing
             </Link>
-          </div>
-          <p className="type-micro mt-0.5 text-slate-400">
-            © {new Date().getFullYear()} {SITE.name}
-            <span className="text-slate-300"> · </span>
-            {CLIPDROP_ATTRIBUTION}
-          </p>
+            {sep}
+            <span className="shrink-0 whitespace-nowrap text-slate-400">
+              © {new Date().getFullYear()} {SITE.name}
+            </span>
+            {sep}
+            <span className="shrink-0 whitespace-nowrap text-slate-400">{CLIPDROP_ATTRIBUTION}</span>
+          </nav>
         </div>
       </div>
     </footer>

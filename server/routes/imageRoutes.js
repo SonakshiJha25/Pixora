@@ -7,6 +7,7 @@ import {
   refineImage,
   generateImage,
   getImageThread,
+  downloadImageFile,
   getMyImages,
   getPromptStyles,
   getPublicGallery,
@@ -74,6 +75,12 @@ imageRouter.get("/history", ...authedCredits, getMyImages);
 /** Alias for gallery clients — same handler as /history, newest first for logged-in user only. */
 imageRouter.get("/my-images", ...authedCredits, getMyImages);
 imageRouter.post("/cleanup-broken", ...authedCredits, cleanupBrokenImages);
+imageRouter.get(
+  "/:imageId/download",
+  ...authedCredits,
+  [param("imageId").isMongoId(), validate],
+  downloadImageFile
+);
 imageRouter.delete("/:imageId", ...authedCredits, deleteImage);
 imageRouter.patch("/:imageId/favorite", ...authedCredits, toggleFavoriteImage);
 imageRouter.patch("/:imageId/visibility", ...authedCredits, toggleImagePublic);

@@ -1,30 +1,32 @@
 import { useEffect, useState } from "react";
-import { formatResetsInCountdown } from "../lib/nextDailyReset.js";
+import { formatResetsInCountdown, getNextIstMidnightIsoFallback } from "../lib/nextDailyReset.js";
 
 /**
- * Tick using API `dailyCreditResetAt` / nextResetAt only — no frontend-computed reset instant.
+ * Live countdown to the next daily credit refill.
+ * Prefers server `nextResetAtIso`; falls back to IST midnight math (same as server) until API syncs.
  */
-function computeLabel(nextResetAtIso) {
-  const now = Date.now();
+function resolveIso(nextResetAtIso) {
   if (nextResetAtIso && typeof nextResetAtIso === "string") {
-    const parsed = Date.parse(nextResetAtIso);
-    if (Number.isFinite(parsed)) {
-      if (now < parsed) {
-        return formatResetsInCountdown(parsed - now);
-      }
-      return "Resets soon";
-    }
+    const trimmed = nextResetAtIso.trim();
+    if (trimmed !== "") return trimmed;
   }
-  return null;
+  return getNextIstMidnightIsoFallback();
 }
 
-/**
- * Countdown uses server-sent next reset ISO; missing/stale iso → neutral copy until refetch.
- */
+function computeLabel(nextResetAtIso) {
+  const iso = resolveIso(nextResetAtIso);
+  const parsed = Date.parse(iso);
+  if (!Number.isFinite(parsed)) return null;
+  const now = Date.now();
+  if (now < parsed) {
+    return formatResetsInCountdown(parsed - now);
+  }
+  return "Updating…";
+}
+
 export default function CreditsResetCountdown({
   className = "",
   as: Tag = "span",
-  showIstSuffix = true,
   nextResetAtIso = null,
 }) {
   const [computed, setComputed] = useState(() => computeLabel(nextResetAtIso));
@@ -38,20 +40,19 @@ export default function CreditsResetCountdown({
 
   if (computed == null) {
     return (
-      <Tag
-        className={className.trim()}
-        aria-live="polite"
-        title="Next refill time arrives from your account sync with the server."
-      >
-        Daily refill · IST
+      <Tag className={className.trim()} aria-live="polite">
+        …
       </Tag>
     );
   }
 
   return (
-    <Tag className={className.trim()} aria-live="polite" title="Credits refresh on the schedule returned by Pixora.">
+    <Tag
+      className={className.trim()}
+      aria-live="polite"
+      title="Daily credits refill countdown (IST midnight, full balance)."
+    >
       {computed}
-      {showIstSuffix ? <span className="font-normal text-slate-400"> · IST</span> : null}
     </Tag>
   );
 }

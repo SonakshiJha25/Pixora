@@ -23,17 +23,15 @@ describe("snapCreditsToLedger", () => {
 
 describe("getIstDateString", () => {
   it("uses IST calendar day not UTC", () => {
-    // 2026-05-15 18:29 UTC → still 2026-05-15 IST
     const beforeMidnight = Date.UTC(2026, 4, 15, 18, 29, 0);
     assert.equal(getIstDateString(beforeMidnight), "2026-05-15");
-    // 2026-05-15 18:30 UTC → 2026-05-16 00:00 IST
     const atMidnight = Date.UTC(2026, 4, 15, 18, 30, 0);
     assert.equal(getIstDateString(atMidnight), "2026-05-16");
   });
 });
 
 describe("evaluateIstDailyCreditReset", () => {
-  const todayMs = Date.UTC(2026, 4, 16, 10, 0, 0); // midday UTC on IST May 16
+  const todayMs = Date.UTC(2026, 4, 16, 10, 0, 0);
   const todayIst = "2026-05-16";
   const yesterdayIst = "2026-05-15";
 
@@ -52,17 +50,18 @@ describe("evaluateIstDailyCreditReset", () => {
     assert.equal(r.lastCreditResetDate, todayIst);
   });
 
-  it("missing stored date: initializes without stealing credits mid-day", () => {
+  it("missing stored date: refills to 100 and stamps today", () => {
     const r = evaluateIstDailyCreditReset(40, null, todayMs);
     assert.equal(r.initialized, true);
-    assert.equal(r.didReset, false);
-    assert.equal(r.credits, 40);
+    assert.equal(r.didReset, true);
+    assert.equal(r.credits, DAILY_CREDITS);
     assert.equal(r.lastCreditResetDate, todayIst);
   });
 
-  it("snaps corrupt balance before compare", () => {
+  it("snaps corrupt balance before compare on same day", () => {
     const r = evaluateIstDailyCreditReset(87, todayIst, todayMs);
     assert.equal(r.credits, 80);
+    assert.equal(r.didReset, false);
   });
 
   it("zero credits same day stays zero", () => {

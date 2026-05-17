@@ -1,107 +1,48 @@
 import { Zap } from "lucide-react";
 import CreditsResetCountdown from "./CreditsResetCountdown.jsx";
-import {
-  CREDITS_PER_IMAGE,
-  DAILY_CREDITS_LIMIT,
-  normalizeCreditsPoints,
-} from "../lib/credits.js";
+import { CREDITS_PER_IMAGE, normalizeCreditsPoints } from "../lib/credits.js";
 
-function CreditRingMeter({ credits, size = 36, accentClass }) {
-  const pts = normalizeCreditsPoints(credits);
-  const ratio = Math.min(1, Math.max(0, pts / DAILY_CREDITS_LIMIT));
-  const stroke = 2.5;
-  const r = (size - stroke * 2) / 2;
-  const cx = size / 2;
-  const c = 2 * Math.PI * r;
-  const dash = `${ratio * c} ${c}`;
-  const baseOpacity = 0.14;
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      className={`shrink-0 ${accentClass}`}
-      aria-hidden
-    >
-      <circle
-        cx={cx}
-        cy={cx}
-        r={r}
-        fill="none"
-        stroke="currentColor"
-        strokeOpacity={baseOpacity}
-        strokeWidth={stroke}
-      />
-      <circle
-        cx={cx}
-        cy={cx}
-        r={r}
-        fill="none"
-        stroke="currentColor"
-        strokeOpacity={1}
-        strokeWidth={stroke}
-        strokeLinecap="round"
-        strokeDasharray={dash}
-        transform={`rotate(-90 ${cx} ${cx})`}
-      />
-    </svg>
-  );
-}
-
+/**
+ * Nav credits ribbon — balances + countdown (richer pill; avoids stripping account context).
+ */
 export default function NavbarCredits({
   workspace = false,
   credits,
   nextResetAtIso,
   onPress,
-  showMeter = true,
 }) {
   const pts = normalizeCreditsPoints(credits);
-  const accent = workspace ? "text-slate-400" : "text-slate-600";
 
-  const shell = workspace
-    ? "rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 sm:px-3"
-    : "rounded-full border border-slate-200/90 bg-white px-2.5 py-1.5 shadow-sm sm:px-3";
+  const muted = workspace ? "text-slate-500" : "text-slate-600";
+  const strong = workspace ? "text-slate-100" : "text-slate-900";
+  const zapClass = workspace
+    ? "mt-0.5 size-[0.9375rem] shrink-0 stroke-[2] sm:size-4 fill-cyan-400/15 stroke-cyan-300/90"
+    : "mt-0.5 size-[0.9375rem] shrink-0 stroke-[2] sm:size-4 fill-brand-cyan/20 stroke-brand-cyan";
 
   return (
     <button
       type="button"
-      className={`inline-flex max-w-[min(100vw-11rem,16rem)] items-center gap-2.5 text-left transition ${shell} ${
-        workspace ? "hover:border-white/12" : "hover:border-slate-300"
+      className={`inline-flex max-w-[min(14rem,calc(100vw-13rem))] flex-col rounded-full px-2.5 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:flex-row sm:items-start sm:gap-2 sm:px-3 sm:py-2 lg:max-w-none ${
+        workspace
+          ? "border border-white/12 bg-gradient-to-r from-slate-900/90 to-slate-800/70 shadow-none ring-1 ring-white/10 hover:ring-cyan-400/30 focus-visible:ring-cyan-400/35 focus-visible:ring-offset-[#13151c]"
+          : "border border-pastel-cyan/55 bg-gradient-to-r from-white via-pastel-mist to-[#eaf8ff] shadow-[0_6px_20px_-10px_rgba(111,203,255,0.45)] ring-1 ring-pastel-sky/50 hover:brightness-[1.015] focus-visible:ring-pastel-cyan/50 focus-visible:ring-offset-pastel-mist"
       }`}
-      title={`${pts} credits · ${CREDITS_PER_IMAGE} credits per new image · IST midnight refill`}
-      aria-label={`${pts} credits. Opens account menu`}
+      title={`${pts} credits · ${CREDITS_PER_IMAGE} credits per new picture · tap for account`}
+      aria-label={`${pts} credits — tap for account`}
       onClick={onPress}
     >
-      {showMeter ? (
-        <div className="relative shrink-0">
-          <CreditRingMeter credits={pts} size={34} accentClass={accent} />
-          <Zap
-            className={`pointer-events-none absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 stroke-[2.5] sm:size-[13px] ${
-              workspace ? "fill-slate-500/15 stroke-slate-300/90" : "fill-slate-400/22 stroke-slate-600"
-            }`}
-            aria-hidden
-          />
-        </div>
-      ) : (
-        <Zap
-          className={`mt-0.5 size-4 shrink-0 stroke-[2] sm:size-[15px] ${
-            workspace ? "fill-slate-500/12 stroke-slate-300/90" : "fill-slate-400/22 stroke-slate-600"
-          }`}
-          aria-hidden
-        />
-      )}
-      <span className="flex min-w-0 flex-col gap-0">
-        <span
-          className={`flex flex-wrap items-baseline gap-x-1 leading-none ${
-            workspace ? "text-slate-100" : "text-slate-900"
-          }`}
-        >
-          <span className="text-[13px] font-bold tabular-nums sm:text-[14px]">{pts}</span>
-          <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">credits</span>
-        </span>
-        <span className="truncate text-[8.5px] font-medium leading-tight tracking-tight text-slate-500 sm:text-[9px]">
-          <CreditsResetCountdown nextResetAtIso={nextResetAtIso} showIstSuffix={false} as="span" className="inline" />
+      <span className="inline-flex items-start gap-1.5 sm:gap-2">
+        <Zap className={zapClass} aria-hidden strokeWidth={2} />
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span className={`flex flex-wrap items-baseline gap-x-1 leading-none ${strong}`}>
+            <span className="text-[13px] font-bold tabular-nums sm:text-sm">{pts}</span>
+            <span className={`text-[9px] font-semibold uppercase tracking-wide ${workspace ? "text-slate-400" : "text-slate-500"}`}>
+              credits
+            </span>
+          </span>
+          <span className={`min-w-0 max-w-[min(11rem,calc(100vw-9rem))] text-[8.5px] font-semibold tabular-nums leading-snug sm:max-w-[13.5rem] sm:text-[9px] ${muted}`}>
+            <CreditsResetCountdown nextResetAtIso={nextResetAtIso} as="span" className="inline" />
+          </span>
         </span>
       </span>
     </button>

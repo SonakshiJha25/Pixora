@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Download, PenLine } from "lucide-react";
+import { Heart, PenLine } from "lucide-react";
 import { resolveImageUrl } from "../config/api.js";
+import DownloadPngButton from "./DownloadPngButton.jsx";
+import { labelForStyleKey } from "../lib/styleTypes.js";
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -25,6 +27,7 @@ export default function HistoryImageCard({
   surface = "default",
   showActionBar = false,
   onContinueEdit,
+  openActionLabel,
 }) {
   const [hover, setHover] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -65,6 +68,22 @@ export default function HistoryImageCard({
           <p className={`text-[10px] uppercase tracking-wider ${isWs ? "text-slate-500" : "text-slate-400"}`}>
             Preview unavailable
           </p>
+          {interactive ? (
+            <button
+              type="button"
+              className={`mt-2 rounded-full px-3 py-1.5 text-[10px] font-semibold ${
+                isWs
+                  ? "border border-white/15 bg-white/10 text-slate-200 hover:bg-white/15"
+                  : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                open();
+              }}
+            >
+              View in Gallery
+            </button>
+          ) : null}
         </div>
       ) : (
         <>
@@ -86,8 +105,8 @@ export default function HistoryImageCard({
                 {promptShort}
                 {promptText.length > 120 ? "…" : ""}
               </p>
-              <span className="shrink-0 rounded-full bg-white/[0.09] px-2 py-0.5 text-[9px] font-bold capitalize tracking-wide text-cyan-50/95 ring-1 ring-white/12">
-                {item.style || "Frame"}
+              <span className="shrink-0 rounded-full bg-white/[0.09] px-2 py-0.5 text-[9px] font-bold tracking-wide text-cyan-50/95 ring-1 ring-white/12">
+                {item.style ? labelForStyleKey(item.style) : "Frame"}
               </span>
             </div>
           ) : null}
@@ -95,7 +114,10 @@ export default function HistoryImageCard({
           {interactive ? (
             <button
               type="button"
-              aria-label={promptShort ? `Open preview: ${promptShort}` : "Open image preview"}
+              aria-label={
+                openActionLabel ||
+                (promptShort ? `Open preview: ${promptShort}` : "Open image preview")
+              }
               className={`absolute inset-x-0 top-0 z-[5] bg-transparent outline-none ring-0 transition focus-visible:ring-2 ${
                 isWs ? "focus-visible:ring-white/30" : "focus-visible:ring-slate-400/40"
               } ${openHitBottom}`}
@@ -107,15 +129,14 @@ export default function HistoryImageCard({
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[6] px-2 pb-2 opacity-100 sm:opacity-0 sm:transition-opacity sm:duration-300 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100">
               <div className="pointer-events-auto flex gap-1.5 rounded-[0.65rem] border border-white/[0.1] bg-slate-950/88 p-1 shadow-lg backdrop-blur-md">
                 {dl ? (
-                  <a
-                    href={dl}
-                    download={`pixorify-${item._id}.png`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-white/18 hover:bg-white/[0.09]"
+                  <DownloadPngButton
+                    imageId={item._id}
+                    imageUrl={item.imageUrl}
+                    filename={`pixorify-${item._id}.png`}
+                    className="inline-flex flex-1 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-white/18 hover:bg-white/[0.09]"
                   >
-                    <Download className="size-3.5 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                     Save
-                  </a>
+                  </DownloadPngButton>
                 ) : null}
                 {typeof onContinueEdit === "function" ? (
                   <button
@@ -139,7 +160,7 @@ export default function HistoryImageCard({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-slate-950/[0.92] to-transparent p-3 text-left text-white md:hidden">
           <p className="line-clamp-1 text-[11px] font-medium text-white/95">{item.promptRaw || "Image"}</p>
           <p className="text-[10px] text-white/60">
-            {formatDate(item.createdAt)} · <span className="capitalize">{item.style}</span>
+            {formatDate(item.createdAt)} · <span>{item.style ? labelForStyleKey(item.style) : "—"}</span>
           </p>
         </div>
       ) : null}
@@ -159,7 +180,7 @@ export default function HistoryImageCard({
             </div>
             <div>
               <dt className="text-white/48">Style</dt>
-              <dd className="capitalize">{item.style || "—"}</dd>
+              <dd>{item.style ? labelForStyleKey(item.style) : "—"}</dd>
             </div>
           </dl>
         </div>
@@ -171,7 +192,7 @@ export default function HistoryImageCard({
         >
           <p className="line-clamp-2 text-[11px] font-medium leading-snug text-white">{item.promptRaw || "No prompt"}</p>
           <p className="mt-1 text-[10px] text-white/80">
-            {formatDate(item.createdAt)} · <span className="capitalize">{item.style}</span>
+            {formatDate(item.createdAt)} · <span>{item.style ? labelForStyleKey(item.style) : "—"}</span>
           </p>
         </div>
       )}
@@ -179,12 +200,12 @@ export default function HistoryImageCard({
         <span
           className={`absolute right-2 top-2 z-[7] inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-md ${
             isWs
-              ? "border-white/22 bg-[#171a22]/95 text-lg text-slate-200"
-              : "border-rose-200/55 bg-white/95 text-sm text-rose-500"
+              ? "border-red-400/40 bg-[#171a22]/95"
+              : "border-rose-200/55 bg-white/95"
           }`}
           aria-label="Favorited"
         >
-          ♥
+          <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500" strokeWidth={2.25} aria-hidden />
         </span>
       ) : null}
     </div>

@@ -1,71 +1,75 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import { FloatingBrandWash } from "../components/MarketingDecorPieces.jsx";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
 export default function Pricing() {
   const card =
-    "flex flex-col rounded-2xl border border-slate-200/85 bg-white p-5 shadow-sm sm:p-6";
+    "flex flex-col rounded-2xl border border-pastel-cyan/30 bg-white/95 p-5 shadow-[0_16px_40px_-24px_rgba(111,203,255,0.22)] backdrop-blur-sm sm:p-6";
 
   return (
     <MarketingPageShell className="pb-28 pt-8 sm:pt-12">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="relative mx-auto w-full max-w-6xl overflow-x-hidden pb-2">
+        <div className="pointer-events-none absolute left-1/2 top-0 z-0 h-[200px] w-[min(100%,720px)] -translate-x-1/2">
+          <FloatingBrandWash />
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="text-center"
+          className="relative z-[1] text-center"
         >
           <p className="type-eyebrow-muted">Pricing</p>
-          <h1 className="type-page-title mt-2">Free to start · room to grow</h1>
+          <h1 className="type-page-title mt-2">Free to start, room when you grow</h1>
           <p className="type-body mx-auto mt-2 max-w-2xl">
-            Directional numbers — see{" "}
-            <Link to="/help" className="font-semibold underline underline-offset-4 decoration-slate-300 hover:decoration-slate-500">
+            These figures are rounded guides—for up-to-date credit rules visit{" "}
+            <Link to="/help" className="font-semibold underline underline-offset-4 decoration-pastel-cyan/55 hover:decoration-pastel-lilac/80">
               Help
-            </Link>{" "}
-            for the live credit ledger.
+            </Link>
+            .
           </p>
         </motion.div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:gap-5">
+        <div className="relative z-[1] mx-auto mt-10 grid max-w-4xl gap-6 lg:grid-cols-2 lg:gap-8 xl:gap-10">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.03 }}
             className={`${card} relative`}
           >
-            <span className="absolute right-4 top-4 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+            <span className="absolute right-4 top-4 rounded-full border border-pastel-cyan/40 bg-pastel-mist/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
               Start here
             </span>
             <p className="type-price-tier">Free</p>
             <p className="mt-1.5 text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">₹0</p>
-            <p className="type-meta">Full workflow included</p>
+            <p className="type-meta">Everything you need to try Pixorify</p>
             <ul className="type-body-tight mt-5 flex-1 space-y-2.5">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
                 <span>
-                  <span className="type-emphasis">~100 credits</span> / day · midnight IST refill
+                  <span className="type-emphasis">About 100 credits</span> daily, refilled at midnight India time
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>~10 fresh runs / day · same-thread refinements</span>
+                <span>About 10 new pictures a day • lighter touch-ups on the same picture</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Private gallery · conversational thread</span>
+                <span>Private gallery; each conversation stays in order</span>
               </li>
             </ul>
             <button
               type="button"
               disabled
-              className="mt-7 w-full cursor-not-allowed rounded-full border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-600"
+              className="mt-7 w-full cursor-not-allowed rounded-full border border-pastel-cyan/35 bg-pastel-mist/80 py-3 text-sm font-semibold text-slate-600"
             >
               Default plan
             </button>
@@ -75,81 +79,41 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.06 }}
-            className={`${card} relative ring-1 ring-slate-300/70`}
+            className={`${card} relative ring-1 ring-pastel-lilac/45`}
           >
-            <span className="absolute right-4 top-4 rounded-full border border-slate-900/90 bg-slate-900 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
-              Coming soon
-            </span>
-            <p className="type-price-tier">Creator</p>
-            <p className="mt-1.5 text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
-              ₹149<span className="type-price-tier ml-1 inline text-base font-semibold tabular-nums text-slate-500"> / mo</span>
-            </p>
-            <p className="type-meta text-slate-600">Personal projects</p>
-            <ul className="type-body-tight mt-5 flex-1 space-y-2.5 text-slate-700">
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 text-slate-500" aria-hidden>
-                  ✓
-                </span>
-                <span>
-                  <span className="type-emphasis">~300 credits</span> / day (3× Free pool)
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 text-slate-500" aria-hidden>
-                  ✓
-                </span>
-                <span>More throughput for heavy iteration days</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-0.5 text-slate-500" aria-hidden>
-                  ✓
-                </span>
-                <span>Higher fidelity exports when available</span>
-              </li>
-            </ul>
-            <Link
-              to="/coming-soon?channel=pricing"
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Notify me
-              <span aria-hidden="true">→</span>
-            </Link>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.09 }} className={`${card} relative`}>
-            <span className="absolute right-4 top-4 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-800">
-              Teams · power users
+            <span className="absolute right-4 top-4 rounded-full border border-pastel-lilac/50 bg-white/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-800">
+              For heavy use
             </span>
             <p className="type-price-tier">Pro</p>
             <p className="mt-1.5 text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
               ₹499<span className="type-price-tier ml-1 inline text-base font-semibold tabular-nums text-slate-500"> / mo</span>
             </p>
-            <p className="type-meta text-slate-600">When the studio stays open late</p>
+            <p className="type-meta text-slate-600">When you create lots, every week</p>
             <ul className="type-body-tight mt-5 flex-1 space-y-2.5 text-slate-700">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
                 <span>
-                  <span className="type-emphasis">~1,000 credits</span> / day — serious batching
+                  <span className="type-emphasis">About 1,000 credits</span> a day for batches and drafts
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Priority lane when queues stack</span>
+                <span>Go to the front of the line when many people are creating at once</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Usage clarity built for client work</span>
+                <span>Clear usage when you&apos;re juggling client projects</span>
               </li>
             </ul>
             <Link
               to="/pricing/pro"
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-900 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full border border-pastel-cyan/55 bg-pastel-mist/70 py-3 text-sm font-semibold text-slate-900 transition hover:border-pastel-sky hover:bg-white"
             >
               Full comparison
               <span aria-hidden="true">→</span>
@@ -157,7 +121,7 @@ export default function Pricing() {
           </motion.div>
         </div>
 
-        <p className="type-body mt-12 text-center">
+        <p className="type-body relative z-[1] mt-12 text-center">
           <Link to="/studio" title={`Open ${WORKSPACE_NAME}`} className="font-semibold underline underline-offset-4 decoration-slate-300 hover:decoration-slate-500">
             ← {WORKSPACE_NAME}
           </Link>
@@ -165,7 +129,7 @@ export default function Pricing() {
             ·
           </span>
           <Link to="/gallery" className="type-link-muted">
-            Gallery
+            My gallery
           </Link>
         </p>
       </div>

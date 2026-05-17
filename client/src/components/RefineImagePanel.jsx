@@ -47,7 +47,7 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
 
   const footerHint = useMemo(
     () =>
-      "Refinements stay chained to this thread and don’t behave like a totally new generation for credits. See Help → credits for the wording that matters.",
+      "These edits stay tied to one picture—they usually skip the full charge of generating something brand new. Credits are spelled out under Help.",
     []
   );
 
@@ -118,10 +118,10 @@ export default function RefineImagePanel({ open, previewSrc, onClose, onApply, s
                 id="refine-instruction"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                rows={4}
+                rows={5}
                 disabled={submitting}
                 placeholder={ph}
-                className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none ring-0 transition placeholder:text-slate-400 focus:border-brand-cyan/50 focus:ring-2 focus:ring-brand-cyan/20 disabled:opacity-60"
+                className="mt-2 min-h-[7rem] max-h-[min(36vh,18rem)] w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-800 shadow-sm outline-none ring-0 transition placeholder:text-slate-400 focus:border-brand-cyan/50 focus:ring-2 focus:ring-brand-cyan/20 disabled:opacity-60 sm:min-h-[7.5rem]"
               />
               <div className="mt-3 flex flex-wrap gap-2">
                 {QUICK_ACTIONS.map((line) => (
