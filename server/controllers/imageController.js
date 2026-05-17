@@ -1,6 +1,7 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
 import Image from "../models/Image.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -16,44 +17,97 @@ import { logInfo } from "../utils/logger.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
 
-async function loadImageBytesForDownload(storedUrl, req) {
+// ---------------------------------------------------------------------------
+// Helpers — local files and remote fetch for download / cleanup
+// ---------------------------------------------------------------------------
+
+function localGeneratedFilePath(storedUrl) {
+  let pathname = String(storedUrl || "").trim();
+  if (!pathname) return null;
+  if (/^https?:\/\//i.test(pathname)) {
+    try {
+      pathname = new URL(pathname).pathname;
+    } catch {
+      return null;
+    }
+  }
+  if (!pathname.startsWith("/")) pathname = `/${pathname}`;
+  const match = pathname.match(/^\/generated\/([^/?#]+)$/i);
+  if (!match?.[1]) return null;
+  const name = path.basename(match[1]);
+  if (!/^[a-zA-Z0-9._-]+\.(png|jpe?g|webp)$/i.test(name)) return null;
+  return path.join(GENERATED_DIR, name);
+}
+
+function resolveDownloadFetchUrl(storedUrl, req) {
   const absolute = absoluteImageUrl(storedUrl, req);
-  if (!absolute || typeof absolute !== "string") {
-    throw new AppError("Invalid image URL", 400, "VALIDATION_ERROR");
+  if (!absolute || typeof absolute !== "string") return null;
+  if (/^https?:\/\//i.test(absolute)) return absolute;
+
+  const pathPart = absolute.startsWith("/") ? absolute : `/${absolute}`;
+  if (req?.get?.("host")) {
+    return `${req.protocol || "http"}://${req.get("host")}${pathPart}`;
   }
 
-  if (/^https?:\/\//i.test(absolute)) {
+  const base = (process.env.BACKEND_PUBLIC_URL || "").trim().replace(/\/+$/, "");
+  return base ? `${base}${pathPart}` : pathPart;
+}
+
+async function fetchRemoteImageBuffer(url) {
+  const resp = await axios.get(url, {
+    responseType: "arraybuffer",
+    timeout: 120_000,
+    maxContentLength: 25 * 1024 * 1024,
+    validateStatus: (status) => status >= 200 && status < 300,
+  });
+  return Buffer.from(resp.data);
+}
+
+async function loadImageBytesForDownload(storedUrl, req) {
+  const localPath = localGeneratedFilePath(storedUrl);
+  if (localPath && fs.existsSync(localPath)) {
+    return { buffer: fs.readFileSync(localPath) };
+  }
+
+  const fetchUrl = resolveDownloadFetchUrl(storedUrl, req);
+  if (fetchUrl && /^https?:\/\//i.test(fetchUrl)) {
     try {
-      const resp = await axios.get(absolute, {
-        responseType: "arraybuffer",
-        timeout: 120_000,
-        maxContentLength: 25 * 1024 * 1024,
-      });
-      return {
-        buffer: Buffer.from(resp.data),
-        type: resp.headers["content-type"] || "image/png",
-      };
-    } catch (err) {
-      throw new AppError("Could not fetch image file for download", 502, "IMAGE_DOWNLOAD_FAILED");
+      return { buffer: await fetchRemoteImageBuffer(fetchUrl) };
+    } catch {
+      /* try disk below */
     }
   }
 
-  const rel = absolute.startsWith("/") ? absolute : `/${absolute}`;
+  const pathPart = String(storedUrl || "").trim();
+  let rel = pathPart;
+  if (/^https?:\/\//i.test(pathPart)) {
+    try {
+      rel = new URL(pathPart).pathname;
+    } catch {
+      rel = pathPart;
+    }
+  }
+  if (!rel.startsWith("/")) rel = `/${rel}`;
+
   if (rel.startsWith("/generated/")) {
     const filePath = path.join(GENERATED_DIR, path.basename(rel));
-    if (!fs.existsSync(filePath)) {
-      throw new AppError("Image file missing on server", 404, "IMAGE_FILE_NOT_FOUND");
+    if (fs.existsSync(filePath)) {
+      return { buffer: fs.readFileSync(filePath) };
     }
-    return { buffer: fs.readFileSync(filePath), type: "image/png" };
   }
 
-  throw new AppError("Unsupported image storage path", 400, "VALIDATION_ERROR");
+  throw new AppError("Could not fetch image file for download", 502, "IMAGE_DOWNLOAD_FAILED");
 }
+
+// ---------------------------------------------------------------------------
+// Download
+// ---------------------------------------------------------------------------
 
 /** GET /api/images/:imageId/download — attachment PNG (Cloudinary-safe). */
 export const downloadImageFile = asyncHandler(async (req, res) => {
+  const imageId = String(req.params.imageId || "").trim();
   const image = await Image.findOne({
-    _id: req.params.imageId,
+    _id: imageId,
     userId: req.user.id,
     deletedAt: null,
   });
@@ -61,15 +115,20 @@ export const downloadImageFile = asyncHandler(async (req, res) => {
     throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
   }
 
-  const { buffer, type } = await loadImageBytesForDownload(image.imageUrl, req);
+  const { buffer } = await loadImageBytesForDownload(image.imageUrl, req);
+  const pngBuffer = await sharp(buffer).png().toBuffer();
   const safeName = `pixorify-${image._id}.png`;
 
-  res.setHeader("Content-Type", type.split(";")[0] || "image/png");
+  res.setHeader("Content-Type", "image/png");
   res.setHeader("Content-Disposition", `attachment; filename="${safeName}"`);
-  res.setHeader("Content-Length", String(buffer.length));
+  res.setHeader("Content-Length", String(pngBuffer.length));
   res.setHeader("Cache-Control", "private, no-store");
-  return res.send(buffer);
+  return res.send(pngBuffer);
 });
+
+// ---------------------------------------------------------------------------
+// Generation (credits deducted via creditService)
+// ---------------------------------------------------------------------------
 
 export const generateImage = asyncHandler(async (req, res) => {
   if (Boolean(req.body?.isRefinement)) {
@@ -114,10 +173,14 @@ export const generateImage = asyncHandler(async (req, res) => {
   });
 });
 
-/** POST /api/images/edit — existing frontend contract (editPrompt + imageId). */
+// ---------------------------------------------------------------------------
+// Refinement (no credit deduction — refinementService)
+// ---------------------------------------------------------------------------
+
+/** POST /api/images/edit — canonical refinement contract (editPrompt + imageId). */
 export const editImage = asyncHandler(runImageRefinement);
 
-/** POST /api/images/refine — same handler; accepts refinementPrompt. */
+/** @deprecated Alias handler — POST /api/images/refine; same as editImage. */
 export const refineImage = asyncHandler(runImageRefinement);
 
 export const getImageThread = asyncHandler(async (req, res) => {
@@ -136,6 +199,10 @@ export const getImageThread = asyncHandler(async (req, res) => {
     refinementCount: packed.ordered.filter((i) => i.isEdit).length,
   });
 });
+
+// ---------------------------------------------------------------------------
+// User gallery (authenticated)
+// ---------------------------------------------------------------------------
 
 export const getMyImages = asyncHandler(async (req, res) => {
   const page = Number(req.query.page || 1);
@@ -164,6 +231,10 @@ export const getMyImages = asyncHandler(async (req, res) => {
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 });
+
+// ---------------------------------------------------------------------------
+// Per-image mutations (authenticated)
+// ---------------------------------------------------------------------------
 
 export const deleteImage = asyncHandler(async (req, res) => {
   const image = await Image.findOne({
@@ -197,6 +268,7 @@ export const toggleFavoriteImage = asyncHandler(async (req, res) => {
   return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
+/** @deprecated No current client — toggles isPublic without gallery UI. */
 export const toggleImagePublic = asyncHandler(async (req, res) => {
   const image = await Image.findOne({
     _id: req.params.imageId,
@@ -213,6 +285,11 @@ export const toggleImagePublic = asyncHandler(async (req, res) => {
   return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
+// ---------------------------------------------------------------------------
+// Public gallery / social — @deprecated no client UI
+// ---------------------------------------------------------------------------
+
+/** @deprecated No current client — public gallery listing. */
 export const getPublicGallery = asyncHandler(async (req, res) => {
   const page = Number(req.query.page || 1);
   const limit = Math.min(Number(req.query.limit || 18), 50);
@@ -236,6 +313,7 @@ export const getPublicGallery = asyncHandler(async (req, res) => {
   });
 });
 
+/** @deprecated No current client — increments likes on public images. */
 export const likePublicImage = asyncHandler(async (req, res) => {
   const image = await Image.findOneAndUpdate(
     { _id: req.params.imageId, isPublic: true, deletedAt: null },
@@ -250,6 +328,10 @@ export const likePublicImage = asyncHandler(async (req, res) => {
   return res.status(200).json({ success: true, image: serializeImage(image, req) });
 });
 
+// ---------------------------------------------------------------------------
+// Prompt utilities
+// ---------------------------------------------------------------------------
+
 export const getPromptStyles = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
@@ -262,19 +344,10 @@ export const previewEnhancedPrompt = asyncHandler(async (req, res) => {
   return res.status(200).json({ success: true, promptEnhanced: enhancePrompt(prompt, style) });
 });
 
-/**
- * Cleanup helper: scans the caller's images and soft-deletes records whose
- * imageUrl points to a file that no longer exists. This is the recovery
- * path after Render redeploys wipe ephemeral /public/generated — we can't
- * restore the bytes, but we can purge the dead records so the gallery
- * looks consistent across accounts and devices.
- *
- * Optimization: any URL on res.cloudinary.com is trusted without a HEAD
- * request, both because Cloudinary is durable and because their endpoint
- * blocks unauthenticated HEAD on some plans.
- *
- * Returns { cleaned, checked, total }.
- */
+// ---------------------------------------------------------------------------
+// Maintenance — @deprecated no current client (post-deploy broken URL recovery)
+// ---------------------------------------------------------------------------
+
 const HEAD_TIMEOUT_MS = 6000;
 const HEAD_CONCURRENCY = 6;
 
@@ -310,6 +383,7 @@ async function pMapLimited(items, limit, mapper) {
   return out;
 }
 
+/** @deprecated Scans caller images and soft-deletes records with unreachable URLs. */
 export const cleanupBrokenImages = asyncHandler(async (req, res) => {
   const images = await Image.find({ userId: req.user.id, deletedAt: null });
 
@@ -335,4 +409,3 @@ export const cleanupBrokenImages = asyncHandler(async (req, res) => {
     cleaned: toDelete.length,
   });
 });
-

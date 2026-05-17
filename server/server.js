@@ -29,14 +29,6 @@ const app = express();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const generatedDir = path.join(__dirname, "public", "generated");
-app.use(
-  "/generated",
-  express.static(generatedDir, {
-    setHeaders(res) {
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    },
-  })
-);
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -62,6 +54,14 @@ app.use(
     credentials: true,
   })
 );
+app.use(
+  "/generated",
+  express.static(generatedDir, {
+    setHeaders(res) {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 app.use(helmet());
 app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
 app.set("trust proxy", 1);
@@ -80,12 +80,19 @@ const generationLimiter = rateLimit({
   },
 });
 
-app.use("/api/auth", authRouter);
-app.use("/api/credits", creditRouter);
+// --- API route mounts (behavior unchanged; aliases kept for backward compatibility) ---
+// Auth + profile + credits read: canonical prefix is /api/user (see userRoutes.js).
 app.use("/api/user", userRouter);
-app.use("/api/image", imageRouter);
+// Deprecated alias — same router as /api/user; prefer /api/user for new clients.
+app.use("/api/auth", authRouter);
+// Deprecated alias — credits read/use also available at GET|POST /api/user/credits.
+app.use("/api/credits", creditRouter);
+// Image API: canonical prefix is /api/images (see imageRoutes.js).
 app.use("/api/images", imageRouter);
+// Deprecated alias — identical imageRouter; some clients still call /api/image/*.
+app.use("/api/image", imageRouter);
 app.use("/api/feedback", feedbackRouter);
+// Temporary v1 aliases — same routers as /api/user and /api/images (rate limit on image only).
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/image", generationLimiter, imageRouter);
 

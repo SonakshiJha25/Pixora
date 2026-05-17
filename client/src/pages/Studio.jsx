@@ -395,6 +395,16 @@ export default function Studio() {
     }
   };
 
+  const onPromptKeyDown = (e) => {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (loading || refineSubmitting) {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+    e.currentTarget.form?.requestSubmit();
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (!input.trim()) {
@@ -511,8 +521,6 @@ export default function Studio() {
   };
 
   const latestFrame = sortedThread.length > 0 ? sortedThread[sortedThread.length - 1] : null;
-  const downloadImageId =
-    latestFrame?._id != null ? String(latestFrame._id) : "";
   const downloadImageUrl = latestFrame?.imageUrl || image;
   const previewSrc = downloadImageUrl ? resolveImageUrl(downloadImageUrl) : "";
 
@@ -527,8 +535,10 @@ export default function Studio() {
           transition={{ duration: 0.45 }}
           className="mb-6 flex flex-col items-center gap-2.5 text-center sm:mb-8 sm:gap-3"
         >
-          <BrandLogo variant="studio" />
-          <h1 className="type-studio-title">{WORKSPACE_NAME}</h1>
+          <div className="flex items-center justify-center gap-3 sm:gap-3.5">
+            <BrandLogo variant="studio" />
+            <h1 className="type-studio-title">{WORKSPACE_NAME}</h1>
+          </div>
           <p className="type-studio-lede mx-auto sm:max-w-xl">
             Choose a style, describe your scene plainly, then look below for your image and edits.
             {!isSignedIn ? (
@@ -625,10 +635,9 @@ export default function Studio() {
                     New prompt
                   </button>
                   <DownloadPngButton
-                    imageId={downloadImageId}
                     imageUrl={downloadImageUrl}
                     filename="pixorify-image.png"
-                    disabled={!downloadImageId && !downloadImageUrl}
+                    disabled={!downloadImageUrl}
                     className="inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-40"
                   />
                   <button
@@ -681,44 +690,48 @@ export default function Studio() {
               </div>
 
               <motion.div className="studio-compose-block mx-auto w-full max-w-5xl">
-                <motion.div className="grid items-end gap-5 md:grid-cols-[minmax(0,13.75rem)_minmax(0,1fr)] md:gap-6 lg:gap-8">
-                  <div className="min-w-0 text-left">
+                <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[minmax(0,auto)_minmax(0,1fr)] md:gap-6 lg:gap-8">
+                  <div className="min-w-0 shrink-0 self-start text-left">
                     <p className="type-studio-eyebrow mb-2.5 text-left">Styles</p>
-                    <div className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
-                    {styles.map((item) => {
-                      const meta = STYLE_META[item];
-                      const thumb = meta?.image;
-                      return (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => setStyle(item)}
-                          aria-pressed={style === item}
-                          title={meta?.label ?? item}
-                          className={`group relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 sm:h-[3.75rem] sm:w-[3.75rem] ${
-                            style === item
-                              ? "border-white/35 ring-1 ring-white/20"
-                              : "border-white/10 opacity-80 hover:border-white/20 hover:opacity-100"
-                          }`}
-                        >
-                          {thumb ? (
-                            <img
-                              src={thumb}
-                              alt=""
-                              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                              draggable={false}
-                            />
-                          ) : null}
-                          <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pb-0.5 pt-3 text-center text-[8px] font-semibold text-white sm:text-[9px]">
-                            {meta?.label ?? item}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    <div
+                      className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                      role="toolbar"
+                      aria-label="Choose style"
+                    >
+                      {styles.map((item) => {
+                        const meta = STYLE_META[item];
+                        const thumb = meta?.image;
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setStyle(item)}
+                            aria-pressed={style === item}
+                            title={meta?.label ?? item}
+                            className={`group relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 sm:h-[3.75rem] sm:w-[3.75rem] ${
+                              style === item
+                                ? "border-white/35 ring-1 ring-white/20"
+                                : "border-white/10 opacity-80 hover:border-white/20 hover:opacity-100"
+                            }`}
+                          >
+                            {thumb ? (
+                              <img
+                                src={thumb}
+                                alt=""
+                                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                draggable={false}
+                              />
+                            ) : null}
+                            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pb-0.5 pt-3 text-center text-[8px] font-semibold text-white sm:text-[9px]">
+                              {meta?.label ?? item}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 self-start text-left">
                     <p className="type-studio-eyebrow mb-2.5 text-left">Prompt</p>
                     <div className="studio-prompt-shell p-3 sm:p-4">
                       <div className="flex min-w-0 flex-col gap-2.5 sm:flex-row sm:items-end sm:gap-3">
@@ -729,9 +742,10 @@ export default function Studio() {
                           setInput(e.target.value);
                           requestAnimationFrame(syncPromptHeight);
                         }}
+                        onKeyDown={onPromptKeyDown}
                         rows={1}
                         placeholder="Describe a scene, light, palette, mood — specificity helps."
-                        className="studio-prompt-input studio-prompt-input--auto min-h-0 w-full flex-1 resize-none rounded-xl border border-white/[0.08] bg-[#0f1116]/90 px-3 py-2.5 text-[13px] font-normal leading-relaxed tracking-tight text-slate-100 placeholder:text-slate-500 placeholder:font-normal focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/15 sm:text-[14px]"
+                        className="studio-prompt-input studio-prompt-input--auto min-h-0 w-full min-w-0 flex-1 resize-none rounded-xl border border-white/[0.08] bg-[#0f1116]/90 px-3 py-2.5 text-[13px] font-normal leading-relaxed tracking-tight text-slate-100 placeholder:text-slate-500 placeholder:font-normal focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/15 sm:text-[14px]"
                       />
                       <div className="flex shrink-0 items-center justify-end gap-2 sm:pb-0.5">
                         <button
@@ -765,6 +779,8 @@ export default function Studio() {
                       </div>
                       </div>
                     </div>
+
+
                     {!speechSupported ? (
                       <p className="mt-2 text-xs text-amber-200/85">Mic won&apos;t fly in this browser.</p>
                     ) : null}
@@ -780,7 +796,7 @@ export default function Studio() {
                       </p>
                     ) : null}
                   </div>
-                </motion.div>
+                </div>
 
                 <p className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
                   New pictures use credits from your daily balance.

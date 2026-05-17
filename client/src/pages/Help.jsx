@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import {
-  ChevronDown,
   Heart,
   LayoutGrid,
   Lightbulb,
@@ -120,62 +118,7 @@ const funFacts = [
   },
 ];
 
-const faqs = [
-  {
-    q: "How many new images can I actually finish in a day?",
-    a: "~10 new images/day at 10 credits each from 100. Out of credits? You can still refine existing work.",
-  },
-  {
-    q: "When do credits come back?",
-    a: "At midnight India time you get that day's full balance—we go by calendar days, not a rolling 24-hour clock.",
-  },
-  {
-    q: `What is the difference between Refine and a new picture in ${WORKSPACE_NAME}?`,
-    a: `Refine adjusts the image you already started. Starting a totally new prompt is a fresh run and uses more credits.`,
-  },
-  {
-    q: "Why might an older thumbnail stop loading?",
-    a: "After some updates preview links expire. Try opening the image again—but if originals never show up, mail us via Help and we’ll dig in.",
-  },
-  {
-    q: "Do I need to sign in?",
-    a: "Browse without an account. Saving work and credits needs sign-in.",
-  },
-];
-
-function FaqItem({ item, open, onToggle }) {
-  return (
-    <motion.div
-      layout
-      className={`overflow-hidden rounded-[1.25rem] border bg-white/90 shadow-sm transition ${
-        open ? "border-brand-cyan/50 ring-1 ring-brand-cyan/25" : "border-slate-200/85"
-      }`}
-    >
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:px-5"
-        aria-expanded={open}
-      >
-        <span className="type-faq-question">{item.q}</span>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-cyan/25 to-brand-sky/20">
-          <ChevronDown
-            className={`h-5 w-5 text-brand-cyan transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          />
-        </span>
-      </button>
-      {open ? (
-        <div className="border-t border-slate-100/90 px-4 pb-3 pt-0 sm:px-5">
-          <p className="type-body pt-3">{item.a}</p>
-        </div>
-      ) : null}
-    </motion.div>
-  );
-}
-
 export default function Help() {
-  const [openFaq, setOpenFaq] = useState(-1);
-
   return (
     <MarketingPageShell className="pb-28 pt-6 sm:pt-8">
       <div className="relative w-full">
@@ -259,11 +202,9 @@ export default function Help() {
 
       {/* Jump tiles */}
       <section className="relative mt-10">
-        <div className="flex flex-wrap items-end justify-between gap-3 px-1">
-          <div>
-            <p className="type-eyebrow-muted">Quick links</p>
-            <h2 className="type-subsection-title mt-1">Shortcuts</h2>
-          </div>
+        <div className="px-1 text-center">
+          <p className="type-eyebrow-muted">Quick links</p>
+          <h2 className="type-subsection-title mt-1">Shortcuts</h2>
         </div>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
           {quickLinks.map((link, idx) => {
@@ -296,8 +237,10 @@ export default function Help() {
 
       {/* Journey */}
       <section className="relative mt-10">
-        <p className="type-eyebrow-muted">The usual flow</p>
-        <h2 className="type-subsection-title mt-2">Three steps</h2>
+        <div className="px-1 text-center">
+          <p className="type-eyebrow-muted">The usual flow</p>
+          <h2 className="type-subsection-title mt-2">Three steps</h2>
+        </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
           {journey.map((step, i) => (
             <motion.article
@@ -327,8 +270,10 @@ export default function Help() {
 
       {/* Credit duo */}
       <section className="relative mt-10">
-        <p className="type-eyebrow-muted">Credits</p>
-        <h2 className="type-subsection-title mt-2">Costs</h2>
+        <div className="px-1 text-center">
+          <p className="type-eyebrow-muted">Credits</p>
+          <h2 className="type-subsection-title mt-2">Costs</h2>
+        </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {creditCards.map((card) => {
             const C = card.icon;
@@ -372,32 +317,12 @@ export default function Help() {
 
       {/* Tips */}
       <section className="relative mt-11">
-        <div className="flex items-start gap-2 px-1">
-          <Lightbulb className="mt-1 h-5 w-5 text-amber-400" aria-hidden />
-          <div>
-            <p className="type-eyebrow-muted">Quick tips</p>
-            <h2 className="type-subsection-title mt-0.5">Tips</h2>
-          </div>
+        <div className="px-1 text-center">
+          <Lightbulb className="mx-auto h-5 w-5 text-amber-400" aria-hidden />
+          <p className="type-eyebrow-muted mt-2">Quick tips</p>
+          <h2 className="type-subsection-title mt-0.5">Tips</h2>
         </div>
         <TipBrandCardGrid />
-      </section>
-
-      {/* FAQ */}
-      <section className="relative mt-11">
-        <div className="px-1 text-center">
-          <p className="type-eyebrow-muted">Questions</p>
-          <h2 className="type-subsection-title mt-2">FAQ</h2>
-        </div>
-        <div className="mt-6 space-y-3">
-          {faqs.map((item, i) => (
-            <FaqItem
-              key={item.q}
-              item={item}
-              open={openFaq === i}
-              onToggle={() => setOpenFaq((v) => (v === i ? -1 : i))}
-            />
-          ))}
-        </div>
       </section>
 
       {/* Email */}

@@ -1,3 +1,7 @@
+/**
+ * Auth-only router mounted at /api/auth (deprecated alias).
+ * Canonical auth paths: POST /api/user/register, POST /api/user/login (userRoutes.js).
+ */
 import express from "express";
 import { body } from "express-validator";
 import { registerUser, loginUser } from "../controllers/authController.js";

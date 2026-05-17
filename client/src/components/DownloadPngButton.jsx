@@ -3,7 +3,6 @@ import { downloadPixorifyImage } from "../lib/downloadImage.js";
 
 /**
  * @param {object} props
- * @param {string} [props.imageId]
  * @param {string} [props.imageUrl]
  * @param {string} [props.filename]
  * @param {string} [props.className]
@@ -11,7 +10,6 @@ import { downloadPixorifyImage } from "../lib/downloadImage.js";
  * @param {boolean} [props.disabled]
  */
 export default function DownloadPngButton({
-  imageId,
   imageUrl,
   filename,
   className = "",
@@ -19,15 +17,15 @@ export default function DownloadPngButton({
   disabled = false,
 }) {
   const [busy, setBusy] = useState(false);
-  const canDownload = Boolean(imageId || imageUrl);
+  const canDownload = Boolean(imageUrl);
 
-  const onClick = async (e) => {
+  const onClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (busy || disabled || !canDownload) return;
     setBusy(true);
     try {
-      await downloadPixorifyImage({ imageId, imageUrl, filename });
+      downloadPixorifyImage({ imageUrl, filename });
     } finally {
       setBusy(false);
     }

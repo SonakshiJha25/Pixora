@@ -368,7 +368,6 @@ export default function Gallery() {
                     Continue editing
                   </Link>
                       <DownloadPngButton
-                        imageId={group.latest._id}
                         imageUrl={group.latest.imageUrl}
                         filename={`pixorify-${group.latest._id}.png`}
                         className="rounded-full border border-white/[0.1] bg-white/[0.05] px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/18 hover:bg-white/[0.08]"

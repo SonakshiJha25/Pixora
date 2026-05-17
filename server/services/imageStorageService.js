@@ -27,36 +27,22 @@ export async function persistImageBuffer(buffer, { publicId } = {}) {
 
   const baseName =
     publicId || `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
-  const isProd = process.env.NODE_ENV === "production";
+
+  const relativeUrl = await saveLocallyAsFallback(buffer, `${baseName}.png`);
+  logInfo(`Image stored locally (${baseName}.png)`);
 
   if (isCloudinaryConfigured()) {
     try {
-      const cloudUrl = await uploadGeneratedImage(buffer, { publicId: baseName });
-      logInfo(`Cloudinary upload completed (asset: ${baseName})`);
-      return cloudUrl;
+      await uploadGeneratedImage(buffer, { publicId: baseName });
+      logInfo(`Cloudinary mirror upload completed (asset: ${baseName})`);
     } catch (err) {
-      logError("Cloudinary upload failed", err);
-      if (isProd) {
-        throw new AppError(
-          `Image storage failed (Cloudinary): ${err.message}`,
-          502,
-          "STORAGE_UPLOAD_FAILED"
-        );
-      }
+      logError("Cloudinary mirror upload failed", err);
     }
-  } else if (isProd) {
-    throw new AppError(
-      "Image storage is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.",
-      500,
-      "STORAGE_NOT_CONFIGURED"
-    );
-  } else {
+  } else if (process.env.NODE_ENV === "production") {
     logWarn(
-      "Cloudinary not configured (set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET). Saving to local disk only (development)."
+      "Cloudinary not configured — images use /generated on this server only."
     );
   }
 
-  const relativeUrl = await saveLocallyAsFallback(buffer, `${baseName}.png`);
-  logInfo(`Image stored locally (${baseName}.png, dev fallback)`);
   return relativeUrl;
 }

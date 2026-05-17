@@ -130,7 +130,6 @@ export default function HistoryImageCard({
               <div className="pointer-events-auto flex gap-1.5 rounded-[0.65rem] border border-white/[0.1] bg-slate-950/88 p-1 shadow-lg backdrop-blur-md">
                 {dl ? (
                   <DownloadPngButton
-                    imageId={item._id}
                     imageUrl={item.imageUrl}
                     filename={`pixorify-${item._id}.png`}
                     className="inline-flex flex-1 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-white/18 hover:bg-white/[0.09]"

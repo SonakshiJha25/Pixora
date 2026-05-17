@@ -1,3 +1,7 @@
+/**
+ * Canonical user API — mounted at /api/user (and temporary alias /api/v1/user).
+ * Register, login, profile, and credits read share this router.
+ */
 import express from "express";
 import { body } from "express-validator";
 import { registerUser, loginUser, getMe } from "../controllers/authController.js";
@@ -25,6 +29,7 @@ userRouter.post(
 );
 
 userRouter.get("/me", ...authedCredits, getMe);
+/** Canonical credits balance — GET or POST (same handler). */
 userRouter.get("/credits", ...authedCredits, getCredits);
 userRouter.post("/credits", ...authedCredits, getCredits);
 
