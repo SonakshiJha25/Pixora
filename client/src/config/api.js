@@ -63,16 +63,15 @@ export function getRequestBaseUrl() {
   }
 
   const apiBase = getApiBase();
-  if (apiBase) {
-    try {
-      const pageOrigin = window.location.origin.replace(/\/+$/, "");
-      const apiOrigin = apiBase.startsWith("http") ? apiBase : `https://${apiBase}`;
-      if (pageOrigin === normalizeOrigin(apiOrigin)) {
-        return "";
-      }
-    } catch {
-      /* ignore */
+
+  try {
+    const pageOrigin = window.location.origin.replace(/\/+$/, "");
+    const apiOrigin = apiBase.startsWith("http") ? apiBase : `https://${apiBase}`;
+    if (pageOrigin === normalizeOrigin(apiOrigin)) {
+      return "";
     }
+  } catch {
+    /* ignore */
   }
 
   return apiBase;

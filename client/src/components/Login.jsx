@@ -67,7 +67,14 @@ const Login = () => {
                 toast.error(response.data.message || 'Something went wrong');
             }
         } catch (error) {
-            toast.error(error?.response?.data?.error?.message || error?.message || 'Network error');
+            const msg = error?.response?.data?.error?.message || error?.message || '';
+            if (!error?.response && /network|failed to fetch|cors/i.test(msg)) {
+                toast.error(
+                    'Cannot reach the API. On localhost, run the server on port 4000. On the live site, check that the frontend was built with VITE_BACKEND_URL.'
+                );
+            } else {
+                toast.error(msg || 'Something went wrong');
+            }
         } finally {
             inFlight.current = false;
             setLoading(false);

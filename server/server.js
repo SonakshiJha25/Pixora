@@ -48,8 +48,13 @@ function isAllowedCorsOrigin(origin) {
   if (!origin) return true;
   if (allowedOrigins.includes(origin)) return true;
   try {
-    const host = new URL(origin).hostname;
-    if (host.endsWith(".vercel.app") || host.endsWith(".onrender.com")) return true;
+    const { protocol, hostname } = new URL(origin);
+    if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) {
+      return true;
+    }
+    if (protocol === "https:" && (hostname.endsWith(".vercel.app") || hostname.endsWith(".onrender.com"))) {
+      return true;
+    }
   } catch {
     return false;
   }
@@ -60,7 +65,7 @@ app.use(
   cors({
     origin(origin, callback) {
       if (isAllowedCorsOrigin(origin)) return callback(null, true);
-      return callback(new Error(`CORS: origin ${origin} not allowed`));
+      return callback(null, false);
     },
     credentials: true,
     exposedHeaders: ["Content-Disposition", "Content-Length", "Content-Type"],
