@@ -521,8 +521,10 @@ export default function Studio() {
   };
 
   const latestFrame = sortedThread.length > 0 ? sortedThread[sortedThread.length - 1] : null;
-  const downloadImageUrl = latestFrame?.imageUrl || image;
-  const previewSrc = downloadImageUrl ? resolveImageUrl(downloadImageUrl) : "";
+  const downloadImageId = latestFrame?._id ? String(latestFrame._id) : "";
+  const previewSrc = (latestFrame?.imageUrl || image)
+    ? resolveImageUrl(latestFrame?.imageUrl || image)
+    : "";
 
   return (
     <div className="relative w-full overflow-hidden pb-24 pt-5 sm:pt-8">
@@ -635,9 +637,8 @@ export default function Studio() {
                     New prompt
                   </button>
                   <DownloadPngButton
-                    imageUrl={downloadImageUrl}
-                    filename="pixorify-image.png"
-                    disabled={!downloadImageUrl}
+                    imageId={downloadImageId}
+                    disabled={!downloadImageId}
                     className="inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-40"
                   />
                   <button

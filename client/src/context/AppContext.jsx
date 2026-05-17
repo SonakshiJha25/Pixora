@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import { getApiBase } from "../config/api.js";
+import { getApiBase, getRequestBaseUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 
@@ -38,7 +38,7 @@ const AppContextProvider = ({ children }) => {
   const api = useMemo(() => {
     const instance = axios.create({ baseURL: "" });
     instance.interceptors.request.use((config) => {
-      config.baseURL = getApiBase() || "";
+      config.baseURL = getRequestBaseUrl() || "";
       const t = getToken();
       if (t) {
         config.headers.Authorization = `Bearer ${t}`;

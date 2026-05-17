@@ -50,14 +50,18 @@ export function getApiBase() {
   return fromEnvBuild;
 }
 
-if (import.meta.env.PROD && typeof window !== "undefined") {
-  queueMicrotask(() => {
-    if (!getApiBase()) {
-      console.warn(
-        "[Pixora] API base URL is not set for this build. If images or login fail, check hosting configuration."
-      );
+/**
+ * Base URL for API requests (axios). On localhost dev, always same-origin so Vite
+ * proxies /api → local Express. In production builds, uses VITE_BACKEND_URL (Render, etc.).
+ */
+export function getRequestBaseUrl() {
+  if (import.meta.env.DEV && typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "";
     }
-  });
+  }
+  return getApiBase();
 }
 
 /**
@@ -74,7 +78,7 @@ if (import.meta.env.PROD && typeof window !== "undefined") {
  */
 export function resolveImageUrl(stored) {
   if (!stored || typeof stored !== "string") return stored;
-  const base = normalizeOrigin(getApiBase());
+  const base = normalizeOrigin(getRequestBaseUrl());
   let pathPart = stored;
 
   if (/^https?:\/\//i.test(stored)) {

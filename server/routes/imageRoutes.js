@@ -21,6 +21,7 @@ import {
   toggleImagePublic,
 } from "../controllers/imageController.js";
 import authedCredits from "../middlewares/authedCredits.js";
+import userAuth from "../middlewares/auth.js";
 import validate from "../middlewares/validate.js";
 
 const imageRouter = express.Router();
@@ -90,14 +91,15 @@ imageRouter.get("/gallery/public", getPublicGallery);
 imageRouter.get("/prompt/styles", getPromptStyles);
 
 const downloadRoute = [
-  ...authedCredits,
+  userAuth,
   [param("imageId").isMongoId(), validate],
   downloadImageFile,
 ];
-/** Canonical download path. */
+/** GET /api/images/:imageId/download (canonical — use this from the client) */
 imageRouter.get("/:imageId/download", downloadRoute);
-/** Deprecated alias — same handler as /:imageId/download. */
+/** GET /api/images/download/:imageId */
 imageRouter.get("/download/:imageId", downloadRoute);
+
 imageRouter.delete("/:imageId", ...authedCredits, deleteImage);
 imageRouter.patch("/:imageId/favorite", ...authedCredits, toggleFavoriteImage);
 /** No current client — toggles isPublic without gallery UI. */
