@@ -4,6 +4,7 @@ import {
   cleanupBrokenImages,
   deleteImage,
   editImage,
+  refineImage,
   generateImage,
   getImageThread,
   getMyImages,
@@ -45,16 +46,22 @@ imageRouter.post(
   generateImage
 );
 
-imageRouter.post(
-  "/edit",
-  ...authedCredits,
-  [
-    body("imageId").customSanitizer((v) => (v == null ? "" : String(v).trim())).isMongoId(),
-    body("editPrompt").isLength({ min: 3, max: 1000 }),
-    validate,
-  ],
-  editImage
-);
+const refineValidators = [
+  body("imageId").customSanitizer((v) => (v == null ? "" : String(v).trim())).isMongoId(),
+  body("editPrompt").optional().isLength({ min: 3, max: 1000 }),
+  body("refinementPrompt").optional().isLength({ min: 3, max: 1000 }),
+  body().custom((_value, { req }) => {
+    const edit = String(req.body?.editPrompt ?? "").trim();
+    const refine = String(req.body?.refinementPrompt ?? "").trim();
+    if (edit.length >= 3 || refine.length >= 3) return true;
+    throw new Error("editPrompt or refinementPrompt is required (min 3 characters)");
+  }),
+  validate,
+];
+
+imageRouter.post("/edit", ...authedCredits, refineValidators, editImage);
+
+imageRouter.post("/refine", ...authedCredits, refineValidators, refineImage);
 
 imageRouter.get(
   "/thread/:imageId",

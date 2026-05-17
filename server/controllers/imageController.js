@@ -6,10 +6,8 @@ import { deductCreditAndSaveImage } from "../services/creditService.js";
 import { resolveGeneratedImageUrl } from "../services/imageService.js";
 import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
-import { resolveEditedImageUrl } from "../services/imageEditService.js";
 import { collectThreadFromAnyNode } from "../utils/imageThread.js";
-import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
-import { snapCreditsToLedger } from "../services/dailyCreditsService.js";
+import { runImageRefinement } from "../services/refinementService.js";
 import { logInfo } from "../utils/logger.js";
 
 export const generateImage = asyncHandler(async (req, res) => {
@@ -55,77 +53,11 @@ export const generateImage = asyncHandler(async (req, res) => {
   });
 });
 
-export const editImage = asyncHandler(async (req, res) => {
-  const { imageId, editPrompt } = req.body;
-  const trimmed = String(editPrompt || "").trim();
+/** POST /api/images/edit — existing frontend contract (editPrompt + imageId). */
+export const editImage = asyncHandler(runImageRefinement);
 
-  const creditSnapshot = await refreshUserCreditsFromDb(req.user.id);
-  if (!creditSnapshot) {
-    throw new AppError("User not found", 404, "USER_NOT_FOUND");
-  }
-
-  const parent = await Image.findOne({
-    _id: imageId,
-    userId: req.user.id,
-    deletedAt: null,
-  });
-
-  if (!parent) {
-    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
-  }
-
-  const originalPrompt = parent.originalPrompt || parent.prompt;
-  const threadRootId = parent.threadRootId || parent._id;
-  const sourceAbs = absoluteImageUrl(parent.imageUrl, req);
-
-  const { imageUrl, mode } = await resolveEditedImageUrl({
-    sourceAbsoluteUrl: sourceAbs,
-    originalPrompt,
-    editPrompt: trimmed,
-    style: parent.style || "realistic",
-  });
-
-  const promptEnhanced = enhancePrompt(trimmed, parent.style || "realistic");
-
-  const child = await Image.create({
-    userId: req.user.id,
-    prompt: trimmed,
-    promptEnhanced,
-    style: parent.style || "realistic",
-    tags: Array.isArray(parent.tags) ? parent.tags.slice(0, 8) : [],
-    isPublic: false,
-    imageUrl,
-    provider:
-      mode === "duplicate_fallback"
-        ? `${String(parent.provider || "clipdrop")}-fallback`
-        : parent.provider || "clipdrop",
-    parentImageId: parent._id,
-    threadRootId,
-    isEdit: true,
-    generationKind: "refine",
-    editPrompt: trimmed,
-    originalPrompt,
-  });
-
-  logInfo(
-    `Image edit saved: user=…${String(req.user.id).slice(-8)} parent=${String(parent._id)} child=${String(child._id)} mode=${mode}`
-  );
-
-  const who =
-    typeof creditSnapshot.email === "string" && creditSnapshot.email.trim()
-      ? creditSnapshot.email.trim()
-      : String(req.user.id);
-  const unchanged = snapCreditsToLedger(creditSnapshot.credits);
-  logInfo(`[Free Refinement]\nUser: ${who}\nCredits unchanged: ${unchanged}`);
-
-  return res.status(200).json({
-    success: true,
-    message: "Refinement saved",
-    creditsUnchanged: true,
-    refinementMode: mode,
-    image: serializeImage(child, req),
-  });
-});
+/** POST /api/images/refine — same handler; accepts refinementPrompt. */
+export const refineImage = asyncHandler(runImageRefinement);
 
 export const getImageThread = asyncHandler(async (req, res) => {
   const packed = await collectThreadFromAnyNode(req.params.imageId, req.user.id);

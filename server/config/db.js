@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { logError, logInfo } from "../utils/logger.js";
 import { runUserCreditLedgerMigrationOnce } from "../migrations/userCreditLedgerMigration.js";
 import { runImageThreadRootBackfillOnce } from "../migrations/imageThreadMigration.js";
+import { runImageVersionMigrationOnce } from "../migrations/imageVersionMigration.js";
 
 async function connectDB() {
   logInfo("MongoDB: connecting");
@@ -12,6 +13,7 @@ async function connectDB() {
     logInfo(`MongoDB connected (database: ${dbName})`);
     await runUserCreditLedgerMigrationOnce();
     await runImageThreadRootBackfillOnce();
+    await runImageVersionMigrationOnce();
   } catch (error) {
     logError("MongoDB connection failed", error);
     throw error;

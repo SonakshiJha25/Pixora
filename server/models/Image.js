@@ -45,8 +45,12 @@ const imageSchema = new mongoose.Schema(
     },
     /** User instruction for this refinement (edits only). */
     editPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
+    /** Same as editPrompt — API alias for refinement requests. */
+    refinementPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
     /** Root generation prompt for the whole thread (copied on each edit). */
     originalPrompt: { type: String, default: null, trim: true, maxlength: 2000 },
+    /** Thread version: 1 = original generate; each refinement = parent.version + 1 */
+    version: { type: Number, default: 1, min: 1 },
   },
   { timestamps: true }
 );
