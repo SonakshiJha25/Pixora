@@ -4,25 +4,28 @@ import {
   getDailyCreditLimit,
   getCreditsPerImage,
   getCreditsResetTimezoneLabel,
+  getNextIstResetIso,
 } from "../services/dailyCreditsService.js";
 import { useCreditsAtomic } from "../services/creditService.js";
 import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
 
-const resetIsoFromUser = (user) =>
-  user.dailyCreditResetAt ? user.dailyCreditResetAt.toISOString() : null;
+const nextResetIso = () => getNextIstResetIso();
 
-const sanitizeUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  credits: user.credits,
-  creditBalance: user.credits,
-  dailyCreditResetAt: resetIsoFromUser(user),
-  lastCreditResetAt: user.lastCreditResetAt ? user.lastCreditResetAt.toISOString() : null,
-  /** Alias of `dailyCreditResetAt` for clients that expect this name. */
-  nextCreditResetAt: resetIsoFromUser(user),
-});
+const sanitizeUser = (user) => {
+  const nextResetAt = nextResetIso();
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    credits: user.credits,
+    creditBalance: user.credits,
+    lastCreditResetDate: user.lastCreditResetDate,
+    dailyCreditResetAt: nextResetAt,
+    nextCreditResetAt: nextResetAt,
+    nextResetAt,
+  };
+};
 
 export const getCredits = asyncHandler(async (req, res) => {
   const user = await refreshUserCreditsFromDb(req.user.id);
@@ -30,7 +33,7 @@ export const getCredits = asyncHandler(async (req, res) => {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
 
-  const nextResetAt = resetIsoFromUser(user);
+  const nextResetAt = nextResetIso();
 
   return res.status(200).json({
     success: true,
@@ -38,9 +41,9 @@ export const getCredits = asyncHandler(async (req, res) => {
     remainingCredits: user.credits,
     dailyLimit: getDailyCreditLimit(),
     creditsPerImage: getCreditsPerImage(),
+    lastCreditResetDate: user.lastCreditResetDate,
     nextResetAt,
     dailyCreditResetAt: nextResetAt,
-    lastCreditResetAt: user.lastCreditResetAt ? user.lastCreditResetAt.toISOString() : null,
     nextCreditResetAt: nextResetAt,
     dailyResetTimezone: getCreditsResetTimezoneLabel(),
     user: sanitizeUser(user),

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getNextIstMidnightUtcMs, snapCreditsToLedger } from "../services/dailyCreditsService.js";
+import { getIstDateString, snapCreditsToLedger } from "../services/dailyCreditsService.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -14,35 +14,25 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    /** Daily pool in points; allowed 0–100 in steps of 10 (snapCreditsToLedger). */
+    /** Daily pool: 0, 10, …, 100 only (see snapCreditsToLedger). */
     credits: { type: Number, required: true, default: 100, min: 0 },
     /**
-     * IST "bucket" day index used for rollover: floor((utcMs + 5h30m) / 864e5).
-     * When this is behind today's bucket, refill credits to daily pool once (calendar day boundary).
+     * Last IST calendar day the daily pool was aligned (`YYYY-MM-DD`).
+     * If this is not today's IST date, credits refill to 100 on next ensureDailyCredits.
      */
-    dailyPoolIstDay: { type: Number, default: null },
-    /**
-     * Next IST midnight UTC instant (human/API countdown). Updated when the pool resets.
-     */
-    dailyCreditResetAt: {
-      type: Date,
+    lastCreditResetDate: {
+      type: String,
       required: true,
-      default() {
-        return new Date(getNextIstMidnightUtcMs(Date.now()));
-      },
+      default: () => getIstDateString(),
+      match: /^\d{4}-\d{2}-\d{2}$/,
     },
-    /**
-     * Wall-clock moment of the most recent daily refill (set when credits reset to the daily pool).
-     * Optional for legacy users until their first rollover after deploy.
-     */
-    lastCreditResetAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", function creditsLedgerPreSave(next) {
   if (this.isModified("credits")) {
-    this.credits = Math.max(0, snapCreditsToLedger(this.credits));
+    this.credits = snapCreditsToLedger(this.credits);
   }
   next();
 });

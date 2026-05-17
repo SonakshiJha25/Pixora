@@ -3,8 +3,8 @@ import User from "../models/User.js";
 import { ensureDailyCredits } from "../services/dailyCreditsService.js";
 
 /**
- * On authenticated routes wired with authedCredits: IST calendar-day bucket vs `dailyPoolIstDay`,
- * persist rollover if needed, reload user so handlers see MongoDB-canonical credits.
+ * On authenticated routes wired with authedCredits: compare `lastCreditResetDate` (IST `YYYY-MM-DD`)
+ * to today; refill if needed, reload user so handlers see MongoDB-canonical credits.
  */
 export default async function refreshUserCreditsFromDb(userId, { session } = {}) {
   if (userId == null || userId === "") return null;

@@ -2,19 +2,24 @@ import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import { login, register } from "../services/authService.js";
 import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
+import { getNextIstResetIso } from "../services/dailyCreditsService.js";
 import { logInfo } from "../utils/logger.js";
 
-const sanitizeUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  credits: user.credits,
-  creditBalance: user.credits,
-  dailyCreditResetAt: user.dailyCreditResetAt
-    ? user.dailyCreditResetAt.toISOString()
-    : null,
-});
+const sanitizeUser = (user) => {
+  const nextResetAt = getNextIstResetIso();
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    credits: user.credits,
+    creditBalance: user.credits,
+    lastCreditResetDate: user.lastCreditResetDate,
+    dailyCreditResetAt: nextResetAt,
+    nextCreditResetAt: nextResetAt,
+    nextResetAt,
+  };
+};
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { token, user } = await register(req.body);

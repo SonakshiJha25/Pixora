@@ -3,18 +3,31 @@ import { logInfo } from "../utils/logger.js";
 export const DAILY_CREDITS = 100;
 export const CREDITS_PER_IMAGE = 10;
 const DAY_MS = 86400000;
-/** India Standard Time = UTC+5:30 (no DST). All daily resets use IST midnight only (calendar, not rolling 24h). */
+/** India Standard Time = UTC+5:30 (no DST). Daily reset at IST midnight only. */
 const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
 
-/** Integer bucket for which IST calendar day a UTC instant falls into (deterministic daily rollover). */
-export function istCalendarDayIndexUtc(utcMs = Date.now()) {
+const IST_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * IST calendar date as `YYYY-MM-DD` (reset bucket — no timestamps stored for logic).
+ * @param {number} [utcMs]
+ */
+export function getIstDateString(utcMs = Date.now()) {
   const t = typeof utcMs === "number" ? utcMs : new Date(utcMs).getTime();
-  if (!Number.isFinite(t)) return Math.floor((Date.now() + IST_OFFSET_MS) / DAY_MS);
-  return Math.floor((t + IST_OFFSET_MS) / DAY_MS);
+  const base = Number.isFinite(t) ? t : Date.now();
+  const ist = new Date(base + IST_OFFSET_MS);
+  const y = ist.getUTCFullYear();
+  const m = String(ist.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(ist.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export function isValidIstDateString(value) {
+  return typeof value === "string" && IST_DATE_RE.test(value);
 }
 
 /**
- * UTC instant (ms) of the next 00:00 IST strictly after `fromMs`.
+ * UTC instant (ms) of the next 00:00 IST strictly after `fromMs` (API countdown only).
  */
 export function getNextIstMidnightUtcMs(fromMs = Date.now()) {
   const t = typeof fromMs === "number" ? fromMs : new Date(fromMs).getTime();
@@ -24,9 +37,7 @@ export function getNextIstMidnightUtcMs(fromMs = Date.now()) {
   return next;
 }
 
-/**
- * Valid balances only: 0, 10, …, 100. Never negative.
- */
+/** Valid balances only: 0, 10, …, 100. */
 export function snapCreditsToLedger(raw) {
   let n = Math.round(Number(raw));
   if (!Number.isFinite(n)) n = 0;
@@ -40,91 +51,91 @@ function formatCreditLogUser(user) {
 }
 
 /**
- * Migrate legacy docs: derive last IST pool bucket from legacy `dailyCreditResetAt`.
- * Before that instant → assume pool matches today's IST bucket; once past → previous bucket triggers rollover next line.
+ * Pure IST midnight rollover: compare stored `lastCreditResetDate` to today's IST date.
+ * @returns {{ credits: number, lastCreditResetDate: string, didReset: boolean, initialized: boolean, creditsBefore?: number }}
  */
-function deriveInitialDailyPoolDayFromLegacy(user, nowMs, currKey) {
-  if (!user.dailyCreditResetAt) return currKey;
-  const n = new Date(user.dailyCreditResetAt).getTime();
-  if (!Number.isFinite(n)) return currKey;
-  if (nowMs < n) return currKey;
-  return currKey - 1;
+export function evaluateIstDailyCreditReset(
+  rawCredits,
+  lastCreditResetDate,
+  nowMs = Date.now()
+) {
+  const todayIst = getIstDateString(nowMs);
+  let credits = snapCreditsToLedger(rawCredits);
+  const stored =
+    typeof lastCreditResetDate === "string" ? lastCreditResetDate.trim() : "";
+
+  if (!isValidIstDateString(stored)) {
+    return {
+      credits,
+      lastCreditResetDate: todayIst,
+      didReset: false,
+      initialized: true,
+    };
+  }
+
+  if (stored !== todayIst) {
+    const creditsBefore = credits;
+    credits = DAILY_CREDITS;
+    return {
+      credits,
+      lastCreditResetDate: todayIst,
+      didReset: true,
+      initialized: false,
+      creditsBefore,
+    };
+  }
+
+  return {
+    credits,
+    lastCreditResetDate: stored,
+    didReset: false,
+    initialized: false,
+  };
 }
 
 /**
- * IST calendar-day rollover in MongoDB (source of truth). Also keeps `dailyCreditResetAt`
- * aligned as the upcoming IST midnight for API/countdown UX.
+ * IST calendar-day rollover in MongoDB. Source of truth: `lastCreditResetDate` (`YYYY-MM-DD`).
  */
 export async function ensureDailyCredits(user, { session } = {}) {
   const saveOpts = session ? { session } : {};
-  let dirty = false;
   const nowMs = Date.now();
   const userIdShort = user?._id != null ? String(user._id) : "?";
   const who = formatCreditLogUser(user);
+  const todayIst = getIstDateString(nowMs);
+  const storedBefore = user.lastCreditResetDate ?? null;
+  const creditsBefore = snapCreditsToLedger(user.credits);
 
-  const snapped = snapCreditsToLedger(user.credits);
-  if (snapped !== user.credits) {
-    user.credits = snapped;
-    dirty = true;
-  }
+  console.log("[Credits] check user", userIdShort, who);
+  console.log("[Credits] current IST date:", todayIst);
+  console.log("[Credits] stored reset date:", storedBefore ?? "(none)");
+  console.log("[Credits] credits before reset:", creditsBefore);
 
-  const currKey = istCalendarDayIndexUtc(nowMs);
-  console.log("[Credits] Checking credit reset for user", userIdShort, who);
+  const outcome = evaluateIstDailyCreditReset(user.credits, user.lastCreditResetDate, nowMs);
 
-  let poolDay =
-    typeof user.dailyPoolIstDay === "number" && Number.isFinite(user.dailyPoolIstDay)
-      ? user.dailyPoolIstDay
-      : null;
+  user.credits = outcome.credits;
+  user.lastCreditResetDate = outcome.lastCreditResetDate;
 
-  if (poolDay === null || poolDay === undefined) {
-    poolDay = deriveInitialDailyPoolDayFromLegacy(user, nowMs, currKey);
-    user.dailyPoolIstDay = poolDay;
-    dirty = true;
-  }
+  const dirty =
+    outcome.didReset ||
+    outcome.initialized ||
+    creditsBefore !== outcome.credits ||
+    storedBefore !== outcome.lastCreditResetDate;
 
-  let nextMs = user.dailyCreditResetAt ? new Date(user.dailyCreditResetAt).getTime() : NaN;
-  const canonicalNext = getNextIstMidnightUtcMs(nowMs);
-  const STUCK_ZERO_SCHEDULE_EPS_MS = 60 * 1000;
-
-  if (
-    snapCreditsToLedger(user.credits) === 0 &&
-    Number.isFinite(nextMs) &&
-    nextMs > canonicalNext + STUCK_ZERO_SCHEDULE_EPS_MS
-  ) {
-    user.dailyCreditResetAt = new Date(canonicalNext);
-    user.credits = DAILY_CREDITS;
-    user.dailyPoolIstDay = currKey;
-    user.lastCreditResetAt = new Date(nowMs);
-    dirty = true;
-    nextMs = canonicalNext;
-    console.log("[Credits] Repaired skewed zero-balance reset schedule → user", userIdShort);
+  if (outcome.didReset) {
+    console.log("[Credits] credits after reset:", user.credits);
     logInfo(
-      `[Credit Reset — schedule repair]\nUser: ${who}\nReason: 0 credits but dailyCreditResetAt was ahead of IST\nNew Credits: ${user.credits}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
+      `[Credit Reset IST midnight]\nUser: ${who}\nIST today: ${todayIst}\nStored date was: ${storedBefore}\nOld Credits: ${outcome.creditsBefore}\nNew Credits: ${user.credits}`
     );
-  }
-
-  if (!Number.isFinite(nextMs) || !user.dailyCreditResetAt) {
-    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
-    dirty = true;
-  }
-
-  if (currKey > poolDay) {
-    const oldCredits = snapCreditsToLedger(user.credits);
-    user.credits = DAILY_CREDITS;
-    user.dailyPoolIstDay = currKey;
-    user.lastCreditResetAt = new Date(nowMs);
-    user.dailyCreditResetAt = new Date(getNextIstMidnightUtcMs(nowMs));
-    dirty = true;
-    console.log("[Credits] Credits reset successfully — user:", userIdShort, "was", oldCredits, "→", user.credits);
-    console.log("[Credits] Next reset at:", user.dailyCreditResetAt.toISOString());
-    logInfo(
-      `[Credit Reset IST day]\nUser: ${who}\nOld Credits: ${oldCredits}\nNew Credits: ${user.credits}\nPool IST day idx: ${currKey}\nNext Reset: ${user.dailyCreditResetAt.toISOString()}`
-    );
+  } else if (outcome.initialized) {
+    console.log("[Credits] initialized lastCreditResetDate:", user.lastCreditResetDate);
+    console.log("[Credits] credits after init (unchanged):", user.credits);
+  } else {
+    console.log("[Credits] no reset — same IST day");
+    console.log("[Credits] credits after check:", user.credits);
   }
 
   if (dirty) {
     await user.save(saveOpts);
-    user.credits = snapCreditsToLedger(user.credits);
   }
 
   user.credits = snapCreditsToLedger(user.credits);
@@ -139,13 +150,13 @@ export function getCreditsPerImage() {
   return CREDITS_PER_IMAGE;
 }
 
-/** API helper: next IST midnight after `now` (ISO string). */
+/** Next IST midnight after `now` (ISO string) — computed for clients, not stored. */
 export function getNextIstResetIso(nowInput = new Date()) {
   const t = nowInput instanceof Date ? nowInput : new Date(nowInput);
   return new Date(getNextIstMidnightUtcMs(t.getTime())).toISOString();
 }
 
-/** @deprecated use getNextIstResetIso — kept for internal error payload compatibility */
+/** @deprecated alias */
 export function getNextResetAt(nowInput = new Date()) {
   return getNextIstResetIso(nowInput);
 }
