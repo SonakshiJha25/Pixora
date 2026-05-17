@@ -638,7 +638,8 @@ export default function Studio() {
                   </button>
                   <DownloadPngButton
                     imageId={downloadImageId}
-                    disabled={!downloadImageId}
+                    imageUrl={latestFrame?.imageUrl || image}
+                    disabled={!downloadImageId && !(latestFrame?.imageUrl || image)}
                     className="inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-40"
                   />
                   <button

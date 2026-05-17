@@ -131,6 +131,7 @@ export default function HistoryImageCard({
                 {dl ? (
                   <DownloadPngButton
                     imageId={String(item._id)}
+                    imageUrl={item.imageUrl}
                     className="inline-flex flex-1 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] py-1.5 text-[10px] font-semibold text-white/95 transition hover:border-white/18 hover:bg-white/[0.09]"
                   >
                     Save

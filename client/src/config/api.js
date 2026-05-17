@@ -55,13 +55,27 @@ export function getApiBase() {
  * proxies /api → local Express. In production builds, uses VITE_BACKEND_URL (Render, etc.).
  */
 export function getRequestBaseUrl() {
-  if (import.meta.env.DEV && typeof window !== "undefined") {
-    const host = window.location.hostname;
-    if (host === "localhost" || host === "127.0.0.1") {
-      return "";
+  if (typeof window === "undefined") return getApiBase();
+
+  const host = window.location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") {
+    return "";
+  }
+
+  const apiBase = getApiBase();
+  if (apiBase) {
+    try {
+      const pageOrigin = window.location.origin.replace(/\/+$/, "");
+      const apiOrigin = apiBase.startsWith("http") ? apiBase : `https://${apiBase}`;
+      if (pageOrigin === normalizeOrigin(apiOrigin)) {
+        return "";
+      }
+    } catch {
+      /* ignore */
     }
   }
-  return getApiBase();
+
+  return apiBase;
 }
 
 /**

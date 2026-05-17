@@ -44,14 +44,26 @@ if (process.env.ALLOWED_ORIGINS) {
 }
 
 app.use(express.json({ limit: "1mb" }));
+function isAllowedCorsOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const host = new URL(origin).hostname;
+    if (host.endsWith(".vercel.app") || host.endsWith(".onrender.com")) return true;
+  } catch {
+    return false;
+  }
+  return false;
+}
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (isAllowedCorsOrigin(origin)) return callback(null, true);
       return callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
+    exposedHeaders: ["Content-Disposition", "Content-Length", "Content-Type"],
   })
 );
 app.use(
