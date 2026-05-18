@@ -24,7 +24,7 @@ export default function Pricing() {
           <h1 className="type-page-title mt-2">Free to create today</h1>
           <p className="type-body mx-auto mt-2 max-w-2xl">
             Pixorify is simple right now: sign in, generate in {WORKSPACE_NAME}, download PNGs, and like favourites. Pro
-            extras are on the way—see{" "}
+            extras are coming soon—see{" "}
             <Link to="/help" className="font-semibold underline underline-offset-4 decoration-pastel-cyan/55 hover:decoration-pastel-lilac/80">
               Help
             </Link>

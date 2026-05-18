@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { HOME_SHORTCUT_TILES } from "../../content/marketingShared.js";
+import { HomeSectionHeading } from "../../lib/homeTypography.jsx";
 
 /** Help “Shortcuts” grid — same markup, home tiles. */
 export default function HomeShortcuts() {
@@ -13,8 +14,9 @@ export default function HomeShortcuts() {
         transition={{ duration: 0.4 }}
         className="px-1"
       >
-        <p className="type-eyebrow-muted">Quick links</p>
-        <h2 className="type-subsection-title mt-1">Jump in</h2>
+        <HomeSectionHeading eyebrow="Quick links">
+          <h2 className="type-subsection-title mt-1">Jump in</h2>
+        </HomeSectionHeading>
       </motion.div>
       <ul className="mt-3 grid gap-2.5 sm:grid-cols-2 sm:gap-3">
         {HOME_SHORTCUT_TILES.map((link, idx) => {

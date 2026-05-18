@@ -12,6 +12,7 @@ import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { collectThreadFromAnyNode } from "../utils/imageThread.js";
 import { runImageRefinement } from "../services/refinementService.js";
+import { bufferToPreviewJpeg } from "../services/imageOptimize.js";
 import { logInfo } from "../utils/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -124,6 +125,30 @@ export const downloadImageFile = asyncHandler(async (req, res) => {
   res.setHeader("Content-Length", String(pngBuffer.length));
   res.setHeader("Cache-Control", "private, no-store");
   return res.send(pngBuffer);
+});
+
+/** GET /api/images/:imageId/preview — smaller JPEG for gallery/studio (faster on slow hosts). */
+export const getImagePreview = asyncHandler(async (req, res) => {
+  const imageId = String(req.params.imageId || "").trim();
+  const width = Math.min(1200, Math.max(160, parseInt(req.query.w, 10) || 640));
+
+  const image = await Image.findOne({
+    _id: imageId,
+    userId: req.user.id,
+    deletedAt: null,
+  });
+  if (!image) {
+    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
+  }
+
+  const { buffer } = await loadImageBytesForDownload(image.imageUrl, req);
+  const jpegBuffer = await bufferToPreviewJpeg(buffer, width);
+
+  res.setHeader("Content-Type", "image/jpeg");
+  res.setHeader("Content-Length", String(jpegBuffer.length));
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  return res.send(jpegBuffer);
 });
 
 // ---------------------------------------------------------------------------

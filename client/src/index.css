@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -63,6 +63,17 @@
   }
   .type-body {
     @apply text-[13px] leading-relaxed text-slate-600 sm:text-sm;
+  }
+  /** Homepage — serif accents + slightly airier body (scope on Home.jsx root). */
+  .home-marketing-scope .type-body,
+  .home-marketing-scope .type-body-tight {
+    @apply leading-[1.68] sm:leading-[1.72];
+  }
+  .home-serif-em {
+    @apply font-serif font-normal italic tracking-[-0.01em] text-inherit;
+  }
+  .home-emotional-heading {
+    @apply font-serif text-[1.35rem] font-normal leading-[1.32] tracking-[-0.02em] text-slate-900 sm:text-[1.65rem] sm:leading-[1.28];
   }
   .type-body-tight {
     @apply text-[13px] leading-snug text-slate-600 sm:text-sm;

@@ -56,10 +56,6 @@ export default function Footer() {
             </Link>
           </nav>
         </div>
-
-        <div className="mt-4 border-t border-pastel-cyan/25 pt-3 text-[10px] leading-relaxed text-slate-400 sm:text-[11px]">
-          © {new Date().getFullYear()} {SITE.name}
-        </div>
       </div>
     </footer>
   );

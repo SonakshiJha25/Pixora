@@ -1,30 +1,17 @@
-Pixorify image archive
-========================
+Pixorify images
+===============
 
-Canonical raster assets for the site. The client imports these via
-`client/src/lib/photos.js` (`@photos` alias in Vite).
+Marketing / decor (your six scenes)
+-----------------------------------
+  bg-1.png … bg-6.png   Home, Help, hero floats, tips, journey cards
 
-hero/
-  hero-float-*.png          Home hero collage only (5 unique scenes)
+Studio style modes (do not replace with bg-*)
+--------------------------------------------
+  style-1.png … style-5.png   Realistic, Anime, Cyberpunk, Fantasy, Minimal
 
-styles/
-  style-*.png               Studio style picker thumbnails
+Brand + UI
+----------
+  logo.png, favicon.png
+  icon-profile.png, icon-stars.png
 
-branding/
-  decor-*.png               Marketing mascots (not the logo)
-  pixorify-lettermark-logo.png
-
-logo/
-  pixorify-lettermark.png   Nav/footer mark
-
-site/
-  pixorify-mascot-cloud.png, star_group.png, profile_icon.png
-
-marketing/
-  tips-carousel/            Help Quick tips tiles
-  tip-gallery-desk-round.png
-  help/help-journey-step-2-studio-desk.png
-  home/home-journey-step-3-collect-desk.png
-  home/studio-preview.png
-
-When adding art: save here with a usage-based name, then wire it in `photos.js`.
+Wire files in `client/src/lib/photos.js`. SVG icons: `client/src/images/icons/`.

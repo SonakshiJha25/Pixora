@@ -12,6 +12,7 @@ import {
   generateImage,
   getImageThread,
   downloadImageFile,
+  getImagePreview,
   getMyImages,
   getPromptStyles,
   getPublicGallery,
@@ -95,6 +96,13 @@ const downloadRoute = [
   [param("imageId").isMongoId(), validate],
   downloadImageFile,
 ];
+const previewRoute = [
+  userAuth,
+  [param("imageId").isMongoId(), validate],
+  getImagePreview,
+];
+/** GET /api/images/:imageId/preview?w=640 — JPEG thumbnail for fast gallery loads */
+imageRouter.get("/:imageId/preview", previewRoute);
 /** GET /api/images/:imageId/download (canonical — use this from the client) */
 imageRouter.get("/:imageId/download", downloadRoute);
 /** GET /api/images/download/:imageId */

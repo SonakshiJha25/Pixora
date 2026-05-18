@@ -24,7 +24,6 @@ server/public/generated/*.png
 # Local Python vendor drop (Clipdrop experiments — not app source)
 server/_pyclipdrop_tmp/
 
-# Duplicate ChatGPT uploads (canonical copies live in photos/hero/)
+# Raw uploads / screenshots — not wired in photos.js
 photos/ChatGPT*.png
-photos/**/ChatGPT*.png
-photos/branding/img *.png
+photos/Screenshot*.png

@@ -2,6 +2,15 @@
 
 This repository is the **Pixorify** product (user-facing branding). The codebase folder name is often **Pixora**. The creative workspace UI is labeled **Pixora Studio** (see `client/src/lib/site.js`).
 
+### Deep-dive docs
+
+| Doc | Contents |
+|-----|----------|
+| [`GENERATION_PIPELINE_AND_API.md`](./GENERATION_PIPELINE_AND_API.md) | Text-to-image pipeline, API orchestration, Mermaid diagrams, env vars |
+| [`DESIGN_SYSTEM_AND_ASSETS.md`](./DESIGN_SYSTEM_AND_ASSETS.md) | **Color palette (all hex)**, typography, buttons, **every `photos/` file**, SVG icons, Home section order |
+
+**Raster rule:** canonical PNGs live in repo **`photos/`** only — wired through `client/src/lib/photos.js`. See `photos/README.txt`.
+
 ---
 
 ## Repository layout
@@ -86,17 +95,22 @@ Build injects `<meta name="pixora-api-base" content="…">` from `VITE_BACKEND_U
 
 ## Homepage architecture
 
-Implemented in **`client/src/pages/Home.jsx`** as a stacked marketing page inside `MarketingPageShell` plus fixed ambient washes.
+Implemented in **`client/src/pages/Home.jsx`** as a stacked marketing page inside `MarketingPageShell` plus `MarketingPageBackdrop`.
 
-| Section | Component | Role |
-|---------|-----------|------|
-| Atmosphere | `HomeAmbient.jsx` | Subtle radial pastel glow (fixed) |
-| Hero | `HomeHero.jsx` | Headline, support line, CTAs; right-side floating moodboard (**no logo as illustration**) |
-| Style exploration | `HomeStyleRail.jsx` | Horizontal “mood” cards → `/studio?style=…` |
-| Emotional beats | `HomeFeelThree.jsx` | Imagine · Refine · Collect |
-| Studio preview | `HomeStudioPeek.jsx` | Prompt + output + version strip tease |
-| Final CTA | `HomeFinalCta.jsx` | Soft gradient + “Enter Studio” |
-| Content data | `client/src/content/homeLanding.js` | Mood strip labels + `STYLE_IMAGES` mapping |
+| Order | Component | Role |
+|-------|-----------|------|
+| 1 | `HomeHero.jsx` | Headline, CTAs, style chip scroll, floating hero collage |
+| 2 | `HomeWhatIs.jsx` | “What is Pixorify?” explainer (text left, studio preview right) |
+| 3 | `HomeShortcuts.jsx` | Quick links tiles |
+| 4 | `HomeFeelThree.jsx` | Sign in → Generate → Download & like |
+| 5 | `HomeRefineTeaser.jsx` | Refine coming soon |
+| 6 | `HomeStyleRail.jsx` | Style mood cards → `/studio?style=…` |
+| 7 | `HomeStudioCta.jsx` | Studio screenshot + final CTA |
+| 8 | FAQ | Inline in `Home.jsx` |
+
+Content data: `client/src/content/homeLanding.js`, `marketingShared.js`.
+
+**Legacy (not mounted on Home):** `HomeAmbient`, `HomeStudioPeek`, `HomeFinalCta`, `HeroCarousel`, `Header`, `Steps`, `HomeMiniFlow`.
 
 Typography/button utilities live in **`client/src/index.css`** (e.g. `type-home-display`, `btn-primary`, `btn-secondary-soft`).
 
@@ -106,7 +120,7 @@ Typography/button utilities live in **`client/src/index.css`** (e.g. `type-home-
 
 ## Marketing content constants
 
-- `client/src/lib/site.js` — `SITE` (name, tagline, **helpEmail**, placeholder social URLs), `WORKSPACE_NAME`, `CLIPDROP_ATTRIBUTION`, `STUDIO_STYLE_SAMPLES`, `STUDIO_STYLE_MOODS`, legacy `HERO_SLIDES` (carousel data if reused elsewhere).
+- `client/src/lib/site.js` — `SITE` (name, tagline, **helpEmail**, placeholder social URLs), `WORKSPACE_NAME`, `STUDIO_STYLE_SAMPLES`, `STUDIO_STYLE_MOODS`, legacy `HERO_SLIDES` (carousel data if reused elsewhere).
 - `client/src/content/marketingShared.js` — Max-width tokens for shells.
 
 ---
@@ -116,7 +130,7 @@ Typography/button utilities live in **`client/src/index.css`** (e.g. `type-home-
 ### Entry & middleware (`server/server.js`)
 
 - `express.json({ limit: "1mb" })`
-- CORS: localhost Vite origins + `ALLOWED_ORIGINS`
+- CORS: localhost Vite origins + `ALLOWED_ORIGINS` + `*.netlify.app` / `*.vercel.app` / `*.onrender.com`
 - Helmet, Morgan, `trust proxy`
 - Static: `/generated` → `server/public/generated`
 - Stricter rate limit on `POST /api/v1/image/*` paths
@@ -201,3 +215,7 @@ When enforcement is off: generate/refine proceed without deduction; `creditRefre
 ## Document maintenance
 
 Update this file when you add routes, rename `SITE` fields, or change deployment/env contracts. Single source for **mailto** visibility remains `SITE.helpEmail` in `client/src/lib/site.js`.
+
+When you change generation, Clipdrop, credits, or refine behavior, update **`docs/GENERATION_PIPELINE_AND_API.md`** in the same PR.
+
+When you change colors, fonts, or any file under **`photos/`**, update **`docs/DESIGN_SYSTEM_AND_ASSETS.md`** and **`photos/README.txt`** in the same PR.

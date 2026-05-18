@@ -8,6 +8,7 @@ import { AppContext } from "../../context/AppContext.jsx";
 import { studioComposePath } from "../../lib/navigation.js";
 import { WORKSPACE_NAME } from "../../lib/site.js";
 import HomeHeroFloat from "./HomeHeroFloat.jsx";
+import { HomeSerif } from "../../lib/homeTypography.jsx";
 
 export default function HomeHero() {
   const { user } = useContext(AppContext);
@@ -17,7 +18,7 @@ export default function HomeHero() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
-      className="relative grid gap-5 overflow-hidden rounded-[1.65rem] border border-pastel-cyan/40 bg-white/72 p-5 shadow-[0_28px_64px_-42px_rgba(111,203,255,0.45)] backdrop-blur-xl sm:grid-cols-[1.08fr_minmax(0,0.95fr)] sm:items-center sm:gap-6 sm:p-7"
+      className="relative grid gap-5 overflow-hidden rounded-[1.65rem] border border-pastel-cyan/40 bg-white/72 p-5 shadow-[0_28px_64px_-42px_rgba(111,203,255,0.45)] backdrop-blur-xl sm:grid-cols-[1fr_minmax(0,1.08fr)] sm:items-center sm:gap-6 sm:p-7 lg:grid-cols-[1.02fr_minmax(0,1.12fr)]"
     >
       <HeroDecorBleed />
       <motion.div className="relative z-[1]">
@@ -25,9 +26,11 @@ export default function HomeHero() {
           <Sparkles className="h-3.5 w-3.5 stroke-[2.5] text-brand-cyan" aria-hidden />
           Pixorify
         </p>
-        <h1 className="type-page-title mt-3 sm:mt-3.5">
+        <h1 className="type-page-title mt-3 leading-[1.22] sm:mt-3.5 sm:leading-[1.2]">
           Ideas in,
-          <span className="block text-slate-800">pixels out</span>
+          <span className="mt-0.5 block font-normal text-slate-800">
+            <HomeSerif className="text-[1.08em] sm:text-[1.06em]">pixels out</HomeSerif>
+          </span>
         </h1>
         <p className="type-body mt-2 max-w-lg">
           {user

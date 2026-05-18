@@ -16,9 +16,6 @@ export const SITE = {
 /** Creative workspace inside Pixorify (route `/studio`). Not the product name; not an image model. */
 export const WORKSPACE_NAME = "Pixora Studio";
 
-/** Subtle attribution for footer or helpers — renders use Clipdrop APIs. */
-export const CLIPDROP_ATTRIBUTION = "Powered by Clipdrop AI";
-
 /**
  * Style chips in Studio idle row + Gallery filters — `{ id, label, image, caption }`.
  * Same labels/thumbnails everywhere; swap art in `assets/assets.js` only.

@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useLayoutEffect, useMemo } from "react";
 import { motion } from "motion/react";
+import RefineComingSoon from "./RefineComingSoon.jsx";
 import { SITE } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
@@ -11,21 +12,16 @@ const CHANNEL_LABEL = {
   discord: "Discord",
 };
 
-const FEATURE_COPY = {
-  refine: {
-    title: "Refine — coming soon",
-    body: "Small tweaks on the picture you already have aren’t available yet—we’re finishing that workflow. You can still create new images in Pixora Studio, and we’ll turn Refine on here when it’s ready.",
-  },
-};
+const FEATURE_COPY = {};
 
 const CHANNEL_COPY = {
   facebook: {
     title: "Facebook — coming soon",
-    body: "We’re preparing a Facebook presence so you can follow Pixorify updates in your feed. Check back soon—we’ll flip this live first thing.",
+    body: "We’re preparing a Facebook presence so you can follow Pixorify updates in your feed. This channel is coming soon—we’ll flip it live when we’re ready.",
   },
   twitter: {
     title: "X — coming soon",
-    body: "Quick updates and drops will land on X when we’re ready. Follow along here soon for announcements and tips.",
+    body: "Quick updates and drops will land on X when we’re ready. Follow us here when we launch—coming soon for announcements and tips.",
   },
   instagram: {
     title: "Instagram — coming soon",
@@ -33,7 +29,7 @@ const CHANNEL_COPY = {
   },
   discord: {
     title: "Discord — coming soon",
-    body: "A cozy spot to chat, share prompts, and hang out with other creators is on the way. The server invite will appear here when we open the doors.",
+    body: "A cozy spot to chat, share prompts, and hang out with other creators is coming soon. The server invite will appear here when we open the doors.",
   },
 };
 
@@ -54,12 +50,16 @@ export default function ComingSoon() {
   const title = variant?.title ?? "Coming soon";
   const body =
     variant?.body ??
-    "Our social profiles are on the way. Thanks for your patience—we’ll share updates here when each channel goes live.";
+    "Our social profiles are coming soon. Thanks for your patience—we’ll share updates here when each channel goes live.";
   const motionKey = variant?.kind === "feature" ? variant.key : variant?.channel ?? "default";
 
   useLayoutEffect(() => {
     scrollPageTop(false);
   }, [motionKey]);
+
+  if (featureParam === "refine") {
+    return <RefineComingSoon />;
+  }
 
   return (
     <motion.section

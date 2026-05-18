@@ -34,7 +34,7 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/pricing",
     title: "Plans",
-    desc: "Free to create today—Pro extras are on the way.",
+    desc: "Free to create today—Pro extras are coming soon.",
     icon: Sparkles,
   },
   {

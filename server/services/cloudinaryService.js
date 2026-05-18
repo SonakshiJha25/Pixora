@@ -54,6 +54,8 @@ export async function uploadGeneratedImage(buffer, { publicId } = {}) {
         resource_type: "image",
         format: "png",
         overwrite: false,
+        /** Eager variant for faster first paint when using delivery transforms. */
+        eager: [{ width: 1024, crop: "limit", quality: "auto:good", fetch_format: "auto" }],
       },
       (err, result) => {
         if (err) return reject(err);

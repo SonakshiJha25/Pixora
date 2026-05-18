@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { HOME_STUDIO_CTA } from "../../content/homeLanding.js";
 import { studioComposePath } from "../../lib/navigation.js";
 import { WORKSPACE_NAME } from "../../lib/site.js";
+import { HomeSectionHeading, HomeSerif } from "../../lib/homeTypography.jsx";
 
 /** Studio peek + final invite — one closing section (no duplicate CTAs). */
 export default function HomeStudioCta() {
@@ -15,32 +16,34 @@ export default function HomeStudioCta() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="home-section-band overflow-hidden rounded-[1.65rem] border border-pastel-cyan/35 bg-gradient-to-br from-white via-pastel-mist/90 to-[#eef6ff] p-5 shadow-[0_28px_64px_-40px_rgba(111,203,255,0.42)] sm:p-7"
       >
-        <div className="relative z-[1] text-center">
-          <p className="type-eyebrow-muted">{WORKSPACE_NAME}</p>
-          <h2 className="type-section-title mx-auto mt-2 max-w-md text-balance">
-            Ready to create something beautiful?
+        <HomeSectionHeading eyebrow={WORKSPACE_NAME} centered className="relative z-[1]">
+          <h2 className="type-section-title mx-auto mt-2 max-w-md text-balance leading-[1.28] sm:leading-[1.26]">
+            Ready to create something{" "}
+            <HomeSerif className="text-slate-900">beautiful?</HomeSerif>
           </h2>
           <p className="type-body mx-auto mt-2 max-w-lg text-slate-600">
             Pick a style, describe your scene, generate in {WORKSPACE_NAME}, then download or heart pictures in My
             gallery. Refine is coming soon.
           </p>
-        </div>
+        </HomeSectionHeading>
 
         <motion.div
-          className="relative z-[1] mx-auto mt-5 max-w-xl"
+          className="relative z-[1] mt-7 flex justify-center px-3 sm:mt-8 sm:px-4"
           animate={{ y: [0, -4, 0] }}
           transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
         >
           <motion.div
-            className="overflow-hidden rounded-xl border border-slate-200/50 bg-[#0f1218] shadow-[0_22px_50px_-28px_rgba(15,23,42,0.5)] ring-1 ring-white/80"
+            className="inline-block max-w-full overflow-hidden rounded-[1.35rem] border border-pastel-cyan/25 bg-gradient-to-b from-white via-pastel-mist/80 to-[#eef7ff] p-2.5 shadow-[0_20px_48px_-24px_rgba(111,203,255,0.35)] ring-1 ring-white/90 sm:rounded-[1.5rem] sm:p-3"
             whileHover={{ scale: 1.01 }}
             transition={{ duration: 0.4 }}
           >
             <img
               src={HOME_STUDIO_CTA.screenshot}
-              alt={`${WORKSPACE_NAME} — styles, prompt, and generate`}
-              className="block w-full object-contain object-top"
+              alt="Pastel dream scene — create in Pixorify"
+              className="block h-auto w-auto max-h-[min(62vh,600px)] max-w-[min(94vw,600px)] rounded-[1.1rem] object-contain sm:rounded-[1.25rem]"
               draggable={false}
+              loading="lazy"
+              decoding="async"
             />
           </motion.div>
         </motion.div>

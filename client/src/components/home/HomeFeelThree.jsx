@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { HOME_JOURNEY } from "../../content/homeLanding.js";
+import { HomeEmotionalHeading, HomeSectionHeading } from "../../lib/homeTypography.jsx";
 
 /** Help “Three steps” journey cards — compact, animated banners. */
 export default function HomeFeelThree() {
@@ -11,8 +12,11 @@ export default function HomeFeelThree() {
         viewport={{ once: true }}
         transition={{ duration: 0.4 }}
       >
-        <p className="type-eyebrow-muted">How it feels</p>
-        <h2 className="type-subsection-title mt-1">Sign in → create → save</h2>
+        <HomeSectionHeading eyebrow="How it feels" centered>
+          <HomeEmotionalHeading className="mt-1 text-base sm:text-lg">
+            Sign in → create → save
+          </HomeEmotionalHeading>
+        </HomeSectionHeading>
       </motion.div>
       <div className="mt-4 grid gap-3 sm:grid-cols-3 sm:gap-3.5">
         {HOME_JOURNEY.map((step, i) => (
@@ -24,7 +28,7 @@ export default function HomeFeelThree() {
             transition={{ delay: 0.06 * i, duration: 0.4 }}
             className="flex flex-col overflow-hidden rounded-[1.35rem] border border-pastel-cyan/28 bg-white/90 shadow-[0_22px_50px_-38px_rgba(111,203,255,0.38)]"
           >
-            <div className={`relative h-[6.5rem] overflow-hidden sm:h-[7rem] ${step.bannerClass}`}>
+            <div className={`relative h-[7.75rem] overflow-hidden sm:h-[8.5rem] ${step.bannerClass}`}>
               <motion.img
                 src={step.img}
                 alt=""
@@ -37,9 +41,9 @@ export default function HomeFeelThree() {
                 {step.n}
               </span>
             </div>
-            <div className="flex flex-1 flex-col p-3.5 sm:p-4">
+            <div className="flex min-h-[5.25rem] flex-1 flex-col justify-center px-4 py-4 sm:min-h-[5.5rem] sm:py-[1.125rem]">
               <h3 className="type-card-title-sm">{step.title}</h3>
-              <p className="type-body mt-2 leading-snug">{step.body}</p>
+              <p className="type-body mt-1.5 leading-snug">{step.body}</p>
             </div>
           </motion.article>
         ))}

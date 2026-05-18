@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Heart, PenLine } from "lucide-react";
-import { resolveImageUrl } from "../config/api.js";
+import { displayImageUrl } from "../lib/imageDelivery.js";
 import DownloadPngButton from "./DownloadPngButton.jsx";
 import { labelForStyleKey } from "../lib/styleTypes.js";
 
@@ -33,7 +33,7 @@ export default function HistoryImageCard({
   const [failed, setFailed] = useState(false);
 
   const isWs = surface === "workspace";
-  const dl = resolveImageUrl(item.imageUrl);
+  const dl = displayImageUrl(item.imageUrl, item._id, { width: 560 });
   const src = dl;
 
   const interactive = typeof onOpen === "function";
@@ -43,8 +43,8 @@ export default function HistoryImageCard({
   const openHitBottom = hasActionStrip ? "bottom-[3.45rem]" : "bottom-0";
 
   const tileClass = isWs
-    ? "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#14161d] shadow-[0_14px_40px_-28px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-[1px] hover:border-white/15"
-    : "group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:-translate-y-[1px] hover:border-slate-300";
+    ? `group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#14161d] shadow-[0_14px_40px_-28px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-[1px] hover:border-white/15${interactive ? " cursor-zoom-in" : ""}`
+    : `group relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:-translate-y-[1px] hover:border-slate-300${interactive ? " cursor-zoom-in" : ""}`;
 
   const open = () => {
     if (!interactive) return;
@@ -118,7 +118,7 @@ export default function HistoryImageCard({
                 openActionLabel ||
                 (promptShort ? `Open preview: ${promptShort}` : "Open image preview")
               }
-              className={`absolute inset-x-0 top-0 z-[5] bg-transparent outline-none ring-0 transition focus-visible:ring-2 ${
+              className={`absolute inset-x-0 top-0 z-[5] cursor-zoom-in bg-transparent outline-none ring-0 transition focus-visible:ring-2 ${
                 isWs ? "focus-visible:ring-white/30" : "focus-visible:ring-slate-400/40"
               } ${openHitBottom}`}
               onClick={open}

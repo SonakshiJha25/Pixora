@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
 import HomeFeelThree from "../components/home/HomeFeelThree.jsx";
 import HomeHero from "../components/home/HomeHero.jsx";
+import HomeWhatIs from "../components/home/HomeWhatIs.jsx";
 import HomeShortcuts from "../components/home/HomeShortcuts.jsx";
 import HomeRefineTeaser from "../components/home/HomeRefineTeaser.jsx";
 import HomeStudioCta from "../components/home/HomeStudioCta.jsx";
@@ -11,6 +12,10 @@ import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
 const faqs = [
+  {
+    q: "What is Pixorify?",
+    a: "A simple web app for making pictures from text: sign in, describe a scene, pick a style, generate, then download or save favourites in your gallery. It is meant for quick creative experiments, not professional production pipelines.",
+  },
   {
     q: "What can I do in Pixorify right now?",
     a: `Sign in, describe a scene in ${WORKSPACE_NAME}, generate an image, download a PNG, and heart favourites in My gallery. That's the full loop today.`,
@@ -68,8 +73,9 @@ export default function Home() {
 
   return (
     <MarketingPageShell className="pb-20 pt-6 sm:pt-8">
-      <div className="relative w-full">
+      <div className="home-marketing-scope relative w-full">
         <HomeHero />
+        <HomeWhatIs />
         <HomeShortcuts />
         <HomeFeelThree />
         <HomeRefineTeaser />
@@ -78,7 +84,7 @@ export default function Home() {
 
         {/* FAQ */}
         <section className="relative mt-11">
-          <div className="px-1 text-center">
+          <div className="px-1 text-left">
             <p className="type-eyebrow-muted">Questions</p>
             <h2 className="type-subsection-title mt-2">FAQ</h2>
           </div>

@@ -5,6 +5,7 @@ import { Heart, LayoutGrid, Search } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import ConfirmModal from "../components/ConfirmModal";
+import GalleryImagePreviewModal from "../components/GalleryImagePreviewModal.jsx";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import DownloadPngButton from "../components/DownloadPngButton.jsx";
@@ -16,6 +17,7 @@ export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
   const [busyId, setBusyId] = useState(null);
   const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
   const [view, setView] = useState("all");
   const [search, setSearch] = useState("");
   const [styleFilter, setStyleFilter] = useState(null);
@@ -298,6 +300,8 @@ export default function Gallery() {
                         item={group.latest}
                         showFavoritePip={false}
                         surface="workspace"
+                        onOpen={setPreviewItem}
+                        openActionLabel="View full size"
                       />
                       <button
                         type="button"
@@ -352,6 +356,12 @@ export default function Gallery() {
             ))}
           </ul>
         )}
+
+        <GalleryImagePreviewModal
+          open={previewItem !== null}
+          item={previewItem}
+          onClose={() => setPreviewItem(null)}
+        />
 
         <ConfirmModal
           open={pendingDeleteItem !== null}

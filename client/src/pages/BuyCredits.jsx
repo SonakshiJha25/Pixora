@@ -14,7 +14,7 @@ const comparison = [
   { label: "Full-quality / high-res exports", free: false, pro: true },
   { label: "More style & generation options", free: false, pro: true },
   { label: "Public sharing & community profile", free: false, pro: true },
-  { label: "Priority in the queue (soon)", free: false, pro: true },
+  { label: "Priority in the queue (coming soon)", free: false, pro: true },
 ];
 
 const futureWorks = [

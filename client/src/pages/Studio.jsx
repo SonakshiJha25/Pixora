@@ -12,6 +12,7 @@ import { REFINE_COMING_SOON_PATH } from "../lib/comingSoon.js";
 import DownloadPngButton from "../components/DownloadPngButton.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
 import { resolveImageUrl } from "../config/api.js";
+import { displayImageUrl } from "../lib/imageDelivery.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
 import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
@@ -345,9 +346,11 @@ export default function Studio() {
                 className="studio-shell relative inline-block w-full max-w-fit overflow-hidden rounded-2xl p-1.5 ring-1 ring-white/25 sm:p-2"
               >
                 <img
-                  src={resolveImageUrl(previewUrl)}
+                  src={displayImageUrl(previewUrl, downloadImageId, { width: 1040 })}
                   alt=""
                   className="block max-h-[min(52vh,520px)] w-auto max-w-[min(92vw,520px)] rounded-2xl object-contain"
+                  decoding="async"
+                  fetchPriority="high"
                 />
                 {loading ? (
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#13151c]/65">
@@ -402,7 +405,7 @@ export default function Studio() {
                       to="/feedback"
                       className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline"
                     >
-                      Tell us
+                      Share feedback
                     </Link>
                   </p>
                 </div>

@@ -31,7 +31,7 @@ export default function HelpContactForm({ id }) {
       setLoading(true);
       const { data } = await api.post("/api/feedback", { message: composed });
       if (data.success) {
-        toast.success("Thanks — we got your message.");
+        toast.success("Thanks — your note was sent.");
         setName("");
         setEmail("");
         setMessage("");
@@ -49,10 +49,9 @@ export default function HelpContactForm({ id }) {
     <section id={id} className="scroll-mt-28">
       <div className="rounded-[1.5rem] border border-slate-200/80 bg-gradient-to-br from-white via-cyan-50/30 to-violet-50/25 p-[1px] shadow-lg shadow-slate-900/10">
         <div className="rounded-[1.43rem] bg-white/90 px-5 py-6 sm:px-8 sm:py-7">
-          <h2 className="type-subsection-title text-center">Talk to a person</h2>
-          <p className="type-body mt-2">
-            Bug, billing hiccup, idea you can&apos;t shoehorn into a ticket — write what happened. Rough notes are OK;
-            we stitch the story together on our side.
+          <h2 className="type-subsection-title text-center">Share what you feel</h2>
+          <p className="type-body mt-2 text-center">
+            A bug, a wish, or something that confused you—write it in your own words. Short notes are welcome.
           </p>
         </div>
       </div>
@@ -87,7 +86,7 @@ export default function HelpContactForm({ id }) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="min-h-[140px] w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-cyan/60"
-            placeholder="What do you need help with?"
+            placeholder="What would make Pixorify better for you?"
             required
             disabled={loading}
           />

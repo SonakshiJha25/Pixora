@@ -45,7 +45,7 @@ const quickLinks = [
   {
     to: "/feedback",
     title: "Feedback",
-    desc: "Something off? Tell us — a human reads these.",
+    desc: "Share what you feel—bugs, ideas, or a quick note.",
     icon: Heart,
   },
 ];
@@ -55,7 +55,7 @@ const journey = [
     n: "1",
     title: "Make an account",
     body: `Sign in to create images and keep your gallery in sync.`,
-    img: assets.brandDecorCloudTablet,
+    img: photos.bg2,
     bannerClass:
       "bg-gradient-to-br from-pastel-mist via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-cyan/35",
   },
@@ -63,7 +63,7 @@ const journey = [
     n: "2",
     title: `Create in ${WORKSPACE_NAME}`,
     body: `Choose a style, describe your scene plainly, then create your picture.`,
-    img: photos.helpJourneyStudioDesk,
+    img: photos.bg4,
     bannerClass:
       "bg-gradient-to-br from-[#f3eeff] via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-lilac/35",
   },
@@ -71,7 +71,7 @@ const journey = [
     n: "3",
     title: "Download & like",
     body: "Save a PNG to your device or tap ♥ in My gallery so favourites are easy to find later.",
-    img: assets.brandDecorKittenCloud,
+    img: photos.bg6,
     bannerClass:
       "bg-gradient-to-br from-pastel-sky/45 via-[#FBF9FF] to-[#fdf4fc] ring-1 ring-inset ring-[#F6B6E8]/35",
   },
@@ -90,7 +90,7 @@ const workflowCards = [
     border: "border-pastel-sky/50",
   },
   {
-    title: "Refine (soon)",
+    title: "Refine (coming soon)",
     body: (
       <>
         Small tweaks on the same picture are <strong>coming soon</strong>. For now, create new scenes in Pixora Studio.
@@ -136,7 +136,7 @@ export default function Help() {
           </p>
           <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
           <p className="type-body mt-2 max-w-lg sm:mt-3">
-            How to sign in, generate, download, and like your pictures—and how to reach a real human if something looks wrong.
+            How to sign in, generate, download, and like your pictures—and how to get in touch if something looks wrong.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link
@@ -151,7 +151,7 @@ export default function Help() {
               className="group inline-flex items-center gap-2 rounded-full border border-pastel-cyan/45 bg-white/95 px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-pastel-lavender/55 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/35"
             >
               <MessageCircleHeart className="h-4 w-4 shrink-0 text-pastel-lilac transition group-hover:scale-[1.05]" aria-hidden />
-              Message us
+              Share feedback
             </a>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-2 sm:mt-5 sm:gap-3">
@@ -167,6 +167,8 @@ export default function Help() {
                   alt=""
                   className="h-[76px] w-[102px] object-cover transition duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[118px]"
                   draggable={false}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 to-transparent px-2 pb-2 pt-6 text-[10px] font-semibold text-white shadow-inner">
                   {t.label}
@@ -183,9 +185,11 @@ export default function Help() {
               className="relative mx-auto w-full sm:ml-auto sm:mr-0 sm:w-auto"
             >
               <img
-                src={assets.brandDecorCloudTablet}
-                alt="Pixorify character sketching glowing ideas"
-                className="mx-auto max-h-[220px] w-auto max-w-full rounded-[1.5rem] object-contain shadow-2xl ring-6 ring-white/95 sm:max-h-[260px]"
+                src={photos.bg1}
+                alt="Cozy Pixorify desk at night — dream it, describe it, create"
+                className="mx-auto max-h-[240px] w-full max-w-[min(100%,22rem)] rounded-[1.5rem] object-contain object-center shadow-2xl ring-6 ring-white/95 sm:max-h-[280px]"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
             <a
@@ -193,7 +197,7 @@ export default function Help() {
               aria-label="Jump to the message form at the bottom of this page"
               className="type-promo-caption mt-5 block w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#6FCBFF] via-[#8FD8FF] to-[#B79CFF]/90 px-5 py-2.5 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-md shadow-pastel-cyan/35 transition hover:brightness-[1.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/45 sm:text-xs sm:tracking-[0.14em]"
             >
-              Someone actually reads messages
+              Share what you feel
             </a>
           </div>
         </div>
@@ -253,7 +257,7 @@ export default function Help() {
               <div
                 className={`relative flex h-[7.5rem] items-center justify-center p-3 sm:h-[8.5rem] sm:p-3.5 ${step.bannerClass ?? "bg-slate-100"}`}
               >
-                <img src={step.img} alt="" className={JOURNEY_IMG} draggable={false} />
+                <img src={step.img} alt="" className={JOURNEY_IMG} draggable={false} loading="lazy" decoding="async" />
                 <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6FCBFF] to-[#8FD8FF] text-[13px] font-black text-white shadow-sm ring-2 ring-white/95">
                   {step.n}
                 </span>

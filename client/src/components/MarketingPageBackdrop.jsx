@@ -2,7 +2,7 @@ import { assets } from "../assets/assets.js";
 
 /**
  * Full-bleed, low-contrast brand illustrations behind marketing pages — blue/white stays dominant.
- * Uses every bundled brand illustration (decors + mascot), placed at different scroll depths.
+ * Uses bundled brand decor illustrations at different scroll depths.
  */
 export default function MarketingPageBackdrop() {
   return (
@@ -19,24 +19,27 @@ export default function MarketingPageBackdrop() {
         alt=""
         className="absolute -left-[6%] top-[6%] w-[min(42%,340px)] max-w-none opacity-[0.068] saturate-[1.08]"
         draggable={false}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
       />
       <img
         src={assets.brandDecorCloudTablet}
         alt=""
         className="absolute -right-[4%] top-[22%] w-[min(38%,280px)] max-w-none opacity-[0.075] saturate-[1.06]"
         draggable={false}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
       />
       <img
         src={assets.brandDecorBunnyArtist}
         alt=""
         className="absolute bottom-[14%] left-[-2%] w-[min(40%,300px)] max-w-none opacity-[0.06] saturate-[1.06]"
         draggable={false}
-      />
-      <img
-        src={assets.home_mascot}
-        alt=""
-        className="absolute bottom-[22%] right-[-8%] w-[min(36%,260px)] max-w-none opacity-[0.05] saturate-[1.05]"
-        draggable={false}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
       />
     </div>
   );

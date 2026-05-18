@@ -80,8 +80,13 @@ app.use(
 app.use(
   "/generated",
   express.static(generatedDir, {
+    maxAge: process.env.NODE_ENV === "production" ? "7d" : 0,
+    immutable: false,
     setHeaders(res) {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      if (process.env.NODE_ENV === "production") {
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      }
     },
   })
 );

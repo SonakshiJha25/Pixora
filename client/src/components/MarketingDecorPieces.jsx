@@ -98,12 +98,6 @@ export function FloatingBrandWash() {
         className="absolute bottom-[-28%] right-[-14%] w-[min(45%,260px)] max-w-none opacity-[0.065]"
         draggable={false}
       />
-      <img
-        src={assets.home_mascot}
-        alt=""
-        className="absolute -left-[6%] top-[15%] w-[min(40%,220px)] max-w-none opacity-[0.05]"
-        draggable={false}
-      />
     </div>
   );
 }

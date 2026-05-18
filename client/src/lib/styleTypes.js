@@ -2,7 +2,7 @@
  * Single source of truth for the five generation styles (must match API / image `style` field).
  *
  * Display names are identical everywhere (Studio, Gallery, Home, Help).
- * Thumbnails: PNGs in repo `photos/styles/` (via `lib/photos.js`).
+ * Thumbnails: `photos/style-1.png` … `style-5.png` (via `lib/photos.js`).
  */
 import { assets } from "../assets/assets.js";
 

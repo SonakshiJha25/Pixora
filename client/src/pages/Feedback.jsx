@@ -61,9 +61,9 @@ export default function Feedback() {
           className="relative z-[1]"
         >
           <p className="type-eyebrow-brand text-center">Feedback</p>
-          <h1 className="type-page-title mt-2 text-center">We actually read these</h1>
+          <h1 className="type-page-title mt-2 text-center">Share what you feel</h1>
           <p className="type-body mx-auto mt-3 max-w-md text-center">
-            Share what went well—or what annoyed you. Short notes still help us a lot.
+            What went well, what stuck, or what you&apos;d change—a sentence is enough.
           </p>
 
           <form

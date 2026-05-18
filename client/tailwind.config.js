@@ -6,6 +6,7 @@ module.exports = {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
         display: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ['"Instrument Serif"', "Georgia", "ui-serif", "serif"],
       },
       colors: {
         pastel: {

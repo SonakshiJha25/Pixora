@@ -1,55 +1,59 @@
 /**
- * Raster assets — import only from repo `photos/` (see `photos/README.txt`).
- * SVG UI icons remain under `src/images/icons/`.
+ * Raster assets — marketing art: `photos/bg-1.png` … `bg-6.png`.
+ * Studio style modes: `photos/style-1.png` … `style-5.png` (unchanged).
+ * SVG UI icons stay under `src/images/icons/`.
  */
-import brandMark from "@photos/logo/pixorify-lettermark.png";
-import styleRealistic from "@photos/styles/style-realistic.png";
-import styleAnime from "@photos/styles/style-anime.png";
-import styleCyberpunk from "@photos/styles/style-cyberpunk.png";
-import styleFantasy from "@photos/styles/style-fantasy.png";
-import styleMinimal from "@photos/styles/style-minimal.png";
-import decorCloudTablet from "@photos/branding/decor-cloud-tablet.png";
-import decorKittenCloud from "@photos/branding/decor-kitten-cloud.png";
-import decorBunnyArtist from "@photos/branding/decor-bunny-artist.png";
-import pixorifyMascotCloud from "@photos/site/pixorify-mascot-cloud.png";
-import starGroup from "@photos/site/star_group.png";
-import profileIcon from "@photos/site/profile_icon.png";
-import tipPromptCamera from "@photos/marketing/tips-carousel/tip-prompt-camera-scene.png";
-import tipRefineStep from "@photos/marketing/tips-carousel/tip-refine-single-step.png";
-import tipCreativeStudio from "@photos/marketing/tips-carousel/tip-creative-studio.png";
-import tipGalleryDeskRound from "@photos/marketing/tip-gallery-desk-round.png";
-import studioPreviewScreenshot from "@photos/marketing/tips-carousel/tip-creative-studio.png";
-import helpJourneyStudioDesk from "@photos/marketing/help/help-journey-step-2-studio-desk.png";
-import homeJourneyCollectDesk from "@photos/marketing/home/home-journey-step-3-collect-desk.png";
-import heroFloatTopLeft from "@photos/hero/hero-float-top-left.png";
-import heroFloatTopRight from "@photos/hero/hero-float-top-right.png";
-import heroFloatBottomLeft from "@photos/hero/hero-float-bottom-left.png";
-import heroFloatBottomRight from "@photos/hero/hero-float-bottom-right.png";
-import heroFloatCenter from "@photos/hero/hero-float-center.png";
+import brandMark from "@photos/logo.png";
+import faviconPng from "@photos/favicon.png";
+import styleRealistic from "@photos/style-1.png";
+import styleAnime from "@photos/style-2.png";
+import styleCyberpunk from "@photos/style-3.png";
+import styleFantasy from "@photos/style-4.png";
+import styleMinimal from "@photos/style-5.png";
+import bg1 from "@photos/bg-1.png";
+import bg2 from "@photos/bg-2.png";
+import bg3 from "@photos/bg-3.png";
+import bg4 from "@photos/bg-4.png";
+import bg5 from "@photos/bg-5.png";
+import bg6 from "@photos/bg-6.png";
+import profileIcon from "@photos/icon-profile.png";
+import starGroup from "@photos/icon-stars.png";
 
 export const photos = Object.freeze({
+  bg1,
+  bg2,
+  bg3,
+  bg4,
+  bg5,
+  bg6,
   brandMark,
+  faviconPng,
   styleRealistic,
   styleAnime,
   styleCyberpunk,
   styleFantasy,
   styleMinimal,
-  decorCloudTablet,
-  decorKittenCloud,
-  decorBunnyArtist,
-  pixorifyMascotCloud,
-  starGroup,
+  decorCloudTablet: bg1,
+  decorKittenCloud: bg2,
+  decorCloudEaselSunset: bg3,
+  decorBunnyArtist: bg4,
+  /** Hero moodboard — one distinct bg per card (bg-1 center … bg-6 bottom-right) */
+  heroFloatTopLeft: bg2,
+  heroFloatTopRight: bg5,
+  heroFloatBottomLeft: bg4,
+  heroFloatBottomRight: bg6,
+  heroFloatCenter: bg1,
+  tipRefineStep: bg3,
+  tipPromptCamera: bg2,
+  tipCreativeStudio: bg4,
+  tipGalleryDeskRound: bg6,
+  tipGalleryTimeline: bg3,
+  tipHelpQuicktipsBanner: bg5,
+  helpJourneyStudioDesk: bg1,
+  homeJourneyCollectDesk: bg6,
+  studioPreviewScreenshot: bg4,
+  studioPreviewHome: bg4,
   profileIcon,
-  tipPromptCamera,
-  tipRefineStep,
-  tipCreativeStudio,
-  tipGalleryDeskRound,
-  studioPreviewScreenshot,
-  helpJourneyStudioDesk,
-  homeJourneyCollectDesk,
-  heroFloatTopLeft,
-  heroFloatTopRight,
-  heroFloatBottomLeft,
-  heroFloatBottomRight,
-  heroFloatCenter,
+  starGroup,
+  pixorifyBrandMark: bg1,
 });

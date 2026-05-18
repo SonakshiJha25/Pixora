@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { HOME_MOOD_STRIP } from "../../content/homeLanding.js";
 import { studioComposePath } from "../../lib/navigation.js";
 import { WORKSPACE_NAME } from "../../lib/site.js";
+import { HomeSectionHeading, HomeSerif } from "../../lib/homeTypography.jsx";
 
 /** Style thumbnails with labels below + horizontal scroll (no marketing mascot tiles). */
 export default function HomeStyleRail() {
@@ -13,11 +14,15 @@ export default function HomeStyleRail() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.4 }}
-        className="px-1"
       >
-        <p className="type-eyebrow-muted">Explore</p>
-        <h2 className="type-subsection-title mt-1">Pick a look</h2>
-        <p className="type-body-tight mt-1 text-slate-500">Each opens {WORKSPACE_NAME} with that style selected.</p>
+        <HomeSectionHeading eyebrow="Explore" centered>
+          <h2 className="type-subsection-title mt-1 leading-[1.35]">
+            Pick a <HomeSerif>look</HomeSerif>
+          </h2>
+          <p className="type-body-tight mx-auto mt-1 max-w-md text-slate-500">
+            Each opens {WORKSPACE_NAME} with that style selected.
+          </p>
+        </HomeSectionHeading>
       </motion.div>
 
       <motion.div
@@ -46,13 +51,13 @@ export default function HomeStyleRail() {
                 whileHover={{ y: -3 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               >
-                <motion.img
+                <img
                   src={m.image}
                   alt=""
                   draggable={false}
-                  className="aspect-[4/5] w-full object-cover"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  loading="lazy"
+                  decoding="async"
+                  className="aspect-[4/5] w-full object-cover transition duration-300 group-hover:scale-105"
                 />
               </motion.div>
               <p className="type-tile-title mt-2 text-center text-slate-800 sm:text-left">{m.label}</p>

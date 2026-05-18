@@ -4,12 +4,13 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 import AppError from "../utils/appError.js";
 import { isCloudinaryConfigured, uploadGeneratedImage } from "./cloudinaryService.js";
+import { optimizeGeneratedBuffer } from "./imageOptimize.js";
 import { logError, logInfo, logWarn } from "../utils/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
 
-async function saveLocallyAsFallback(buffer, filename) {
+async function saveLocally(buffer, filename) {
   await fs.mkdir(GENERATED_DIR, { recursive: true });
   const filepath = path.join(GENERATED_DIR, filename);
   await fs.writeFile(filepath, buffer);
@@ -17,8 +18,9 @@ async function saveLocallyAsFallback(buffer, filename) {
 }
 
 /**
- * Upload a raster buffer to Cloudinary when configured, else local /generated (dev).
- * Shared by text-to-image generation and edit fallbacks.
+ * Persist generated/edited rasters.
+ * Production: prefer Cloudinary CDN URL when configured (fast global delivery).
+ * Dev / fallback: local /generated on this server.
  */
 export async function persistImageBuffer(buffer, { publicId } = {}) {
   if (!buffer?.length || buffer.length < 100) {
@@ -27,22 +29,30 @@ export async function persistImageBuffer(buffer, { publicId } = {}) {
 
   const baseName =
     publicId || `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
-
-  const relativeUrl = await saveLocallyAsFallback(buffer, `${baseName}.png`);
-  logInfo(`Image stored locally (${baseName}.png)`);
+  const optimized = await optimizeGeneratedBuffer(buffer);
 
   if (isCloudinaryConfigured()) {
     try {
-      await uploadGeneratedImage(buffer, { publicId: baseName });
-      logInfo(`Cloudinary mirror upload completed (asset: ${baseName})`);
+      const secureUrl = await uploadGeneratedImage(optimized, { publicId: baseName });
+      logInfo(`Image stored on Cloudinary (${baseName})`);
+      if (process.env.NODE_ENV !== "production") {
+        try {
+          await saveLocally(optimized, `${baseName}.png`);
+        } catch {
+          /* optional local copy in dev */
+        }
+      }
+      return secureUrl;
     } catch (err) {
-      logError("Cloudinary mirror upload failed", err);
+      logError("Cloudinary upload failed; falling back to local disk", err);
     }
   } else if (process.env.NODE_ENV === "production") {
     logWarn(
-      "Cloudinary not configured — images use /generated on this server only."
+      "Cloudinary not configured — images use /generated on this server only (slower on split deploys)."
     );
   }
 
+  const relativeUrl = await saveLocally(optimized, `${baseName}.png`);
+  logInfo(`Image stored locally (${baseName}.png)`);
   return relativeUrl;
 }
