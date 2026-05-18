@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import BrandLogo from "./BrandLogo.jsx";
-import { SITE, CLIPDROP_ATTRIBUTION } from "../lib/site";
+import { SITE } from "../lib/site";
 import { scrollPageTop } from "../lib/navigation";
 
 /** Matches `NavBar` inner rail so logo + links line up with the header. */
@@ -57,11 +57,8 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="mt-4 flex flex-col gap-1.5 border-t border-pastel-cyan/25 pt-3 text-[10px] leading-relaxed text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-4 sm:gap-y-1 sm:text-[11px]">
-          <span className="shrink-0">
-            © {new Date().getFullYear()} {SITE.name}
-          </span>
-          <span className="min-w-0 text-slate-400/95">{CLIPDROP_ATTRIBUTION}</span>
+        <div className="mt-4 border-t border-pastel-cyan/25 pt-3 text-[10px] leading-relaxed text-slate-400 sm:text-[11px]">
+          © {new Date().getFullYear()} {SITE.name}
         </div>
       </div>
     </footer>

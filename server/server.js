@@ -52,7 +52,13 @@ function isAllowedCorsOrigin(origin) {
     if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) {
       return true;
     }
-    if (protocol === "https:" && (hostname.endsWith(".vercel.app") || hostname.endsWith(".onrender.com"))) {
+    if (
+      protocol === "https:" &&
+      (hostname.endsWith(".vercel.app") ||
+        hostname.endsWith(".onrender.com") ||
+        hostname.endsWith(".netlify.app") ||
+        hostname.endsWith(".netlify.live"))
+    ) {
       return true;
     }
   } catch {

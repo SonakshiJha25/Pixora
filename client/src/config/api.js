@@ -1,3 +1,5 @@
+import { DEFAULT_BACKEND_ORIGIN } from "./backendOrigin.js";
+
 /** Strip trailing slashes for origins. */
 function normalizeOrigin(raw) {
   return String(raw ?? "")
@@ -47,7 +49,14 @@ export function getApiBase() {
   const injected = globalThis.__PIXORA_API_BASE__;
   if (injected != null && String(injected).trim() !== "") return normalizeOrigin(injected);
 
-  return fromEnvBuild;
+  if (fromEnvBuild) return fromEnvBuild;
+
+  const host = window.location.hostname;
+  if (host !== "localhost" && host !== "127.0.0.1" && import.meta.env.PROD) {
+    return DEFAULT_BACKEND_ORIGIN;
+  }
+
+  return "";
 }
 
 /**

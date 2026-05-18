@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { SITE } from '../lib/site.js'
 import { normalizeCreditsPoints } from '../lib/credits.js'
+import { apiUnreachableMessage } from '../lib/apiReachability.js'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
@@ -69,9 +70,7 @@ const Login = () => {
         } catch (error) {
             const msg = error?.response?.data?.error?.message || error?.message || '';
             if (!error?.response && /network|failed to fetch|cors/i.test(msg)) {
-                toast.error(
-                    'Cannot reach the API. On localhost, run the server on port 4000. On the live site, check that the frontend was built with VITE_BACKEND_URL.'
-                );
+                toast.error(apiUnreachableMessage());
             } else {
                 toast.error(msg || 'Something went wrong');
             }

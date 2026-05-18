@@ -1,0 +1,14 @@
+# Pixorify SPA on Netlify → API on Render
+[build]
+  base = "client"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  VITE_BACKEND_URL = "https://pixora-backend-p5vv.onrender.com"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
