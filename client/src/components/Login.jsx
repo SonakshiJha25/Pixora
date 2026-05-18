@@ -101,7 +101,7 @@ const Login = () => {
             <p className='text-sm'>
               {state === 'Login'
                 ? `Welcome back — sign in to continue using ${SITE.name}.`
-                : `Create your ${SITE.name} account to save credits and work.`}
+                : `Create your ${SITE.name} account to generate and save pictures.`}
             </p>
 
             {state !=='Login' && (

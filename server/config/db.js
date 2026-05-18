@@ -3,6 +3,7 @@ import { logError, logInfo } from "../utils/logger.js";
 import { runUserCreditLedgerMigrationOnce } from "../migrations/userCreditLedgerMigration.js";
 import { runImageThreadRootBackfillOnce } from "../migrations/imageThreadMigration.js";
 import { runImageVersionMigrationOnce } from "../migrations/imageVersionMigration.js";
+import { areCreditsEnforced } from "./creditsEnabled.js";
 import { refillStaleCreditPoolsForToday } from "../services/dailyCreditsService.js";
 
 function requireMongoUri() {
@@ -48,7 +49,9 @@ async function connectDB() {
     await runUserCreditLedgerMigrationOnce();
     await runImageThreadRootBackfillOnce();
     await runImageVersionMigrationOnce();
-    await refillStaleCreditPoolsForToday();
+    if (areCreditsEnforced()) {
+      await refillStaleCreditPoolsForToday();
+    }
   } catch (error) {
     logError(
       "MongoDB connection failed. Check MONGODB_URI, Atlas IP allowlist (0.0.0.0/0 for dev), and username/password.",

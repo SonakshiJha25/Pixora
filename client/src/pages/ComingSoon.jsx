@@ -11,6 +11,13 @@ const CHANNEL_LABEL = {
   discord: "Discord",
 };
 
+const FEATURE_COPY = {
+  refine: {
+    title: "Refine — coming soon",
+    body: "Small tweaks on the picture you already have aren’t available yet—we’re finishing that workflow. You can still create new images in Pixora Studio, and we’ll turn Refine on here when it’s ready.",
+  },
+};
+
 const CHANNEL_COPY = {
   facebook: {
     title: "Facebook — coming soon",
@@ -34,21 +41,25 @@ export default function ComingSoon() {
   const [searchParams] = useSearchParams();
 
   const channelParam = searchParams.get("channel")?.trim().toLowerCase() ?? "";
+  const featureParam = searchParams.get("feature")?.trim().toLowerCase() ?? "";
 
   const variant = useMemo(() => {
+    if (featureParam && FEATURE_COPY[featureParam]) {
+      return { kind: "feature", key: featureParam, ...FEATURE_COPY[featureParam] };
+    }
     if (!channelParam || !CHANNEL_COPY[channelParam]) return null;
-    return { channel: channelParam, ...CHANNEL_COPY[channelParam] };
-  }, [channelParam]);
-
-  useLayoutEffect(() => {
-    scrollPageTop(false);
-  }, [variant?.channel]);
+    return { kind: "channel", channel: channelParam, ...CHANNEL_COPY[channelParam] };
+  }, [channelParam, featureParam]);
 
   const title = variant?.title ?? "Coming soon";
   const body =
     variant?.body ??
     "Our social profiles are on the way. Thanks for your patience—we’ll share updates here when each channel goes live.";
-  const motionKey = variant?.channel ?? "default";
+  const motionKey = variant?.kind === "feature" ? variant.key : variant?.channel ?? "default";
+
+  useLayoutEffect(() => {
+    scrollPageTop(false);
+  }, [motionKey]);
 
   return (
     <motion.section
@@ -59,17 +70,22 @@ export default function ComingSoon() {
       className="flex w-full max-w-lg flex-col items-center px-4 pb-24 pt-16 text-center"
     >
       <p className="type-eyebrow-brand">{SITE.name}</p>
-      {variant ? (
+      {variant?.kind === "channel" ? (
         <p className="type-eyebrow-muted mt-3">{CHANNEL_LABEL[variant.channel]}</p>
       ) : null}
       <h1 className="type-page-title mt-3">{title}</h1>
       <p className="type-body mt-4">{body}</p>
-      <Link
-        to="/"
-        className="btn-primary mt-10 rounded-full px-10 py-3 text-sm font-semibold"
-      >
-        Back home
-      </Link>
+      <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <Link to="/studio" className="btn-primary rounded-full px-10 py-3 text-sm font-semibold">
+          Open Pixora Studio
+        </Link>
+        <Link
+          to="/"
+          className="rounded-full border border-pastel-cyan/45 bg-white/90 px-8 py-3 text-sm font-semibold text-slate-800 transition hover:bg-white"
+        >
+          Back home
+        </Link>
+      </div>
     </motion.section>
   );
 }

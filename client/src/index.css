@@ -211,14 +211,14 @@
     transform: translateY(0) scale(0.98);
   }
   .nav-link {
-    @apply shrink-0 whitespace-nowrap rounded-lg px-2.5 py-2 text-[14px] font-semibold text-slate-700 transition sm:px-3 sm:text-[15px];
+    @apply shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-semibold text-slate-700 transition lg:px-2.5 lg:py-2 lg:text-[14px] xl:px-3 xl:text-[15px];
   }
   .nav-link:hover {
     background-color: rgba(111, 203, 255, 0.18);
     @apply text-slate-950;
   }
   .nav-link-active {
-    @apply shrink-0 whitespace-nowrap rounded-lg px-2.5 py-2 text-[14px] font-semibold text-slate-950 ring-1 ring-[rgba(111,203,255,0.38)] sm:px-3 sm:text-[15px];
+    @apply shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-semibold text-slate-950 ring-1 ring-[rgba(111,203,255,0.38)] lg:px-2.5 lg:py-2 lg:text-[14px] xl:px-3 xl:text-[15px];
     background-color: rgba(111, 203, 255, 0.26);
   }
   .nav-link-active:hover {
@@ -226,7 +226,7 @@
     @apply text-slate-950;
   }
   .nav-link-studio {
-    @apply shrink-0 whitespace-nowrap rounded-lg px-2.5 py-2 text-[14px] font-semibold text-slate-200 transition hover:bg-white/[0.06] hover:text-white sm:px-3 sm:text-[15px];
+    @apply shrink-0 whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-semibold text-slate-200 transition hover:bg-white/[0.06] hover:text-white lg:px-2.5 lg:py-2 lg:text-[14px] xl:px-3 xl:text-[15px];
   }
   .nav-link-studio-active {
     @apply bg-white/[0.08] text-white ring-1 ring-white/[0.12] hover:bg-white/[0.09] hover:text-white;

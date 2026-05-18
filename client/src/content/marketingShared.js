@@ -34,13 +34,13 @@ export const HOME_SHORTCUT_TILES = [
   {
     to: "/pricing",
     title: "Plans",
-    desc: "Start free, upgrade when Pixorify is part of your day.",
+    desc: "Free to create today—Pro extras are on the way.",
     icon: Sparkles,
   },
   {
     to: "/help",
     title: "Help",
-    desc: "How credits work, daily limits, edits, and how to reach us.",
+    desc: "Sign in, generate, download, like—and how to reach us.",
     icon: CircleHelp,
   },
 ];

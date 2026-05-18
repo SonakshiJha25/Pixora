@@ -1,14 +1,14 @@
 import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import axios from "axios";
-import { ArrowDown, Mic } from "lucide-react";
+import { Mic } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
 import LimitReachedModal from "../components/LimitReachedModal";
-import RefineImagePanel from "../components/RefineImagePanel.jsx";
+import { CREDITS_UI_ENABLED } from "../lib/creditsEnabled.js";
+import { REFINE_COMING_SOON_PATH } from "../lib/comingSoon.js";
 import DownloadPngButton from "../components/DownloadPngButton.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
 import { resolveImageUrl } from "../config/api.js";
@@ -46,83 +46,6 @@ function StudioOrbitSpinner({ sizeClass = "h-11 w-11" }) {
   );
 }
 
-/** Map /api/images/edit errors to clear toasts (server sends { error: { code, message, details } }). */
-function isAxiosAbortError(error) {
-  return (
-    axios.isCancel?.(error) === true ||
-    error?.code === "ERR_CANCELED" ||
-    error?.name === "CanceledError" ||
-    error?.name === "AbortError"
-  );
-}
-
-function threadLoadToastFromAxiosError(error) {
-  if (isAxiosAbortError(error)) return;
-  const status = error?.response?.status;
-  const code = error?.response?.data?.error?.code;
-  const msg =
-    typeof error?.response?.data?.error?.message === "string"
-      ? error.response.data.error.message.trim()
-      : "";
-
-  if (status === 401) {
-    toast.error("Your session expired — sign in again to continue editing.");
-    return;
-  }
-  if (status === 403) {
-    toast.error("You can't open this picture—it may belong to someone else.");
-    return;
-  }
-  if (status === 400 && code === "VALIDATION_ERROR") {
-    toast.error("That link isn’t valid — use Continue editing from Gallery again.");
-    return;
-  }
-  if (status === 404 || code === "IMAGE_NOT_FOUND") {
-    toast.error("That render isn’t available anymore — it may have been removed.");
-    return;
-  }
-  if (!error?.response) {
-    toast.error("We couldn’t reach the studio — check that the API is running, then try again.");
-    return;
-  }
-  toast.error(msg || "We couldn't load those versions — try again.");
-}
-
-function refinementToastFromApiError(error) {
-  const payload = error?.response?.data;
-  const errObj = payload?.error ?? (payload?.success === false ? payload : null);
-  const code = errObj?.code;
-  const apiMsg = typeof errObj?.message === "string" ? errObj.message.trim() : "";
-  const detailFromArray =
-    Array.isArray(errObj?.details) && errObj.details[0]?.msg
-      ? String(errObj.details[0].msg).trim()
-      : "";
-
-  if (!error?.response) {
-    return "Can't reach the server — check your connection or API URL.";
-  }
-
-  switch (code) {
-    case "CLIPDROP_ERROR":
-    case "CLIPDROP_EMPTY":
-      return "Clipdrop couldn't finish this tweak — check API key, quota, or try a simpler instruction.";
-    case "CLIPDROP_NOT_CONFIGURED":
-      return "Editing needs the Clipdrop API key on the server (same as Generate).";
-    case "EDIT_FAILED":
-    case "EDIT_SOURCE_READ_FAILED":
-      return apiMsg || "We couldn't read or save your last image. Try generating again, then edit.";
-    case "STORAGE_UPLOAD_FAILED":
-    case "STORAGE_NOT_CONFIGURED":
-      return apiMsg || "Could not save image on the server — check Cloudinary or disk storage.";
-    case "IMAGE_NOT_FOUND":
-      return "That image isn't there anymore — create a fresh one, then use Refine this image.";
-    case "VALIDATION_ERROR":
-      return detailFromArray || apiMsg || "Invalid request — check instruction length and try again.";
-    default:
-      return detailFromArray || apiMsg || "Couldn't finish editing — please try again.";
-  }
-}
-
 export default function Studio() {
   const {
     api,
@@ -150,12 +73,7 @@ export default function Studio() {
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
   const [limitModal, setLimitModal] = useState({ open: false, dailyResetTimezone: null });
-  /** Refinement chain for current session (oldest → newest); API returns absolute imageUrl where applicable */
-  const [refinementThread, setRefinementThread] = useState([]);
-  const [refinePanelOpen, setRefinePanelOpen] = useState(false);
-  const [refineSubmitting, setRefineSubmitting] = useState(false);
-  /** When set, refinement POST uses this frame as parent instead of the latest in the strip. */
-  const [refineParentId, setRefineParentId] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState(null);
   const [loadingStage, setLoadingStage] = useState(0);
 
   const recognitionRef = useRef(null);
@@ -174,19 +92,6 @@ export default function Studio() {
     syncPromptHeight();
   }, [input, syncPromptHeight]);
 
-  const sortedThread = useMemo(
-    () =>
-      [...refinementThread].sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      ),
-    [refinementThread]
-  );
-
-  const latestThreadImageIdRaw = sortedThread.at(-1)?._id;
-  const latestThreadImageId =
-    latestThreadImageIdRaw !== undefined && latestThreadImageIdRaw !== null
-      ? String(latestThreadImageIdRaw)
-      : "";
   const autoStopTimerRef = useRef(null);
 
   const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
@@ -210,86 +115,6 @@ export default function Studio() {
     scrollPageTop(false);
   }, [location.pathname, location.search, location.hash, navigate]);
 
-  const hydrateStudioThread = useCallback(
-    async (imageId, options = {}) => {
-      const { signal } = options;
-      const id = String(imageId ?? "").trim();
-      if (!id || !authToken) return { ok: false };
-
-      try {
-        const { data } = await api.get(`/api/images/thread/${encodeURIComponent(id)}`, { signal });
-
-        if (!data?.success || !Array.isArray(data.thread) || data.thread.length === 0) {
-          toast.error("We couldn't load that picture's versions.");
-          return { ok: false };
-        }
-
-        const sorted = [...data.thread].sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-        const tail = sorted.at(-1);
-        const styleFromFrame = tail?.style;
-        if (typeof styleFromFrame === "string" && styles.includes(styleFromFrame)) {
-          setStyle(styleFromFrame);
-        }
-
-        setRefinementThread(sorted);
-        setImage(resolveImageUrl(tail?.imageUrl || ""));
-        setIsImageLoaded(true);
-
-        return { ok: true, sorted, tail };
-      } catch (err) {
-        if (isAxiosAbortError(err)) return { ok: false, canceled: true };
-        threadLoadToastFromAxiosError(err);
-        return { ok: false };
-      }
-    },
-    [api, authToken, styles]
-  );
-
-  useEffect(() => {
-    const c = searchParams.get("continue")?.trim();
-    if (!c || !isSignedIn) return undefined;
-
-    const ac = new AbortController();
-
-    (async () => {
-      const r = await hydrateStudioThread(c, { signal: ac.signal });
-      if (ac.signal.aborted || r.canceled) return;
-      if (!r.ok || !r.tail?._id) return;
-
-      navigate("/studio", { replace: true });
-      setRefineParentId(String(r.tail._id));
-      setRefinePanelOpen(true);
-      scrollPageTop(true);
-      toast.success("Pick up where you left off — small edits here usually skip a full charge.");
-    })();
-
-    return () => ac.abort();
-  }, [searchParams, isSignedIn, hydrateStudioThread, navigate]);
-
-  const continueConversationFromHistory = useCallback(
-    async (item) => {
-      if (!item?._id) return;
-      const r = await hydrateStudioThread(String(item._id));
-      if (!r.ok || r.canceled) return;
-      setRefineParentId(String(item._id));
-      scrollPageTop(true);
-      setRefinePanelOpen(true);
-    },
-    [hydrateStudioThread]
-  );
-
-  /** Recent grid: tap image → Gallery with this thread/modal opener (not in-place lightbox). */
-  const openRecentInGallery = useCallback(
-    (item) => {
-      const id = item?._id != null ? String(item._id).trim() : "";
-      if (!id) return;
-      navigate(`/gallery?thread=${encodeURIComponent(id)}`);
-    },
-    [navigate]
-  );
-
   const activeStyleSample = useMemo(() => STUDIO_STYLE_SAMPLES.find((s) => s.id === style), [style]);
 
   const moodGrad = STUDIO_STYLE_MOODS[style] ?? STUDIO_STYLE_MOODS.realistic;
@@ -312,7 +137,7 @@ export default function Studio() {
   }, [stopListening]);
 
   useEffect(() => {
-    if (!loading && !refineSubmitting) {
+    if (!loading) {
       setLoadingStage(0);
       return undefined;
     }
@@ -320,7 +145,7 @@ export default function Studio() {
       setLoadingStage((n) => (n + 1) % GENERATION_STAGE_HINTS.length);
     }, 2400);
     return () => window.clearInterval(id);
-  }, [loading, refineSubmitting]);
+  }, [loading]);
 
   const toggleVoiceInput = () => {
     const Ctor = getSpeechRecognitionCtor();
@@ -397,7 +222,7 @@ export default function Studio() {
 
   const onPromptKeyDown = (e) => {
     if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
-    if (loading || refineSubmitting) {
+    if (loading) {
       e.preventDefault();
       return;
     }
@@ -413,7 +238,7 @@ export default function Studio() {
     }
 
     if (!authToken) {
-      toast.info("Sign in first — we need a place to save credits and results.");
+      toast.info("Sign in first — we need your account to save pictures in your gallery.");
       setShowLogin(true);
       return;
     }
@@ -435,7 +260,7 @@ export default function Studio() {
       const credits = response.credits ?? response.creditBalance ?? response.remainingCredits;
 
       setImage(resolveImageUrl(response.image?.imageUrl ?? response.resultImage ?? response.imageUrl));
-      setRefinementThread([response.image]);
+      setGeneratedImage(response.image ?? null);
       if (credits !== undefined && credits !== null) {
         setCredit(normalizeCreditsPoints(credits));
       }
@@ -449,12 +274,14 @@ export default function Studio() {
       }
       await fetchHistory();
       await fetchUserData();
-      setRefineParentId(null);
-      toast.success("Saved — scroll up to review. You can tweak, download, or open Gallery.");
+      toast.success("Saved — scroll up to review, download, or open Gallery.");
     } catch (error) {
       const code = error?.response?.data?.error?.code;
 
-      if (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS") {
+      if (
+        CREDITS_UI_ENABLED &&
+        (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS")
+      ) {
         const err = error?.response?.data?.error;
         setLimitModal({
           open: true,
@@ -472,59 +299,8 @@ export default function Studio() {
     }
   };
 
-  const applyRefinement = async (editPrompt) => {
-    const scoped =
-      refineParentId && sortedThread.some((x) => String(x._id) === String(refineParentId))
-        ? String(refineParentId).trim()
-        : "";
-
-    const parentForEdit = (scoped || latestThreadImageId).trim();
-
-    if (!parentForEdit) {
-      toast.error("No image to refine yet — generate one first.");
-      return;
-    }
-    try {
-      setRefineSubmitting(true);
-      const { data } = await api.post("/api/images/edit", {
-        imageId: parentForEdit,
-        editPrompt,
-      });
-      if (!data?.success || !data?.image) {
-        const fallback =
-          typeof data?.error?.message === "string" && data.error.message.trim()
-            ? data.error.message.trim()
-            : "Server returned no image — try again.";
-        toast.error(fallback);
-        return;
-      }
-      const nextImg = data.image;
-      setRefinementThread((prev) =>
-        [...prev, nextImg].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-      );
-      setImage(resolveImageUrl(nextImg.imageUrl));
-      await fetchHistory();
-      setRefinePanelOpen(false);
-      setRefineParentId(null);
-      if (data.refinementMode === "duplicate_fallback") {
-        toast.warning(
-          "Clipdrop didn't return a new render — we saved a linked copy of your frame. Check API quota or try a simpler edit."
-        );
-      } else {
-        toast.success("Edit saved — newest version appears at the bottom of your timeline.");
-      }
-    } catch (error) {
-      toast.error(refinementToastFromApiError(error));
-    } finally {
-      setRefineSubmitting(false);
-    }
-  };
-
-  const latestFrame = sortedThread.length > 0 ? sortedThread[sortedThread.length - 1] : null;
-  const downloadImageId = latestFrame?._id ? String(latestFrame._id) : "";
-  const previewSrc = (latestFrame?.imageUrl || image)
-    ? resolveImageUrl(latestFrame?.imageUrl || image)
-    : "";
+  const downloadImageId = generatedImage?._id ? String(generatedImage._id) : "";
+  const previewUrl = generatedImage?.imageUrl || image;
 
   return (
     <div className="relative w-full overflow-hidden pb-24 pt-5 sm:pt-8">
@@ -542,10 +318,10 @@ export default function Studio() {
             <h1 className="type-studio-title">{WORKSPACE_NAME}</h1>
           </div>
           <p className="type-studio-lede mx-auto sm:max-w-xl">
-            Choose a style, describe your scene plainly, then look below for your image and edits.
+            Choose a style, describe your scene plainly, then look below for your image.
             {!isSignedIn ? (
               <span className="mt-1.5 block text-slate-500">
-                Sign in to use credits; your balance resets at midnight India time.
+                Sign in to generate and keep pictures in your gallery.
               </span>
             ) : null}
           </p>
@@ -559,100 +335,64 @@ export default function Studio() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {isImageLoaded && sortedThread.length > 0 ? (
+          {isImageLoaded && previewUrl ? (
             <div className="flex w-full flex-col items-center px-1">
-              <div className="flex w-full max-w-xl flex-col items-center gap-1">
-                {sortedThread.map((slot, idx) => {
-                  const isLatest = idx === sortedThread.length - 1;
-                  return (
-                    <div key={String(slot._id)} className="flex w-full flex-col items-center">
-                      {idx > 0 ? (
-                        <div className="flex justify-center py-2 text-slate-600" aria-hidden>
-                          <ArrowDown className="h-5 w-5" strokeWidth={2} />
-                        </div>
-                      ) : null}
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, ease: "easeOut" }}
-                        className={`studio-shell relative inline-block w-full max-w-fit overflow-hidden rounded-2xl p-1.5 sm:p-2 ${
-                          isLatest ? "ring-1 ring-white/25" : "opacity-[0.92]"
-                        }`}
-                      >
-                        <img
-                          src={resolveImageUrl(slot.imageUrl)}
-                          alt=""
-                          className={`block w-auto rounded-2xl object-contain ${
-                            isLatest
-                              ? "max-h-[min(52vh,520px)] max-w-[min(92vw,520px)]"
-                              : "max-h-[min(30vh,300px)] max-w-[min(88vw,420px)] mx-auto"
-                          }`}
-                        />
-                        {(loading || refineSubmitting) && isLatest ? (
-                          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#13151c]/65">
-                            <motion.div
-                              initial={{ opacity: 0.85, scale: 0.96 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ duration: 0.35, ease: "easeOut" }}
-                              className="flex flex-col items-center px-4"
-                            >
-                              <StudioOrbitSpinner sizeClass="h-14 w-14 sm:h-[4.25rem] sm:w-[4.25rem]" />
-                              <p className="mt-3 max-w-[14rem] text-center text-[11px] font-medium leading-snug text-slate-200 sm:text-xs">
-                                {GENERATION_STAGE_HINTS[loadingStage]}
-                              </p>
-                            </motion.div>
-                          </div>
-                        ) : null}
-                      </motion.div>
-                      <p className="mt-1.5 max-w-lg px-2 text-center text-[11px] leading-snug text-slate-400 sm:text-xs">
-                        <span className="font-semibold text-slate-200">
-                          {idx === 0 ? "Started from" : `Tweak ${idx}`}:
-                        </span>{" "}
-                        {(slot.promptRaw || slot.prompt || slot.editPrompt || "").slice(0, 200)}
-                        {String(slot.promptRaw || slot.prompt || slot.editPrompt || "").length > 200
-                          ? "…"
-                          : ""}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="studio-shell relative inline-block w-full max-w-fit overflow-hidden rounded-2xl p-1.5 ring-1 ring-white/25 sm:p-2"
+              >
+                <img
+                  src={resolveImageUrl(previewUrl)}
+                  alt=""
+                  className="block max-h-[min(52vh,520px)] w-auto max-w-[min(92vw,520px)] rounded-2xl object-contain"
+                />
+                {loading ? (
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#13151c]/65">
+                    <StudioOrbitSpinner sizeClass="h-14 w-14 sm:h-[4.25rem] sm:w-[4.25rem]" />
+                    <p className="mt-3 max-w-[14rem] text-center text-[11px] font-medium leading-snug text-slate-200 sm:text-xs">
+                      {GENERATION_STAGE_HINTS[loadingStage]}
+                    </p>
+                  </div>
+                ) : null}
+              </motion.div>
+              {generatedImage ? (
+                <p className="mt-3 max-w-lg px-2 text-center text-[11px] leading-snug text-slate-400 sm:text-xs">
+                  <span className="font-semibold text-slate-200">Prompt:</span>{" "}
+                  {(generatedImage.promptRaw || generatedImage.prompt || "").slice(0, 200)}
+                  {String(generatedImage.promptRaw || generatedImage.prompt || "").length > 200 ? "…" : ""}
+                </p>
+              ) : null}
 
               <div className="mt-10 flex w-full max-w-2xl flex-col items-center gap-8 px-2">
                 <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
                   <button
                     type="button"
                     className="btn-primary rounded-full px-6 py-2 text-center text-[13px] font-semibold shadow-md shadow-pastel-cyan/25 transition hover:opacity-95"
-                    disabled={loading || refineSubmitting}
+                    disabled={loading}
                     onClick={() => {
                       setIsImageLoaded(false);
                       setInput("");
                       setImage(null);
-                      setRefinementThread([]);
-                      setRefinePanelOpen(false);
-                      setRefineParentId(null);
+                      setGeneratedImage(null);
                     }}
                   >
                     New prompt
                   </button>
                   <DownloadPngButton
                     imageId={downloadImageId}
-                    imageUrl={latestFrame?.imageUrl || image}
-                    disabled={!downloadImageId && !(latestFrame?.imageUrl || image)}
+                    imageUrl={previewUrl}
+                    disabled={!downloadImageId && !previewUrl}
                     className="inline-flex items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.05] px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:pointer-events-none disabled:opacity-40"
                   />
-                  <button
-                    type="button"
-                    disabled={loading || refineSubmitting}
-                    onClick={() => {
-                      setRefineParentId(null);
-                      setRefinePanelOpen(true);
-                    }}
+                  <Link
+                    to={REFINE_COMING_SOON_PATH}
                     className="inline-flex items-center justify-center rounded-full border border-[#5a8fa3]/40 bg-[#5a8fa3]/10 px-8 py-3 text-center text-sm font-semibold text-slate-100 transition hover:border-[#6a9fb3]/55 hover:bg-[#5a8fa3]/14"
                   >
                     Refine this image
-                  </button>
+                  </Link>
                 </div>
 
                 <div className="w-full border-t border-white/[0.08] pt-6 text-center">
@@ -801,13 +541,12 @@ export default function Studio() {
                 </div>
 
                 <p className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-2.5 text-xs leading-relaxed text-slate-500 sm:text-[13px]">
-                  New pictures use credits from your daily balance.
-                  <span className="font-medium text-slate-400"> Refine this image</span> handles small tweaks to what you already
-                  have—often without another full charge.{" "}
+                  After you create, download a PNG or open My gallery to heart favourites.{" "}
+                  <span className="font-medium text-slate-400">Refine this image</span> (small edits) is coming soon.{" "}
                   <Link to="/help" className="font-semibold text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
                     Help
                   </Link>{" "}
-                  has the finer details.
+                  has the full walkthrough.
                 </p>
               </motion.div>
 
@@ -839,7 +578,7 @@ export default function Studio() {
           <div className="text-center sm:text-left">
             <h2 className="font-display text-base font-semibold text-white sm:text-lg">Recent</h2>
             <p className="mt-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
-              Tap any tile to jump to Gallery and browse every saved version alongside PNG downloads and starred picks.
+              Tap any tile to open Gallery — download PNGs or save favourites there.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
@@ -890,26 +629,20 @@ export default function Studio() {
               <HistoryImageCard
                 key={item._id}
                 item={item}
-                onOpen={openRecentInGallery}
-                openActionLabel={`View versions in Gallery: ${item.promptRaw || item.prompt || "image"}`.slice(0, 120)}
+                onOpen={() => navigate("/gallery")}
+                openActionLabel={`Open in gallery: ${item.promptRaw || item.prompt || "image"}`.slice(0, 120)}
                 surface="workspace"
                 showActionBar={isSignedIn}
-                onContinueEdit={continueConversationFromHistory}
+                onContinueEdit={() => navigate(REFINE_COMING_SOON_PATH)}
               />
             ))}
           </div>
         )}
       </section>
 
-      <RefineImagePanel
-        open={refinePanelOpen}
-        previewSrc={previewSrc}
-        onClose={() => !refineSubmitting && setRefinePanelOpen(false)}
-        onApply={applyRefinement}
-        submitting={refineSubmitting}
-      />
 
-      <LimitReachedModal
+      {CREDITS_UI_ENABLED ? (
+        <LimitReachedModal
         open={limitModal.open}
         dailyResetTimezone={
           limitModal.dailyResetTimezone ??
@@ -920,6 +653,7 @@ export default function Studio() {
           setLimitModal({ open: false, dailyResetTimezone: null })
         }
       />
+      ) : null}
       </div>
     </div>
   );

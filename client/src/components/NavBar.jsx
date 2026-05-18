@@ -14,6 +14,7 @@ import {
   normalizeCreditsPoints,
 } from "../lib/credits.js";
 import { WORKSPACE_NAME } from "../lib/site.js";
+import { CREDITS_UI_ENABLED } from "../lib/creditsEnabled.js";
 
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
@@ -30,9 +31,10 @@ function measureMenu(el) {
   if (!el?.getBoundingClientRect) return null;
   const r = el.getBoundingClientRect();
   const pad = 8;
-  let left = Math.round(r.right - MENU_W);
-  left = Math.min(Math.max(left, pad), window.innerWidth - MENU_W - pad);
-  return { top: Math.round(r.bottom + pad), left };
+  const width = Math.min(MENU_W, window.innerWidth - pad * 2);
+  let left = Math.round(r.right - width);
+  left = Math.min(Math.max(left, pad), window.innerWidth - width - pad);
+  return { top: Math.round(r.bottom + pad), left, width };
 }
 
 function ProfileDropdownFixed({
@@ -43,6 +45,7 @@ function ProfileDropdownFixed({
   credit,
   gensLeft,
   nextResetAtIso,
+  showCredits,
   menuBoxClass,
   onLogout,
   onLogin,
@@ -60,7 +63,7 @@ function ProfileDropdownFixed({
         position: "fixed",
         top: coords.top,
         left: coords.left,
-        width: MENU_W,
+        width: coords.width ?? MENU_W,
       }}
       className={`z-[80] overflow-hidden rounded-xl border py-1 shadow-xl ${menuBoxClass}`}
       role="menu"
@@ -72,17 +75,19 @@ function ProfileDropdownFixed({
             <p className="font-semibold">{user.name}</p>
             <p className="text-xs text-slate-500">{user.email}</p>
           </div>
-          <div className={`border-t px-4 py-2 ${rowBorder}`}>
-            <p className={`text-sm font-semibold ${isWorkspaceNav ? "text-slate-100" : "text-slate-800"}`}>
-              Credits: {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT}
-            </p>
-            <p className={`mt-1 text-[11px] font-medium leading-snug ${isWorkspaceNav ? "text-slate-400" : "text-slate-600"}`}>
-              <CreditsResetCountdown nextResetAtIso={nextResetAtIso} className="tabular-nums" />
-            </p>
-            <p className={`mt-1 ${muted}`}>
-              ~{gensLeft} new picture{gensLeft === 1 ? "" : "s"} left today ({CREDITS_PER_IMAGE} credits each) · small tweaks often free
-            </p>
-          </div>
+          {showCredits ? (
+            <div className={`border-t px-4 py-2 ${rowBorder}`}>
+              <p className={`text-sm font-semibold ${isWorkspaceNav ? "text-slate-100" : "text-slate-800"}`}>
+                Credits: {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT}
+              </p>
+              <p className={`mt-1 text-[11px] font-medium leading-snug ${isWorkspaceNav ? "text-slate-400" : "text-slate-600"}`}>
+                <CreditsResetCountdown nextResetAtIso={nextResetAtIso} className="tabular-nums" />
+              </p>
+              <p className={`mt-1 ${muted}`}>
+                ~{gensLeft} new picture{gensLeft === 1 ? "" : "s"} left today ({CREDITS_PER_IMAGE} credits each) · small tweaks often free
+              </p>
+            </div>
+          ) : null}
           <button
             type="button"
             role="menuitem"
@@ -173,6 +178,28 @@ export default function NavBar() {
   }, [profileOpen]);
 
   useEffect(() => {
+    setMenuOpen(false);
+    closeProfile();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        closeProfile();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (!profileOpen) return undefined;
     const onDoc = (e) => {
       const target = e.target;
@@ -211,13 +238,13 @@ export default function NavBar() {
   const avatarSrc = assets.avatarDefault;
 
   const headerSurface = isWorkspaceNav
-    ? "sticky top-0 z-40 w-full border-b border-white/[0.06] bg-[#13151c]/88 backdrop-blur-md"
-    : "sticky top-0 z-40 w-full border-b border-pastel-cyan/40 bg-pastel-mist/93 backdrop-blur-md";
+    ? "sticky top-0 z-40 w-full border-b border-white/[0.06] bg-[#13151c]/88 pt-[env(safe-area-inset-top,0px)] backdrop-blur-md"
+    : "sticky top-0 z-40 w-full border-b border-pastel-cyan/40 bg-pastel-mist/93 pt-[env(safe-area-inset-top,0px)] backdrop-blur-md";
 
   const menuSurface = isWorkspaceNav ? "border-white/[0.08] bg-[#1a1d26]" : "border-slate-200/90 bg-white shadow-lg";
 
   const dividerCls =
-    "hidden h-8 w-px shrink-0 md:block " + (isWorkspaceNav ? "bg-white/[0.08]" : "bg-slate-200/90");
+    "hidden h-8 w-px shrink-0 lg:block " + (isWorkspaceNav ? "bg-white/[0.08]" : "bg-slate-200/90");
 
   const renderNavLinks = (onNavigate) => (
     <>
@@ -250,7 +277,7 @@ export default function NavBar() {
   return (
     <header className={headerSurface}>
       <div className={NAV_INNER}>
-        <div className="hidden min-h-[3.875rem] items-center md:grid md:min-h-[4rem] md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-3 lg:gap-x-5 xl:gap-x-6 xl:min-h-[4.125rem]">
+        <div className="hidden min-h-[3.875rem] items-center lg:grid lg:min-h-[4rem] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-x-4 xl:gap-x-6 xl:min-h-[4.125rem]">
           <div className="flex shrink-0 items-center">
             <button
               type="button"
@@ -275,14 +302,14 @@ export default function NavBar() {
           </div>
 
           <nav
-            className="flex min-w-0 flex-nowrap items-center justify-center gap-x-1 overflow-x-auto overflow-y-visible py-2 [-ms-overflow-style:none] [scrollbar-width:none] md:justify-center [&::-webkit-scrollbar]:hidden lg:gap-x-2.5 xl:gap-x-3 2xl:gap-x-4"
+            className="flex min-w-0 flex-nowrap items-center justify-center gap-x-0.5 overflow-x-auto overflow-y-visible py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:gap-x-1.5 xl:gap-x-2.5 2xl:gap-x-4"
             aria-label="Primary navigation"
           >
             {renderNavLinks(undefined)}
           </nav>
 
           <div className="flex shrink-0 flex-nowrap items-center justify-end gap-2 lg:gap-3">
-            {user ? (
+            {user && CREDITS_UI_ENABLED ? (
               <>
                 <div ref={creditsDeskWrapRef} className="shrink-0">
                   <NavbarCredits
@@ -313,7 +340,7 @@ export default function NavBar() {
                 aria-haspopup="true"
               >
                 <span
-                  className={`hidden max-w-[9rem] truncate text-sm font-medium md:inline xl:max-w-[12rem] ${
+                  className={`hidden max-w-[9rem] truncate text-sm font-medium lg:inline xl:max-w-[12rem] ${
                     isWorkspaceNav ? "text-slate-200" : "text-slate-800"
                   }`}
                 >
@@ -336,7 +363,7 @@ export default function NavBar() {
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <span className={`hidden text-sm font-medium md:inline ${isWorkspaceNav ? "text-slate-300" : "text-slate-700"}`}>
+                <span className={`hidden text-sm font-medium lg:inline ${isWorkspaceNav ? "text-slate-300" : "text-slate-700"}`}>
                   Account
                 </span>
                 <img
@@ -351,10 +378,10 @@ export default function NavBar() {
           </div>
         </div>
 
-        <div className="relative flex min-h-[3.5rem] items-center justify-between gap-3 py-2.5 md:hidden">
+        <div className="relative flex min-h-[3.25rem] items-center justify-between gap-2 py-2 sm:min-h-[3.5rem] sm:gap-3 sm:py-2.5 lg:hidden">
           <button
             type="button"
-            className={`flex min-w-0 max-w-[56vw] cursor-pointer items-center gap-2.5 rounded-xl py-1 text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 ${
+            className={`flex min-w-0 max-w-[min(56vw,12rem)] cursor-pointer items-center gap-2 rounded-xl py-1 text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 sm:max-w-[56vw] sm:gap-2.5 ${
               isWorkspaceNav ? "focus-visible:ring-white/25" : "focus-visible:ring-slate-400/35"
             }`}
             onClick={goHomeTop}
@@ -367,8 +394,8 @@ export default function NavBar() {
             </span>
           </button>
 
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-2.5">
-            {user ? (
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-2.5">
+            {user && CREDITS_UI_ENABLED ? (
               <div ref={creditsMobWrapRef}>
                 <NavbarCredits
                   workspace={isWorkspaceNav}
@@ -381,7 +408,7 @@ export default function NavBar() {
             <button
               type="button"
               onClick={goStudioTop}
-              className="btn-primary h-[1.875rem] shrink-0 rounded-full px-3 text-[11px] font-semibold leading-none"
+              className="btn-primary h-[1.875rem] shrink-0 rounded-full px-2.5 text-[10px] font-semibold leading-none sm:px-3.5 sm:text-[11px]"
             >
               Generate
             </button>
@@ -432,6 +459,7 @@ export default function NavBar() {
         credit={credit}
         gensLeft={gensLeft}
         nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
+        showCredits={CREDITS_UI_ENABLED}
         menuBoxClass={`border ${menuSurface}`}
         onLogout={() => {
           closeProfile();
@@ -451,13 +479,17 @@ export default function NavBar() {
           ref={mobileNavRef}
           className={
             isWorkspaceNav
-              ? "border-t border-white/[0.06] bg-[#13151c] md:hidden"
-              : "border-t border-slate-100 bg-[#fdfcfa] md:hidden"
+              ? "border-t border-white/[0.06] bg-[#13151c] lg:hidden"
+              : "border-t border-slate-100 bg-[#fdfcfa] lg:hidden"
           }
         >
-          <div className={`${NAV_INNER} py-5 pb-6`}>
-            <nav className="flex flex-col gap-0.5 [&_a]:flex [&_a]:min-h-[2.75rem] [&_a]:items-center">{renderNavLinks(closeMobile)}</nav>
-            {user ? (
+          <div
+            className={`${NAV_INNER} max-h-[min(70dvh,28rem)] overflow-y-auto overscroll-contain py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:py-5 sm:pb-6`}
+          >
+            <nav className="flex flex-col gap-0.5 [&_a]:flex [&_a]:min-h-[2.75rem] [&_a]:items-center [&_a]:px-1 [&_a]:text-[15px]">
+              {renderNavLinks(closeMobile)}
+            </nav>
+            {user && CREDITS_UI_ENABLED ? (
               <div className={`mt-5 border-t pt-4 ${isWorkspaceNav ? "border-white/[0.08]" : "border-slate-100"}`}>
                 <p className={`text-sm font-semibold ${isWorkspaceNav ? "text-slate-100" : "text-slate-800"}`}>
                   Credits · {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT}

@@ -21,8 +21,8 @@ export default function HomeStudioCta() {
             Ready to create something beautiful?
           </h2>
           <p className="type-body mx-auto mt-2 max-w-lg text-slate-600">
-            Pick a style, describe your scene, generate and refine on one thread—then save what you love in your
-            gallery.
+            Pick a style, describe your scene, generate in {WORKSPACE_NAME}, then download or heart pictures in My
+            gallery. Refine is coming soon.
           </p>
         </div>
 
@@ -59,8 +59,8 @@ export default function HomeStudioCta() {
           >
             Enter {WORKSPACE_NAME}
           </Link>
-          <Link to="/help" className="btn-secondary-soft btn-lift rounded-full px-6 py-2.5 text-sm font-semibold">
-            How credits work
+          <Link to="/help#workflow" className="btn-secondary-soft btn-lift rounded-full px-6 py-2.5 text-sm font-semibold">
+            How it works
           </Link>
         </motion.div>
       </motion.div>

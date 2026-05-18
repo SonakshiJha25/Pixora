@@ -21,9 +21,10 @@ export default function Pricing() {
           className="relative z-[1] text-center"
         >
           <p className="type-eyebrow-muted">Pricing</p>
-          <h1 className="type-page-title mt-2">Free to start, room when you grow</h1>
+          <h1 className="type-page-title mt-2">Free to create today</h1>
           <p className="type-body mx-auto mt-2 max-w-2xl">
-            These figures are rounded guides—for up-to-date credit rules visit{" "}
+            Pixorify is simple right now: sign in, generate in {WORKSPACE_NAME}, download PNGs, and like favourites. Pro
+            extras are on the way—see{" "}
             <Link to="/help" className="font-semibold underline underline-offset-4 decoration-pastel-cyan/55 hover:decoration-pastel-lilac/80">
               Help
             </Link>
@@ -50,20 +51,20 @@ export default function Pricing() {
                   ✓
                 </span>
                 <span>
-                  <span className="type-emphasis">About 100 credits</span> daily, refilled at midnight India time
+                  <span className="type-emphasis">Generate images</span> in {WORKSPACE_NAME}—no credit counters for now
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>About 10 new pictures a day • lighter touch-ups on the same picture</span>
+                <span>Download PNGs and heart favourites in My gallery</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Private gallery; each conversation stays in order</span>
+                <span>Refine (edits on the same picture) — coming soon</span>
               </li>
             </ul>
             <button
@@ -95,20 +96,20 @@ export default function Pricing() {
                   ✓
                 </span>
                 <span>
-                  <span className="type-emphasis">About 1,000 credits</span> a day for batches and drafts
+                  <span className="type-emphasis">More generation headroom</span> when billing goes live
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Go to the front of the line when many people are creating at once</span>
+                <span>Priority when many people are creating at once</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-slate-500" aria-hidden>
                   ✓
                 </span>
-                <span>Clear usage when you&apos;re juggling client projects</span>
+                <span>Refine and other pro tools as they ship</span>
               </li>
             </ul>
             <Link

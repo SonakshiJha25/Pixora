@@ -54,7 +54,7 @@ const journey = [
   {
     n: "1",
     title: "Make an account",
-    body: `Sign in to create images, see your credits, and keep your gallery in sync.`,
+    body: `Sign in to create images and keep your gallery in sync.`,
     img: assets.brandDecorCloudTablet,
     bannerClass:
       "bg-gradient-to-br from-pastel-mist via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-cyan/35",
@@ -69,21 +69,20 @@ const journey = [
   },
   {
     n: "3",
-    title: "Polish without a full rerun",
-    body: "Use Refine for gentle fixes on the image you already have—they usually skip the heavier credit cost of starting over.",
+    title: "Download & like",
+    body: "Save a PNG to your device or tap ♥ in My gallery so favourites are easy to find later.",
     img: assets.brandDecorKittenCloud,
     bannerClass:
       "bg-gradient-to-br from-pastel-sky/45 via-[#FBF9FF] to-[#fdf4fc] ring-1 ring-inset ring-[#F6B6E8]/35",
   },
 ];
 
-const creditCards = [
+const workflowCards = [
   {
-    title: "Credits",
+    title: "Create",
     body: (
       <>
-        ~<strong>100</strong> credits every day for new pictures; each new creation is often ~<strong>10</strong> credits (so about{" "}
-        <strong>10</strong> a day fits). Credits refill around <strong>midnight India time (IST)</strong>.
+        Pick a style, describe your scene, and generate. There are <strong>no daily limits</strong> right now—focus on making pictures.
       </>
     ),
     icon: Zap,
@@ -91,10 +90,10 @@ const creditCards = [
     border: "border-pastel-sky/50",
   },
   {
-    title: "Refine",
+    title: "Refine (soon)",
     body: (
       <>
-        Small changes on the same picture use <strong>Refine</strong> instead of firing a pricey brand-new generation.
+        Small tweaks on the same picture are <strong>coming soon</strong>. For now, create new scenes in Pixora Studio.
       </>
     ),
     icon: Sparkles,
@@ -105,16 +104,16 @@ const creditCards = [
 
 const funFacts = [
   {
-    emoji: "🌙",
-    text: "Daily refill at midnight India time (calendar day—not 24 hours from your last visit).",
+    emoji: "🎨",
+    text: `Describe the mood and subject plainly in ${WORKSPACE_NAME}—short, clear prompts beat long lists of keywords.`,
   },
   {
     emoji: "🧊",
-    text: `A brand-new idea in ${WORKSPACE_NAME} uses credits like a fresh picture. Refine adjusts what you already have—usually lighter.`,
+    text: "Refine (small edits on the same picture) is coming soon—for now, write a new prompt in the main box for a fresh scene.",
   },
   {
     emoji: "✨",
-    text: "New scenes pull from today's allowance; polishing the same image is usually gentler on credits.",
+    text: "My gallery stores your pictures—download PNGs anytime or heart what you want to keep handy.",
   },
 ];
 
@@ -137,7 +136,7 @@ export default function Help() {
           </p>
           <h1 className="type-page-title mt-3 sm:mt-4">Help</h1>
           <p className="type-body mt-2 max-w-lg sm:mt-3">
-            Credits, daily limits, the difference between a new picture and a quick polish—and how to reach a real human if something looks wrong.
+            How to sign in, generate, download, and like your pictures—and how to reach a real human if something looks wrong.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-5">
             <Link
@@ -268,14 +267,14 @@ export default function Help() {
         </div>
       </section>
 
-      {/* Credit duo */}
-      <section className="relative mt-10">
+      {/* Create & refine */}
+      <section id="workflow" className="relative mt-10">
         <div className="px-1 text-center">
-          <p className="type-eyebrow-muted">Credits</p>
-          <h2 className="type-subsection-title mt-2">Costs</h2>
+          <p className="type-eyebrow-muted">Workflow</p>
+          <h2 className="type-subsection-title mt-2">Create today</h2>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {creditCards.map((card) => {
+          {workflowCards.map((card) => {
             const C = card.icon;
             return (
               <div

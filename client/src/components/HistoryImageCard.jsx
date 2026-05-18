@@ -147,7 +147,7 @@ export default function HistoryImageCard({
                     }}
                   >
                     <PenLine className="size-3.5 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
-                    Continue
+                    Refine
                   </button>
                 ) : null}
               </div>

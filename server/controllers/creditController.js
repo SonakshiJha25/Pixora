@@ -1,5 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
+import User from "../models/User.js";
+import { areCreditsEnforced } from "../config/creditsEnabled.js";
 import {
   getDailyCreditLimit,
   getCreditsPerImage,
@@ -28,7 +30,9 @@ const sanitizeUser = (user) => {
 };
 
 export const getCredits = asyncHandler(async (req, res) => {
-  const user = await refreshUserCreditsFromDb(req.user.id);
+  const user = areCreditsEnforced()
+    ? await refreshUserCreditsFromDb(req.user.id)
+    : await User.findById(req.user.id);
   if (!user) {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }

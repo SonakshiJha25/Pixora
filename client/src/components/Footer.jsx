@@ -7,9 +7,8 @@ import { scrollPageTop } from "../lib/navigation";
 const FOOTER_INNER =
   "mx-auto w-full max-w-[min(132rem,calc(100%-1.5rem))] px-4 sm:px-5 lg:px-8 xl:px-11 2xl:px-14";
 
-const sep = <span className="shrink-0 select-none text-slate-300" aria-hidden>·</span>;
-
-const link = "shrink-0 font-medium text-slate-600 underline-offset-4 transition hover:text-slate-900 hover:underline";
+const link =
+  "font-medium text-slate-600 underline-offset-4 transition hover:text-slate-900 hover:underline";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -22,50 +21,47 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-auto w-full border-t border-pastel-cyan/35 bg-gradient-to-b from-white to-pastel-mist">
-      <div className={`${FOOTER_INNER} py-2.5 sm:py-3`}>
-        <div className="flex min-w-0 flex-nowrap items-center justify-between gap-x-3 text-[11px] leading-tight sm:text-xs sm:gap-x-4">
+    <footer className="mt-auto w-full border-t border-pastel-cyan/35 bg-gradient-to-b from-white to-pastel-mist pb-[env(safe-area-inset-bottom,0px)]">
+      <div className={`${FOOTER_INNER} py-4 sm:py-5`}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6 lg:items-center">
           <button
             type="button"
             onClick={goHomeTop}
-            className="group flex shrink-0 items-center gap-2 rounded-lg py-0.5 text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/40"
+            className="group flex w-fit max-w-full shrink-0 items-center gap-2 rounded-lg py-0.5 text-left transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/40"
           >
             <span className="shrink-0 overflow-hidden rounded-full transition group-hover:opacity-95">
               <BrandLogo variant="footer" alt="Pixorify" />
             </span>
-            <span className="font-display font-bold text-slate-900">{SITE.name}</span>
+            <span className="font-display text-sm font-bold text-slate-900 sm:text-base">{SITE.name}</span>
           </button>
 
           <nav
-            className="flex min-w-0 flex-nowrap items-center justify-end gap-x-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-2.5 [&::-webkit-scrollbar]:hidden"
+            className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-[11px] leading-snug sm:justify-end sm:text-xs lg:max-w-[min(100%,44rem)] lg:gap-x-3.5"
             aria-label="Footer"
           >
             <Link to="/help#contact" className={`${link} font-semibold text-slate-700`}>
               Contact
             </Link>
-            {sep}
-            <a className={link} href={`mailto:${SITE.helpEmail}`}>
+            <a className={`${link} break-all sm:break-normal`} href={`mailto:${SITE.helpEmail}`}>
               {SITE.helpEmail}
             </a>
-            {sep}
             <Link className={link} to="/help">
               Help
             </Link>
-            {sep}
             <Link className={link} to="/gallery">
               My gallery
             </Link>
-            {sep}
             <Link className={link} to="/pricing">
               Pricing
             </Link>
-            {sep}
-            <span className="shrink-0 whitespace-nowrap text-slate-400">
-              © {new Date().getFullYear()} {SITE.name}
-            </span>
-            {sep}
-            <span className="shrink-0 whitespace-nowrap text-slate-400">{CLIPDROP_ATTRIBUTION}</span>
           </nav>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-1.5 border-t border-pastel-cyan/25 pt-3 text-[10px] leading-relaxed text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-4 sm:gap-y-1 sm:text-[11px]">
+          <span className="shrink-0">
+            © {new Date().getFullYear()} {SITE.name}
+          </span>
+          <span className="min-w-0 text-slate-400/95">{CLIPDROP_ATTRIBUTION}</span>
         </div>
       </div>
     </footer>

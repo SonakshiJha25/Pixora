@@ -41,7 +41,7 @@ export default function Steps() {
         Open {WORKSPACE_NAME}
       </Link>
       <p className="type-meta mt-3 max-w-lg text-slate-500 sm:mx-auto sm:leading-relaxed">
-        Daily credit refresh (India time) and how edits are priced —{" "}
+        Sign in, generate, download, and like —{" "}
         <Link to="/help" className="font-medium text-slate-700 underline-offset-4 hover:underline">
           see Help
         </Link>

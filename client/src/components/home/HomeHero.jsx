@@ -31,8 +31,8 @@ export default function HomeHero() {
         </h1>
         <p className="type-body mt-2 max-w-lg">
           {user
-            ? `Your ${WORKSPACE_NAME} desk is ready—describe a scene, refine gently, keep favourites close.`
-            : "A soft studio for picture-making: plain-language prompts, one living thread per idea, and a gallery that stays tidy."}
+            ? `Your ${WORKSPACE_NAME} desk is ready—generate, download PNGs, and heart what you love in My gallery.`
+            : "Sign in, describe what you want, generate in Pixora Studio, then download or save favourites in your gallery."}
         </p>
         <div className="mt-3.5 flex flex-wrap gap-2.5 sm:mt-4">
           <Link

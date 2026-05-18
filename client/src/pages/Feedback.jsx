@@ -90,7 +90,7 @@ export default function Feedback() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={5}
-                placeholder="e.g. loved the anime style but credits confused me..."
+                placeholder="e.g. loved the anime style but download failed on mobile..."
                 className="w-full rounded-xl border border-pastel-cyan/25 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-cyan focus:outline-none focus:ring-2 focus:ring-brand-cyan/30"
                 disabled={loading}
               />

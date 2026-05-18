@@ -3,6 +3,7 @@ import axios from "axios";
 import { getApiBase, getRequestBaseUrl } from "../config/api.js";
 import { getToken } from "../utils/token.js";
 import { normalizeCreditsPoints } from "../lib/credits.js";
+import { CREDITS_UI_ENABLED } from "../lib/creditsEnabled.js";
 
 export const AppContext = createContext();
 
@@ -66,6 +67,15 @@ const AppContextProvider = ({ children }) => {
   const fetchUserData = useCallback(async () => {
     if (!getToken()) return;
     try {
+      if (!CREDITS_UI_ENABLED) {
+        const { data } = await api.get("/api/user/me");
+        const u = data?.user ?? data;
+        if (u && typeof u === "object") {
+          setUser(u);
+        }
+        return;
+      }
+
       // Single source of truth — runs IST daily rollover on the server once and returns synced user + balance.
       const { data } = await api.get("/api/user/credits");
       const raw =
@@ -92,12 +102,12 @@ const AppContextProvider = ({ children }) => {
       const status = error?.response?.status;
       const code = error?.response?.data?.error?.code;
       if (status === 401) logout();
-      if (status === 503 && code === "DATABASE_UNAVAILABLE") {
+      if (CREDITS_UI_ENABLED && status === 503 && code === "DATABASE_UNAVAILABLE") {
         console.error(
           "[Pixorify] Cannot sync credits — MongoDB is not connected on the server. Check server/.env MONGODB_URI."
         );
       } else if (!error?.response) {
-        console.error("[Pixorify] Cannot reach API for credit sync — is the backend running?");
+        console.error("[Pixorify] Cannot reach API — is the backend running?");
       }
     }
   }, [api, logout]);
@@ -116,7 +126,7 @@ const AppContextProvider = ({ children }) => {
   const ROLLOVER_MAX_ATTEMPTS = 90;
 
   useEffect(() => {
-    if (!token) return undefined;
+    if (!CREDITS_UI_ENABLED || !token) return undefined;
 
     const tick = () => {
       const iso = scheduleRef.current?.nextResetAtIso;

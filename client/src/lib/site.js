@@ -5,7 +5,7 @@ export const SITE = {
   name: "Pixorify",
   /** Browser tab title (keep in sync with client/index.html). */
   browserTitle: "Pixorify — Ideas in, pixels out",
-  tagline: "AI image generation for creators",
+  tagline: "Sign in, generate, download, and save what you love",
   helpEmail: "pixorify.help@gmail.com",
   twitter: "https://example.com/pixorify-twitter",
   instagram: "https://example.com/pixorify-instagram",
@@ -42,14 +42,14 @@ export const HERO_SLIDES = [
       "https://images.unsplash.com/photo-1469474968028-4fad6c27e9bf?w=1920&q=85&auto=format&fit=crop",
     kicker: "What is Pixorify",
     title: "Create images from text",
-    sub: `Prompts and styles live in ${WORKSPACE_NAME}; finished art lives in your Pixorify gallery`,
+    sub: `Describe a scene in ${WORKSPACE_NAME}, then keep finished art in your gallery`,
   },
   {
     image:
       "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1920&q=85&auto=format&fit=crop",
-    kicker: "Credits & limits",
-    title: "10 credits refresh every day on Free",
-    sub: `Create in ${WORKSPACE_NAME}; check your balance anytime; unlock more credits on Pro when you're ready`,
+    kicker: "Simple flow",
+    title: "Sign in and start creating",
+    sub: "No credit counters—just generate, download PNGs, and heart the pictures you want to find again.",
   },
   {
     image:
@@ -61,8 +61,8 @@ export const HERO_SLIDES = [
   {
     image:
       "https://images.unsplash.com/photo-1523240795612-9a054b0d7039?w=1920&q=85&auto=format&fit=crop",
-    kicker: "Gallery & files",
-    title: "Save, fave, export",
-    sub: "Favs, PNGs, cleanup—My gallery.",
+    kicker: "Gallery",
+    title: "Download and like",
+    sub: "Save PNGs anytime and mark favourites in My gallery.",
   },
 ];

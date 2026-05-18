@@ -2,15 +2,16 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import { WORKSPACE_NAME } from "../lib/site.js";
 
 const FEATURES = [
-  { label: "Credits per day", free: "100", pro: "1,000" },
-  { label: "Roughly how many brand-new pictures / day", free: "~10", pro: "~100" },
-  { label: "Credits per new picture", free: "10", pro: "10" },
+  { label: `Generate in ${WORKSPACE_NAME}`, free: "Yes", pro: "Yes" },
+  { label: "Download PNGs", free: "Yes", pro: "Yes" },
+  { label: "Like favourites in gallery", free: "Yes", pro: "Yes" },
+  { label: "Refine (edits on same picture)", free: "Coming soon", pro: "Coming soon" },
   { label: "Output size", free: "Standard", pro: "HD (1024px+)" },
   { label: "When lots of people are creating", free: "Standard wait", pro: "Priority queue" },
   { label: "Client / commercial use", free: "Personal", pro: "Allowed (see terms)" },
-  { label: "Gallery saved work", free: "Yes", pro: "Yes" },
   { label: "Styles", free: "All", pro: "All" },
   { label: "If you’re stuck", free: "Community + Help", pro: "Email-first" },
 ];
@@ -32,8 +33,8 @@ export default function PricingPro() {
             Free and Pro, side by side
           </h1>
           <p className="type-body mx-auto mt-3 max-w-xl">
-            Same app—Pro just gives you more credits each day. Billing isn&apos;t live yet; this table is here so you know
-            what to expect when it is.
+            Today the free tier is the full loop: sign in, generate, download, and like. Billing isn&apos;t live yet—this table
+            is here so you know what to expect when Pro ships.
           </p>
         </motion.div>
 
@@ -95,7 +96,7 @@ export default function PricingPro() {
             to="/help"
             className="text-xs font-medium text-slate-500 underline-offset-4 hover:text-slate-700 hover:underline"
           >
-            Credit answers in Help
+            How Pixorify works
           </Link>
         </div>
 

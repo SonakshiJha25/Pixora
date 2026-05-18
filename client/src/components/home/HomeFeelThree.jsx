@@ -12,7 +12,7 @@ export default function HomeFeelThree() {
         transition={{ duration: 0.4 }}
       >
         <p className="type-eyebrow-muted">How it feels</p>
-        <h2 className="type-subsection-title mt-1">How you&apos;ll work here</h2>
+        <h2 className="type-subsection-title mt-1">Sign in → create → save</h2>
       </motion.div>
       <div className="mt-4 grid gap-3 sm:grid-cols-3 sm:gap-3.5">
         {HOME_JOURNEY.map((step, i) => (

@@ -1,5 +1,6 @@
 import { photos } from "../lib/photos.js";
 import { STYLE_IMAGES } from "../lib/styleTypes.js";
+import { REFINE_COMING_SOON_COPY } from "./productMessaging.js";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
 /** Hero moodboard — five unique scenes from `photos/hero/` (not style picker / tips art). */
@@ -50,8 +51,8 @@ export const HOME_HERO_FLOATS = [
 export const HOME_JOURNEY = [
   {
     n: "1",
-    title: "Imagine",
-    body: "Describe your idea naturally—light, texture, and mood in plain words.",
+    title: "Sign in",
+    body: "One account holds your gallery—sign in once and your pictures stay with you.",
     img: photos.tipPromptCamera,
     bannerClass:
       "bg-gradient-to-br from-pastel-mist via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-cyan/35",
@@ -59,23 +60,25 @@ export const HOME_JOURNEY = [
   },
   {
     n: "2",
-    title: "Refine",
-    body: "Continue the same image thread. Nudge detail without starting over.",
-    img: photos.tipRefineStep,
+    title: "Generate",
+    body: `Pick a style, describe your scene in plain words, and create in ${WORKSPACE_NAME}.`,
+    img: photos.helpJourneyStudioDesk,
     bannerClass:
-      "bg-gradient-to-br from-pastel-sky/45 via-[#FBF9FF] to-[#fdf4fc] ring-1 ring-inset ring-[#F6B6E8]/35",
+      "bg-gradient-to-br from-[#f3eeff] via-white to-[#eaf8ff] ring-1 ring-inset ring-pastel-lilac/35",
     imgClass: "object-contain object-center p-2 sm:p-3",
   },
   {
     n: "3",
-    title: "Collect",
-    body: "Keep your favorite generations organized in your gallery.",
+    title: "Download & like",
+    body: "Save a PNG to your device or tap ♥ in My gallery to find favourites fast.",
     img: photos.homeJourneyCollectDesk,
     bannerClass:
       "bg-gradient-to-br from-pastel-sky/50 via-pastel-mist to-white ring-1 ring-inset ring-pastel-sky/40",
     imgClass: "object-contain object-center p-2 sm:p-3",
   },
 ];
+
+export const HOME_REFINE_TEASER = REFINE_COMING_SOON_COPY;
 
 export const HOME_MOOD_STRIP = [
   { label: "Realistic", hint: "Natural light", studioStyle: "realistic", image: STYLE_IMAGES.realistic },

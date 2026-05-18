@@ -1,25 +1,20 @@
-import { Fragment, useContext, useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Fragment, useContext, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Heart, LayoutGrid, Search } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import ConfirmModal from "../components/ConfirmModal";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
-import GalleryThreadModal from "../components/GalleryThreadModal.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
-import { resolveImageUrl } from "../config/api.js";
 import DownloadPngButton from "../components/DownloadPngButton.jsx";
+import { REFINE_COMING_SOON_PATH } from "../lib/comingSoon.js";
 import { groupGalleryItems, groupThreadsByCalendarDay, threadMatchesFavoriteFilter, threadSearchHaystack } from "../lib/groupGalleryThreads.js";
 import { STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
 
-const MONGO_ID_RE = /^[a-f\d]{24}$/i;
-
 export default function Gallery() {
   const { token, setShowLogin, api, fetchHistory, history, setHistory, historyStatus } = useContext(AppContext);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [busyId, setBusyId] = useState(null);
-  const [threadBrowseId, setThreadBrowseId] = useState(null);
   const [pendingDeleteItem, setPendingDeleteItem] = useState(null);
   const [view, setView] = useState("all");
   const [search, setSearch] = useState("");
@@ -47,21 +42,6 @@ export default function Gallery() {
   const daySections = useMemo(() => groupThreadsByCalendarDay(filteredGroups), [filteredGroups]);
   const hasThreadsInView = viewFiltered.length > 0;
   const filtersExcludeAll = hasThreadsInView && filteredGroups.length === 0;
-
-  /** Deep-link from Studio Recent (or shared URL): `/gallery?thread=<imageId>`. */
-  useEffect(() => {
-    const raw = searchParams.get("thread")?.trim() ?? "";
-    if (!token || !raw || !MONGO_ID_RE.test(raw)) return;
-    setThreadBrowseId(raw);
-  }, [searchParams, token]);
-
-  const closeThreadModal = () => {
-    setThreadBrowseId(null);
-    if (!searchParams.get("thread")) return;
-    const next = new URLSearchParams(searchParams);
-    next.delete("thread");
-    setSearchParams(next, { replace: true });
-  };
 
   const run = async (id, fn) => {
     setBusyId(id);
@@ -98,8 +78,8 @@ export default function Gallery() {
             </span>
             <h1 className="type-page-title mt-5">Your Pixorify gallery</h1>
             <p className="type-body mx-auto mt-3 max-w-md">
-              Sign in once and everything you create in {WORKSPACE_NAME} shows up here—downloads, starred favourites, and
-              each edited version neatly grouped together.
+              Sign in once and everything you create in {WORKSPACE_NAME} shows up here—downloads and starred favourites in
+              one place.
             </p>
             <button
               type="button"
@@ -131,9 +111,8 @@ export default function Gallery() {
         >
           <h1 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">My gallery</h1>
           <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-slate-400 sm:text-sm">
-            Each card shows one journey—the latest snapshot is on top. Tap{" "}
-            <span className="font-medium text-slate-300">View versions</span> to browse every step, use the ♥ icon to save to{" "}
-            <span className="font-medium text-slate-300">Saved</span>.
+            Your saved pictures, newest first. Use the ♥ icon to add to{" "}
+            <span className="font-medium text-slate-300">Saved</span>, or download a PNG anytime.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm">
             <Link to="/studio" className="font-medium text-slate-400 underline-offset-4 hover:text-slate-200 hover:underline">
@@ -142,8 +121,8 @@ export default function Gallery() {
             <span className="text-slate-600" aria-hidden>
               ·
             </span>
-            <Link to="/help" className="font-medium text-slate-500 underline-offset-4 transition hover:text-slate-200 hover:underline">
-              How credits work
+            <Link to="/help#workflow" className="font-medium text-slate-500 underline-offset-4 transition hover:text-slate-200 hover:underline">
+              Help & tips
             </Link>
           </div>
         </motion.header>
@@ -191,7 +170,7 @@ export default function Gallery() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search your prompts or edits…"
+              placeholder="Search your prompts…"
               className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none ring-0 transition focus:border-white/18 focus:ring-1 focus:ring-white/10"
             />
           </label>
@@ -315,14 +294,8 @@ export default function Gallery() {
                     className="studio-shell flex flex-col items-center gap-5 rounded-2xl p-5"
                   >
                     <div className="relative w-full max-w-[280px]">
-                      {group.refinements > 0 ? (
-                        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/[0.08] bg-[#13151c]/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
-                          +{group.refinements} edit{group.refinements === 1 ? "" : "s"}
-                        </span>
-                      ) : null}
                       <HistoryImageCard
                         item={group.latest}
-                        onOpen={() => setThreadBrowseId(String(group.latest._id))}
                         showFavoritePip={false}
                         surface="workspace"
                       />
@@ -352,21 +325,13 @@ export default function Gallery() {
                       </button>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setThreadBrowseId(String(group.latest._id))}
-                      className="btn-primary w-full max-w-[280px] rounded-full py-2.5 text-xs font-semibold"
-                    >
-                      View versions
-                    </button>
-
                     <div className="flex w-full max-w-[280px] flex-wrap justify-center gap-2">
-                  <Link
-                    to={`/studio?continue=${encodeURIComponent(String(group.latest._id))}`}
-                    className="rounded-full border border-[rgba(90,143,163,0.35)] bg-[rgba(90,143,163,0.12)] px-3 py-2 text-xs font-semibold text-slate-100 transition hover:border-[rgba(106,159,179,0.45)] hover:bg-[rgba(90,143,163,0.18)]"
-                  >
-                    Continue editing
-                  </Link>
+                      <Link
+                        to={REFINE_COMING_SOON_PATH}
+                        className="rounded-full border border-[rgba(90,143,163,0.35)] bg-[rgba(90,143,163,0.12)] px-3 py-2 text-xs font-semibold text-slate-100 transition hover:border-[rgba(106,159,179,0.45)] hover:bg-[rgba(90,143,163,0.18)]"
+                      >
+                        Refine
+                      </Link>
                       <DownloadPngButton
                         imageId={String(group.latest._id)}
                         imageUrl={group.latest.imageUrl}
@@ -401,13 +366,6 @@ export default function Gallery() {
             setPendingDeleteItem(null);
             if (item) run(item._id, () => api.delete(`/api/image/${item._id}`));
           }}
-        />
-
-        <GalleryThreadModal
-          open={Boolean(threadBrowseId)}
-          imageId={threadBrowseId}
-          api={api}
-          onClose={closeThreadModal}
         />
       </div>
     </div>

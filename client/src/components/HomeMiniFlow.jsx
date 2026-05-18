@@ -8,7 +8,7 @@ const flowSteps = [
   {
     n: "1",
     title: "Sign in once",
-    line: "One account keeps your credits and saved pictures organized.",
+    line: "One account keeps your gallery and favourites in sync.",
     img: assets.sample_img_1,
     imgClass: "object-cover object-center",
   },
@@ -21,8 +21,8 @@ const flowSteps = [
   },
   {
     n: "3",
-    title: "Tweak, don't rebuild",
-    line: "Small changes stick with the picture you already started—no need to start over from scratch.",
+    title: "Download & like",
+    line: "Save a PNG or heart pictures in My gallery—Refine (gentle edits) is coming soon.",
     img: assets.brandDecorKittenCloud,
     imgClass: "object-contain object-center p-2",
   },
@@ -64,10 +64,10 @@ export default function HomeMiniFlow() {
           <div className="min-w-0 flex-1">
             <div className="text-center lg:text-left">
               <p className="type-eyebrow-muted text-slate-500">How it works</p>
-              <h2 className="type-section-accent mt-1.5 text-slate-900">Idea → picture → polish</h2>
+              <h2 className="type-section-accent mt-1.5 text-slate-900">Sign in → generate → save</h2>
               <p className="type-body mx-auto mt-2 max-w-lg text-slate-600 lg:mx-0">
-                A brand‑new scene uses credits from today&apos;s allowance. Gentle fixes on the same picture usually stay light on
-                credits compared with starting again.
+                Pixorify is focused on the basics: create pictures, download them, and heart favourites in your gallery. No credit
+                counters on screen.
               </p>
             </div>
 
@@ -101,18 +101,17 @@ export default function HomeMiniFlow() {
           <span className="inline-flex items-start justify-center gap-2 sm:items-center">
             <Zap className="mt-0.5 h-4 w-4 shrink-0 text-pastel-cyan sm:mt-0" aria-hidden />
             <span className="type-body text-left text-slate-700">
-              On the free plan, about <strong className="type-emphasis">10 new pictures</strong> a day fits the{" "}
-              <strong className="type-emphasis">100</strong> credits you receive (often <strong className="type-emphasis">10</strong> credits per new picture). Light
-              touch‑ups on the same picture usually cost less—see Help for the full breakdown.
+              <strong className="type-emphasis">Refine</strong> (small edits on the same picture) is coming soon. Until then, generate
+              fresh scenes and use download + ♥ in My gallery.
             </span>
           </span>
-          <Link to="/help" className="type-link-brand mt-2.5 block shrink-0 text-center sm:mt-0 sm:inline-block">
-            How credits work
+          <Link to="/help#workflow" className="type-link-brand mt-2.5 block shrink-0 text-center sm:mt-0 sm:inline-block">
+            See the workflow
           </Link>
         </div>
 
         <p className="type-meta mt-4 text-center text-slate-500">
-          Time zones and what counts as a new picture versus a tweak —{" "}
+          Questions about what&apos;s live today —{" "}
           <Link to="/help" className="font-medium text-slate-700 underline-offset-4 hover:underline">
             open Help
           </Link>

@@ -185,6 +185,19 @@ Documented placeholders: **`server/.env.example`** (never commit real secrets).
 
 ---
 
+## Credits (temporarily disabled)
+
+Daily credit limits and deductions are **turned off** for product stabilization. All models, services, middleware, and schema fields remain in place.
+
+| Switch | Location | Re-enable |
+|--------|----------|-----------|
+| Server enforcement | `server/config/creditsEnabled.js` — `areCreditsEnforced()` | Set `CREDITS_ENABLED=true` in `server/.env` and restart |
+| Client UI | `client/src/lib/creditsEnabled.js` — `CREDITS_UI_ENABLED` | Set `VITE_CREDITS_UI_ENABLED=true` at build time |
+
+When enforcement is off: generate/refine proceed without deduction; `creditRefresh` and IST bulk refill on DB connect are skipped; navbar credit pill, reset countdown, and `LimitReachedModal` are hidden.
+
+---
+
 ## Document maintenance
 
 Update this file when you add routes, rename `SITE` fields, or change deployment/env contracts. Single source for **mailto** visibility remains `SITE.helpEmail` in `client/src/lib/site.js`.

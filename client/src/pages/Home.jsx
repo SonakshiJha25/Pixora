@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import HomeFeelThree from "../components/home/HomeFeelThree.jsx";
 import HomeHero from "../components/home/HomeHero.jsx";
 import HomeShortcuts from "../components/home/HomeShortcuts.jsx";
+import HomeRefineTeaser from "../components/home/HomeRefineTeaser.jsx";
 import HomeStudioCta from "../components/home/HomeStudioCta.jsx";
 import HomeStyleRail from "../components/home/HomeStyleRail.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
@@ -11,16 +12,16 @@ import { WORKSPACE_NAME } from "../lib/site.js";
 
 const faqs = [
   {
-    q: "How many new images can I actually finish in a day?",
-    a: "~10 new images/day at 10 credits each from 100. Out of credits? You can still refine existing work.",
+    q: "What can I do in Pixorify right now?",
+    a: `Sign in, describe a scene in ${WORKSPACE_NAME}, generate an image, download a PNG, and heart favourites in My gallery. That's the full loop today.`,
   },
   {
-    q: "When do credits come back?",
-    a: "At midnight India time you get that day's full balance—we go by calendar days, not a rolling 24-hour clock.",
+    q: "Is Pixorify free right now?",
+    a: "Yes—sign in and create without credit counters on screen. Paid Pro extras may arrive later; we'll say so clearly when they do.",
   },
   {
-    q: `What is the difference between Refine and a new picture in ${WORKSPACE_NAME}?`,
-    a: `Refine adjusts the image you already started. Starting a totally new prompt is a fresh run and uses more credits.`,
+    q: "What about Refine?",
+    a: `Refine (small edits on the same picture) is coming soon. Until then, start a fresh prompt in ${WORKSPACE_NAME} when you want a new scene.`,
   },
   {
     q: "Why might an older thumbnail stop loading?",
@@ -28,7 +29,7 @@ const faqs = [
   },
   {
     q: "Do I need to sign in?",
-    a: "Browse without an account. Saving work and credits needs sign-in.",
+    a: "You can browse the site without an account. Saving to your gallery, downloading, and liking pictures requires sign-in.",
   },
 ];
 
@@ -71,6 +72,7 @@ export default function Home() {
         <HomeHero />
         <HomeShortcuts />
         <HomeFeelThree />
+        <HomeRefineTeaser />
         <HomeStyleRail />
         <HomeStudioCta />
 

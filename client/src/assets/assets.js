@@ -56,19 +56,19 @@ export const stepsData = [
   {
     title: "Describe the scene",
     description:
-      "Start with the subject and the setting: who or what is in frame, where they are, and what the light is doing (window light, golden hour, soft studio). Mention colors and lens feel when it matters—“warm tans and deep blues” beats “nice colors.” Pixorify works best when you describe what a camera could see rather than repeating a mood adjective.",
+      "Start with the subject and setting: who or what is in frame, where they are, and what the light is doing. Mention colors and lens feel when it matters—“warm tans and deep blues” beats “nice colors.” Pixorify works best when you describe what a camera could see.",
     icon: step_icon_1,
   },
   {
-    title: "Pick a style & go",
+    title: "Pick a style & generate",
     description:
-      "Choose realistic, anime, cyberpunk, fantasy, or minimal before you hit create—each tilts shadows, edges, and detail level so results match how you imagined the genre. First runs use your daily credits; after that, Refine tweaks the picture you already have for smaller, gentler edits so you rarely need to pay the full price of starting over.",
+      "Choose realistic, anime, cyberpunk, fantasy, or minimal before you hit create—each tilts shadows, edges, and detail level. There are no credit counters right now; just sign in and generate.",
     icon: step_icon_2,
   },
   {
-    title: "Save what you love",
+    title: "Download & like",
     description:
-      "Download PNGs anytime, favourite versions in My gallery so the best thumbnails stay sorted, or sign in across devices so your drafts follow you. Every thread keeps versions in chronological order—you can always scroll backward to recover an older look.",
+      "Save a PNG to your device anytime, or tap ♥ in My gallery so your best pictures stay easy to find. Refine (edits on the same image) is coming soon.",
     icon: credit_star,
   },
 ];
@@ -79,21 +79,21 @@ export const testimonialsData = [
     name: "Maya Lin",
     role: "Designer",
     stars: 5,
-    text: `Pixorify fits how I work — quick first drafts, then gentle edits without redoing everything from zero.`,
+    text: "Pixorify fits how I work — quick drafts in Pixora Studio, then download or favourite what lands.",
   },
   {
     image: photos.decorBunnyArtist,
     name: "Jordan Cole",
     role: "Content creator",
     stars: 4,
-    text: `The studio feels calm. Credits make sense to me, and my gallery stays organised when I'm trying ideas.`,
+    text: "The studio feels calm. I sign in, generate, and my gallery stays organised when I'm trying ideas.",
   },
   {
     image: photos.decorKittenCloud,
     name: "Priya Nair",
     role: "Freelance art director",
     stars: 5,
-    text: `Simple daily credit refresh and edits on the same picture mean I focus on creativity, not the controls.`,
+    text: "Simple flow: create, download, heart the keepers—I focus on the pictures, not the controls.",
   },
 ];
 
@@ -102,12 +102,12 @@ export const plans = [
     id: "Free",
     price: 0,
     credits: 10,
-    desc: "10 credits every day. Private gallery + downloads.",
+    desc: "Sign in, generate, download PNGs, and like favourites in your gallery.",
   },
   {
     id: "Pro",
     price: 9,
     credits: 200,
-    desc: "More credits + priority generation (coming soon).",
+    desc: "More headroom and priority features (coming soon).",
   },
 ];

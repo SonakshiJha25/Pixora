@@ -13,16 +13,16 @@ export const TIP_CAROUSEL_SLIDES = [
   },
   {
     image: photos.tipRefineStep,
-    alt: "Cloud character sketching on a glowing tablet — one change at a time",
-    title: "One tweak, then another",
-    text: "Refine adjusts the picture you already have—gentler than a fresh run.",
+    alt: "Cloud character sketching on a glowing tablet — refine coming soon",
+    title: "Refine (soon)",
+    text: "Gentle edits on the same picture are on the way—for now, generate and save what you love.",
     tone: "from-pastel-mist via-[#f8f5ff]/90 to-[#fdf4fc]",
   },
   {
     image: photos.tipGalleryDeskRound,
     alt: "Cozy pastel desk by a round window — gallery keeps your work organized",
-    title: "Versions stay lined up",
-    text: "My gallery remembers each iteration so you can scroll backward fast.",
+    title: "Download & like",
+    text: "My gallery stores your pictures—export PNGs or heart favourites anytime.",
     tone: "from-white via-[#eaf8ff]/80 to-pastel-mist",
   },
 ];

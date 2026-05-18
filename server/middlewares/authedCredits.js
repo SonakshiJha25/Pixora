@@ -1,5 +1,6 @@
 import userAuth from "./auth.js";
 import creditRefreshMiddleware from "./creditRefresh.js";
+import { areCreditsEnforced } from "../config/creditsEnabled.js";
 
-/** Authenticated routes that should apply IST daily rollover from MongoDB before handlers run. */
-export default [userAuth, creditRefreshMiddleware];
+/** Authenticated routes — credit refresh only when enforcement is enabled. */
+export default areCreditsEnforced() ? [userAuth, creditRefreshMiddleware] : [userAuth];

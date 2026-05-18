@@ -1,5 +1,7 @@
 import Image from "../models/Image.js";
+import User from "../models/User.js";
 import AppError from "../utils/appError.js";
+import { areCreditsEnforced } from "../config/creditsEnabled.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { resolveEditedImageUrl } from "./imageEditService.js";
 import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
@@ -24,7 +26,9 @@ export async function runImageRefinement(req, res) {
 
   console.log("[Refine] refinement started — user", String(req.user.id).slice(-8));
 
-  const creditSnapshot = await refreshUserCreditsFromDb(req.user.id);
+  const creditSnapshot = areCreditsEnforced()
+    ? await refreshUserCreditsFromDb(req.user.id)
+    : await User.findById(req.user.id);
   if (!creditSnapshot) {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }

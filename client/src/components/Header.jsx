@@ -31,13 +31,12 @@ export default function Header() {
         <p className="type-body mt-2.5 max-w-sm text-slate-600 sm:mt-3">
           {user ? (
             <>
-              Keep it simple: watch your credits in {WORKSPACE_NAME}, then polish the same picture with small edits—you
-              don&apos;t need to start from scratch every time.
+              Sign in, open {WORKSPACE_NAME}, generate, download PNGs, and heart favourites in My gallery.
             </>
           ) : (
             <>
-              Describe what you want, pick a style, then improve it step by step in one place—without redoing the whole
-              picture for every little change.
+              Sign in, describe what you want, pick a style, and generate—then download or save what you love in your
+              gallery.
             </>
           )}
         </p>

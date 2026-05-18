@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 import Image from "../models/Image.js";
 import AppError from "../utils/appError.js";
+import { areCreditsEnforced } from "../config/creditsEnabled.js";
 import {
   ensureDailyCredits,
   getCreditsPerImage,
@@ -12,6 +13,49 @@ import { logInfo } from "../utils/logger.js";
 function creditLogUser(email, fallbackId) {
   const e = email && String(email).trim();
   return e || String(fallbackId ?? "unknown");
+}
+
+function buildNewImageDoc({ userId, prompt, promptEnhanced, style, imageUrl, tags, isPublic, provider }) {
+  return {
+    userId,
+    prompt: prompt.trim(),
+    promptEnhanced: (promptEnhanced || prompt).trim(),
+    style: style || "realistic",
+    tags: Array.isArray(tags) ? tags.slice(0, 8) : [],
+    isPublic: Boolean(isPublic),
+    imageUrl,
+    provider,
+    parentImageId: null,
+    isEdit: false,
+    generationKind: "generate",
+    editPrompt: null,
+    refinementPrompt: null,
+    originalPrompt: prompt.trim(),
+    version: 1,
+  };
+}
+
+async function saveImageWithoutCreditDeduction(
+  { userId, prompt, promptEnhanced, style, imageUrl, tags, isPublic, provider },
+  session
+) {
+  const user = await User.findById(userId).session(session);
+  if (!user) {
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
+  }
+
+  const [image] = await Image.create([buildNewImageDoc({ userId, prompt, promptEnhanced, style, imageUrl, tags, isPublic, provider })], {
+    session,
+  });
+
+  await Image.findByIdAndUpdate(image._id, { $set: { threadRootId: image._id } }, { session });
+
+  const balance = snapCreditsToLedger(user.credits);
+  logInfo(
+    `Image saved (credits disabled): userId=${String(userId).slice(-8)} imageId=${String(image._id)}`
+  );
+
+  return { image, remainingCredits: balance, userEmail: user.email };
 }
 
 export async function deductCreditAndSaveImage({
@@ -28,6 +72,15 @@ export async function deductCreditAndSaveImage({
   session.startTransaction();
 
   try {
+    if (!areCreditsEnforced()) {
+      const result = await saveImageWithoutCreditDeduction(
+        { userId, prompt, promptEnhanced, style, imageUrl, tags, isPublic, provider },
+        session
+      );
+      await session.commitTransaction();
+      return result;
+    }
+
     const user = await User.findById(userId).session(session);
     if (!user) {
       throw new AppError("User not found", 404, "USER_NOT_FOUND");
@@ -67,25 +120,7 @@ export async function deductCreditAndSaveImage({
     }
 
     const [image] = await Image.create(
-      [
-        {
-          userId,
-          prompt: prompt.trim(),
-          promptEnhanced: (promptEnhanced || prompt).trim(),
-          style: style || "realistic",
-          tags: Array.isArray(tags) ? tags.slice(0, 8) : [],
-          isPublic: Boolean(isPublic),
-          imageUrl,
-          provider,
-          parentImageId: null,
-          isEdit: false,
-          generationKind: "generate",
-          editPrompt: null,
-          refinementPrompt: null,
-          originalPrompt: prompt.trim(),
-          version: 1,
-        },
-      ],
+      [buildNewImageDoc({ userId, prompt, promptEnhanced, style, imageUrl, tags, isPublic, provider })],
       { session }
     );
 
@@ -115,6 +150,14 @@ export async function useCreditsAtomic({ userId, amount }) {
   const cost = getCreditsPerImage();
   if (amount !== cost) {
     throw new AppError(`amount must be exactly ${cost}`, 400, "VALIDATION_ERROR");
+  }
+
+  if (!areCreditsEnforced()) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError("User not found", 404, "USER_NOT_FOUND");
+    }
+    return snapCreditsToLedger(user.credits);
   }
 
   const session = await mongoose.startSession();

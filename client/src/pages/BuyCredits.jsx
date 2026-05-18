@@ -6,11 +6,11 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 
 const comparison = [
-  { label: "100 credits every day", free: true, pro: true },
+  { label: "Generate images in Pixora Studio", free: true, pro: true },
   { label: "Private gallery", free: true, pro: true },
   { label: "Download generated images", free: true, pro: true },
   { label: "Favorites", free: true, pro: true },
-  { label: "Larger monthly credit pool", free: false, pro: true },
+  { label: "More generation headroom", free: false, pro: true },
   { label: "Full-quality / high-res exports", free: false, pro: true },
   { label: "More style & generation options", free: false, pro: true },
   { label: "Public sharing & community profile", free: false, pro: true },
@@ -36,7 +36,7 @@ export default function BuyCredits() {
       return;
     }
     if (plan === "Free") {
-      toast.info("You're on Free — 100 daily credits are already included.");
+      toast.info("You're on Free — sign in, generate, download, and like in your gallery.");
       return;
     }
     navigate("/coming-soon");
