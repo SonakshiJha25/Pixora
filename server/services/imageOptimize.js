@@ -20,13 +20,3 @@ export async function optimizeGeneratedBuffer(buffer) {
     return buffer;
   }
 }
-
-/** Resize for preview responses (JPEG is much smaller than full PNG). */
-export async function bufferToPreviewJpeg(buffer, width = 640) {
-  const w = Math.min(1200, Math.max(120, Number(width) || 640));
-  return sharp(buffer)
-    .rotate()
-    .resize({ width: w, withoutEnlargement: true })
-    .jpeg({ quality: 82, mozjpeg: true })
-    .toBuffer();
-}

@@ -16,12 +16,14 @@ import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { HeroDecorBleed } from "../components/MarketingDecorPieces.jsx";
 import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
 import { SITE, WORKSPACE_NAME } from "../lib/site.js";
-import { assets } from "../assets/assets.js";
 import { photos } from "../lib/photos.js";
 
-/** Uniform inset + rounded art inside journey banners. */
+/** Even inset inside card image areas (hero section excluded). */
+const HELP_IMG_INSET = "p-2.5 sm:p-3";
+
+/** Three journey banners — fixed visual size so every step matches. */
 const JOURNEY_IMG =
-  "h-full w-full max-h-full max-w-full rounded-xl object-contain object-center";
+  "mx-auto h-[5.25rem] w-auto max-w-full object-contain object-center sm:h-[6rem]";
 
 const quickLinks = [
   {
@@ -178,16 +180,16 @@ export default function Help() {
           </div>
         </div>
         <div className="relative z-[1] flex justify-center sm:justify-end">
-          <div className="flex w-full max-w-[min(100%,300px)] flex-col items-stretch sm:max-w-none">
+          <motion.div className="flex w-full max-w-[min(100%,21rem)] flex-col items-stretch gap-3.5 sm:max-w-[24rem] sm:gap-4">
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative mx-auto w-full sm:ml-auto sm:mr-0 sm:w-auto"
+              className="flex w-full items-center justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-[#EDE8F8] via-[#F3EBF6] to-[#EDE4F2] p-3 shadow-[0_22px_52px_-18px_rgba(148,130,188,0.44)] ring-1 ring-[#E8E0F5]/90 sm:rounded-[1.65rem] sm:p-3.5"
             >
               <img
                 src={photos.bg1}
                 alt="Cozy Pixorify desk at night — dream it, describe it, create"
-                className="mx-auto max-h-[240px] w-full max-w-[min(100%,22rem)] rounded-[1.5rem] object-contain object-center shadow-2xl ring-6 ring-white/95 sm:max-h-[280px]"
+                className="block max-h-[15rem] w-full rounded-[1.15rem] object-contain object-center sm:max-h-[18rem] sm:rounded-[1.35rem]"
                 loading="lazy"
                 decoding="async"
               />
@@ -195,11 +197,11 @@ export default function Help() {
             <a
               href="#contact"
               aria-label="Jump to the message form at the bottom of this page"
-              className="type-promo-caption mt-5 block w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#6FCBFF] via-[#8FD8FF] to-[#B79CFF]/90 px-5 py-2.5 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-md shadow-pastel-cyan/35 transition hover:brightness-[1.06] focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/45 sm:text-xs sm:tracking-[0.14em]"
+              className="type-promo-caption w-full cursor-pointer rounded-full bg-gradient-to-r from-[#8FD8FF] via-[#C4B8F5] to-[#F6B6E8] px-6 py-3.5 text-center text-xs font-semibold uppercase tracking-[0.12em] text-white/95 shadow-[0_10px_28px_-10px_rgba(143,180,255,0.55)] ring-1 ring-inset ring-white/30 transition hover:from-[#9FE0FF] hover:via-[#D0C0F8] hover:to-[#F9CFF0] focus:outline-none focus-visible:ring-2 focus-visible:ring-pastel-cyan/45 sm:px-7 sm:py-4 sm:text-[13px] sm:tracking-[0.14em]"
             >
               Share what you feel
             </a>
-          </div>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -255,7 +257,7 @@ export default function Help() {
               className="flex flex-col overflow-hidden rounded-[1.5rem] border border-pastel-cyan/28 bg-white/90 shadow-[0_26px_60px_-40px_rgba(111,203,255,0.38)]"
             >
               <div
-                className={`relative flex h-[7.5rem] items-center justify-center p-3 sm:h-[8.5rem] sm:p-3.5 ${step.bannerClass ?? "bg-slate-100"}`}
+                className={`relative flex h-[8.25rem] items-center justify-center sm:h-[9rem] ${HELP_IMG_INSET} ${step.bannerClass ?? "bg-slate-100"}`}
               >
                 <img src={step.img} alt="" className={JOURNEY_IMG} draggable={false} loading="lazy" decoding="async" />
                 <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#6FCBFF] to-[#8FD8FF] text-[13px] font-black text-white shadow-sm ring-2 ring-white/95">

@@ -1,11 +1,8 @@
 import Image from "../models/Image.js";
 import User from "../models/User.js";
 import AppError from "../utils/appError.js";
-import { areCreditsEnforced } from "../config/creditsEnabled.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { resolveEditedImageUrl } from "./imageEditService.js";
-import refreshUserCreditsFromDb from "../utils/refreshUserCreditsFromDb.js";
-import { snapCreditsToLedger } from "./dailyCreditsService.js";
 import { logInfo } from "../utils/logger.js";
 
 function parentVersionOf(doc) {
@@ -26,9 +23,7 @@ export async function runImageRefinement(req, res) {
 
   console.log("[Refine] refinement started — user", String(req.user.id).slice(-8));
 
-  const creditSnapshot = areCreditsEnforced()
-    ? await refreshUserCreditsFromDb(req.user.id)
-    : await User.findById(req.user.id);
+  const creditSnapshot = await User.findById(req.user.id);
   if (!creditSnapshot) {
     throw new AppError("User not found", 404, "USER_NOT_FOUND");
   }
@@ -90,8 +85,7 @@ export async function runImageRefinement(req, res) {
     typeof creditSnapshot.email === "string" && creditSnapshot.email.trim()
       ? creditSnapshot.email.trim()
       : String(req.user.id);
-  const unchanged = snapCreditsToLedger(creditSnapshot.credits);
-  logInfo(`[Free Refinement]\nUser: ${who}\nCredits unchanged: ${unchanged}`);
+  logInfo(`[Free Refinement]\nUser: ${who}\nCredits unchanged: ${creditSnapshot.credits}`);
 
   return res.status(200).json({
     success: true,

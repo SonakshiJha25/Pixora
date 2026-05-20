@@ -61,7 +61,7 @@ export default function Gallery() {
     const id = item._id;
     const next = !item.isFavorite;
     setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: next } : x)));
-    api.patch(`/api/image/${id}/favorite`).catch(() => {
+    api.patch(`/api/images/${id}/favorite`).catch(() => {
       setHistory((prev) => prev.map((x) => (x._id === id ? { ...x, isFavorite: !next } : x)));
     });
   };
@@ -374,7 +374,7 @@ export default function Gallery() {
           onConfirm={() => {
             const item = pendingDeleteItem;
             setPendingDeleteItem(null);
-            if (item) run(item._id, () => api.delete(`/api/image/${item._id}`));
+            if (item) run(item._id, () => api.delete(`/api/images/${item._id}`));
           }}
         />
       </div>

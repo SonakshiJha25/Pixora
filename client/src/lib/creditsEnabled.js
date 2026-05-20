@@ -1,5 +1,8 @@
 /**
- * UI switch for credit surfaces (navbar, modals, help copy).
- * Set VITE_CREDITS_UI_ENABLED=true at build time to show them again.
+ * UI switch for credit surfaces (navbar, studio hint, limit modal).
+ * - `VITE_CREDITS_UI_ENABLED=true` → always on
+ * - Dev default: on unless `VITE_CREDITS_UI_ENABLED=false`
  */
-export const CREDITS_UI_ENABLED = import.meta.env.VITE_CREDITS_UI_ENABLED === "true";
+const flag = import.meta.env.VITE_CREDITS_UI_ENABLED;
+export const CREDITS_UI_ENABLED =
+  flag === "true" || (import.meta.env.DEV && flag !== "false");

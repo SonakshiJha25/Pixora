@@ -8,6 +8,7 @@ import {
   getNextIstMidnightUtcMs,
   snapCreditsToLedger,
 } from "../services/dailyCreditsService.js";
+import { GENERATION_COST } from "../utils/resetCreditsIfNewDay.js";
 
 describe("snapCreditsToLedger", () => {
   it("allows only 0,10,...,100", () => {
@@ -97,5 +98,12 @@ describe("getNextIstMidnightUtcMs", () => {
     const next = getNextIstMidnightUtcMs(now);
     assert.ok(next > now);
     assert.equal(getIstDateString(next), "2026-05-17");
+  });
+});
+
+describe("resetCreditsIfNewDay helper", () => {
+  it("GENERATION_COST matches CREDITS_PER_IMAGE", () => {
+    assert.equal(GENERATION_COST, CREDITS_PER_IMAGE);
+    assert.equal(GENERATION_COST, 10);
   });
 });

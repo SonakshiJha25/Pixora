@@ -6,15 +6,13 @@ import { toast } from "sonner";
 import { AppContext } from "../context/AppContext";
 import HistoryImageCard from "../components/HistoryImageCard";
 import GalleryGridSkeleton from "../components/GalleryGridSkeleton";
-import LimitReachedModal from "../components/LimitReachedModal";
-import { CREDITS_UI_ENABLED } from "../lib/creditsEnabled.js";
 import { REFINE_COMING_SOON_PATH } from "../lib/comingSoon.js";
 import DownloadPngButton from "../components/DownloadPngButton.jsx";
 import BrandLogo from "../components/BrandLogo.jsx";
 import { resolveImageUrl } from "../config/api.js";
 import { displayImageUrl } from "../lib/imageDelivery.js";
 import { getToken } from "../utils/token.js";
-import { normalizeCreditsPoints } from "../lib/credits.js";
+import { CREDITS_PER_IMAGE, DAILY_CREDITS_LIMIT, normalizeCreditsPoints } from "../lib/credits.js";
 import { STUDIO_STYLE_MOODS, STUDIO_STYLE_SAMPLES, WORKSPACE_NAME } from "../lib/site.js";
 import { STYLE_KEYS, STYLE_META, labelForStyleKey } from "../lib/styleTypes.js";
 import { scrollPageTop } from "../lib/navigation.js";
@@ -52,11 +50,10 @@ export default function Studio() {
     api,
     setShowLogin,
     fetchHistory,
-    fetchUserData,
     history,
     setHistory,
+    credit,
     setCredit,
-    dailyCreditSchedule,
     historyStatus,
   } = useContext(AppContext);
 
@@ -65,6 +62,8 @@ export default function Studio() {
 
   const authToken = getToken()?.trim() ?? "";
   const isSignedIn = Boolean(authToken);
+  const creditsPts = normalizeCreditsPoints(credit);
+  const outOfCredits = isSignedIn && creditsPts < CREDITS_PER_IMAGE;
   const [image, setImage] = useState(null);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,7 +72,6 @@ export default function Studio() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechError, setSpeechError] = useState("");
-  const [limitModal, setLimitModal] = useState({ open: false, dailyResetTimezone: null });
   const [generatedImage, setGeneratedImage] = useState(null);
   const [loadingStage, setLoadingStage] = useState(0);
 
@@ -274,20 +272,11 @@ export default function Studio() {
         ]);
       }
       await fetchHistory();
-      await fetchUserData();
       toast.success("Saved — scroll up to review, download, or open Gallery.");
     } catch (error) {
-      const code = error?.response?.data?.error?.code;
-
-      if (
-        CREDITS_UI_ENABLED &&
-        (code === "DAILY_LIMIT_REACHED" || code === "INSUFFICIENT_CREDITS")
-      ) {
-        const err = error?.response?.data?.error;
-        setLimitModal({
-          open: true,
-          dailyResetTimezone: err?.dailyResetTimezone ?? null,
-        });
+      if (error?.response?.status === 403) {
+        const msg = error?.response?.data?.message || "Come back tomorrow 💫";
+        toast.error(msg);
       } else if (error?.response?.status === 404) {
         toast.error(
           "We couldn't reach Pixorify from this page — try refreshing, or opening the link your host gave you."
@@ -478,6 +467,16 @@ export default function Studio() {
 
                   <div className="min-w-0 self-start text-left">
                     <p className="type-studio-eyebrow mb-2.5 text-left">Prompt</p>
+                    {isSignedIn ? (
+                      <p
+                        className="mb-2.5 text-xs font-medium text-slate-400"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <span className="tabular-nums text-slate-200">{creditsPts}</span>
+                        <span> / {DAILY_CREDITS_LIMIT} Credits</span>
+                      </p>
+                    ) : null}
                     <div className="studio-prompt-shell p-3 sm:p-4">
                       <div className="flex min-w-0 flex-col gap-2.5 sm:flex-row sm:items-end sm:gap-3">
                       <textarea
@@ -516,7 +515,7 @@ export default function Studio() {
                         </button>
                         <button
                           type="submit"
-                          disabled={loading}
+                          disabled={loading || outOfCredits}
                           className="btn-primary shrink-0 rounded-full px-6 py-2.5 text-[13px] font-semibold leading-none shadow-md shadow-pastel-cyan/25 disabled:opacity-60 sm:min-w-[7.5rem]"
                         >
                           {loading ? "Working…" : "Generate"}
@@ -526,6 +525,9 @@ export default function Studio() {
                     </div>
 
 
+                    {outOfCredits ? (
+                      <p className="mt-2 text-xs font-medium text-pink-200/90">Come back tomorrow 💫</p>
+                    ) : null}
                     {!speechSupported ? (
                       <p className="mt-2 text-xs text-amber-200/85">Mic won&apos;t fly in this browser.</p>
                     ) : null}
@@ -643,20 +645,6 @@ export default function Studio() {
         )}
       </section>
 
-
-      {CREDITS_UI_ENABLED ? (
-        <LimitReachedModal
-        open={limitModal.open}
-        dailyResetTimezone={
-          limitModal.dailyResetTimezone ??
-          dailyCreditSchedule?.timezone ??
-          "IST"
-        }
-        onClose={() =>
-          setLimitModal({ open: false, dailyResetTimezone: null })
-        }
-      />
-      ) : null}
       </div>
     </div>
   );

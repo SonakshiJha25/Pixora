@@ -4,22 +4,22 @@ import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 import Image from "../models/Image.js";
+import User from "../models/User.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
-import { deductCreditAndSaveImage } from "../services/creditService.js";
+import { applyDailyCreditReset, deductDailyCredits } from "../utils/applyDailyCredits.js";
 import { resolveGeneratedImageUrl } from "../services/imageService.js";
-import { PROMPT_STYLES, enhancePrompt } from "../utils/promptStyles.js";
+import { enhancePrompt } from "../utils/promptStyles.js";
 import { serializeImage, absoluteImageUrl } from "../utils/imageUrl.js";
 import { collectThreadFromAnyNode } from "../utils/imageThread.js";
 import { runImageRefinement } from "../services/refinementService.js";
-import { bufferToPreviewJpeg } from "../services/imageOptimize.js";
 import { logInfo } from "../utils/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GENERATED_DIR = path.join(__dirname, "..", "public", "generated");
 
 // ---------------------------------------------------------------------------
-// Helpers — local files and remote fetch for download / cleanup
+// Helpers — local files and remote fetch for download
 // ---------------------------------------------------------------------------
 
 function localGeneratedFilePath(storedUrl) {
@@ -127,32 +127,8 @@ export const downloadImageFile = asyncHandler(async (req, res) => {
   return res.send(pngBuffer);
 });
 
-/** GET /api/images/:imageId/preview — smaller JPEG for gallery/studio (faster on slow hosts). */
-export const getImagePreview = asyncHandler(async (req, res) => {
-  const imageId = String(req.params.imageId || "").trim();
-  const width = Math.min(1200, Math.max(160, parseInt(req.query.w, 10) || 640));
-
-  const image = await Image.findOne({
-    _id: imageId,
-    userId: req.user.id,
-    deletedAt: null,
-  });
-  if (!image) {
-    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
-  }
-
-  const { buffer } = await loadImageBytesForDownload(image.imageUrl, req);
-  const jpegBuffer = await bufferToPreviewJpeg(buffer, width);
-
-  res.setHeader("Content-Type", "image/jpeg");
-  res.setHeader("Content-Length", String(jpegBuffer.length));
-  res.setHeader("Cache-Control", "public, max-age=86400");
-  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-  return res.send(jpegBuffer);
-});
-
 // ---------------------------------------------------------------------------
-// Generation (credits deducted via creditService)
+// Generation — daily credits reset, then deduct, then generate
 // ---------------------------------------------------------------------------
 
 export const generateImage = asyncHandler(async (req, res) => {
@@ -166,32 +142,56 @@ export const generateImage = asyncHandler(async (req, res) => {
 
   const { prompt, style, isPublic, tags } = req.body;
 
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    throw new AppError("User not found", 404, "USER_NOT_FOUND");
+  }
+
+  await applyDailyCreditReset(user);
+
+  const deduct = deductDailyCredits(user);
+  if (!deduct.ok) {
+    return res.status(deduct.status).json(deduct.body);
+  }
+  await user.save();
+
   const promptEnhanced = enhancePrompt(prompt, style);
   const relativeImageUrl = await resolveGeneratedImageUrl({ prompt, promptEnhanced });
 
-  const { image, remainingCredits, userEmail } = await deductCreditAndSaveImage({
-    userId: req.user.id,
-    prompt,
-    promptEnhanced,
-    style,
-    tags,
-    isPublic,
-    imageUrl: relativeImageUrl,
-    provider: "clipdrop",
-  });
+  const [image] = await Image.create([
+    {
+      userId: req.user.id,
+      prompt: prompt.trim(),
+      promptEnhanced: (promptEnhanced || prompt).trim(),
+      style: style || "realistic",
+      tags: Array.isArray(tags) ? tags.slice(0, 8) : [],
+      isPublic: Boolean(isPublic),
+      imageUrl: relativeImageUrl,
+      provider: "clipdrop",
+      parentImageId: null,
+      isEdit: false,
+      generationKind: "generate",
+      editPrompt: null,
+      refinementPrompt: null,
+      originalPrompt: prompt.trim(),
+      version: 1,
+    },
+  ]);
+
+  await Image.findByIdAndUpdate(image._id, { $set: { threadRootId: image._id } });
 
   const serialized = serializeImage(image, req);
 
   logInfo(
-    `Image generated: ${userEmail} style=${style || "realistic"} imageId=${String(image._id)}`
+    `Image generated: ${user.email} style=${style || "realistic"} imageId=${String(image._id)} credits=${user.credits}`
   );
 
   return res.status(200).json({
     success: true,
     message: "Image generated",
-    creditBalance: remainingCredits,
-    credits: remainingCredits,
-    remainingCredits,
+    creditBalance: user.credits,
+    credits: user.credits,
+    remainingCredits: user.credits,
     imageUrl: serialized.imageUrl,
     resultImage: serialized.imageUrl,
     image: serialized,
@@ -202,11 +202,8 @@ export const generateImage = asyncHandler(async (req, res) => {
 // Refinement (no credit deduction — refinementService)
 // ---------------------------------------------------------------------------
 
-/** POST /api/images/edit — canonical refinement contract (editPrompt + imageId). */
+/** POST /api/images/edit — refinement (editPrompt + imageId). */
 export const editImage = asyncHandler(runImageRefinement);
-
-/** @deprecated Alias handler — POST /api/images/refine; same as editImage. */
-export const refineImage = asyncHandler(runImageRefinement);
 
 export const getImageThread = asyncHandler(async (req, res) => {
   const packed = await collectThreadFromAnyNode(req.params.imageId, req.user.id);
@@ -291,146 +288,4 @@ export const toggleFavoriteImage = asyncHandler(async (req, res) => {
   await image.save();
 
   return res.status(200).json({ success: true, image: serializeImage(image, req) });
-});
-
-/** @deprecated No current client — toggles isPublic without gallery UI. */
-export const toggleImagePublic = asyncHandler(async (req, res) => {
-  const image = await Image.findOne({
-    _id: req.params.imageId,
-    userId: req.user.id,
-    deletedAt: null,
-  });
-  if (!image) {
-    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
-  }
-
-  image.isPublic = !image.isPublic;
-  await image.save();
-
-  return res.status(200).json({ success: true, image: serializeImage(image, req) });
-});
-
-// ---------------------------------------------------------------------------
-// Public gallery / social — @deprecated no client UI
-// ---------------------------------------------------------------------------
-
-/** @deprecated No current client — public gallery listing. */
-export const getPublicGallery = asyncHandler(async (req, res) => {
-  const page = Number(req.query.page || 1);
-  const limit = Math.min(Number(req.query.limit || 18), 50);
-  const skip = (page - 1) * limit;
-
-  const [images, total] = await Promise.all([
-    Image.find({ isPublic: true, deletedAt: null })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select(
-        "imageUrl prompt style provider isPublic likesCount viewsCount createdAt tags promptEnhanced"
-      ),
-    Image.countDocuments({ isPublic: true, deletedAt: null }),
-  ]);
-
-  return res.status(200).json({
-    success: true,
-    images: images.map((img) => serializeImage(img, req)),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  });
-});
-
-/** @deprecated No current client — increments likes on public images. */
-export const likePublicImage = asyncHandler(async (req, res) => {
-  const image = await Image.findOneAndUpdate(
-    { _id: req.params.imageId, isPublic: true, deletedAt: null },
-    { $inc: { likesCount: 1 } },
-    { new: true }
-  );
-
-  if (!image) {
-    throw new AppError("Image not found", 404, "IMAGE_NOT_FOUND");
-  }
-
-  return res.status(200).json({ success: true, image: serializeImage(image, req) });
-});
-
-// ---------------------------------------------------------------------------
-// Prompt utilities
-// ---------------------------------------------------------------------------
-
-export const getPromptStyles = asyncHandler(async (req, res) => {
-  return res.status(200).json({
-    success: true,
-    styles: Object.keys(PROMPT_STYLES).map((key) => ({ key, description: PROMPT_STYLES[key] })),
-  });
-});
-
-export const previewEnhancedPrompt = asyncHandler(async (req, res) => {
-  const { prompt, style } = req.body;
-  return res.status(200).json({ success: true, promptEnhanced: enhancePrompt(prompt, style) });
-});
-
-// ---------------------------------------------------------------------------
-// Maintenance — @deprecated no current client (post-deploy broken URL recovery)
-// ---------------------------------------------------------------------------
-
-const HEAD_TIMEOUT_MS = 6000;
-const HEAD_CONCURRENCY = 6;
-
-const isProbablyDurable = (url) => {
-  if (typeof url !== "string") return false;
-  return /\bres\.cloudinary\.com\b/i.test(url);
-};
-
-async function probeUrl(url) {
-  try {
-    const res = await axios.head(url, {
-      timeout: HEAD_TIMEOUT_MS,
-      validateStatus: () => true,
-      maxRedirects: 3,
-    });
-    return res.status >= 200 && res.status < 400;
-  } catch {
-    return false;
-  }
-}
-
-async function pMapLimited(items, limit, mapper) {
-  const out = new Array(items.length);
-  let cursor = 0;
-  const workers = new Array(Math.min(limit, items.length)).fill(0).map(async () => {
-    while (true) {
-      const i = cursor++;
-      if (i >= items.length) return;
-      out[i] = await mapper(items[i], i);
-    }
-  });
-  await Promise.all(workers);
-  return out;
-}
-
-/** @deprecated Scans caller images and soft-deletes records with unreachable URLs. */
-export const cleanupBrokenImages = asyncHandler(async (req, res) => {
-  const images = await Image.find({ userId: req.user.id, deletedAt: null });
-
-  const decisions = await pMapLimited(images, HEAD_CONCURRENCY, async (img) => {
-    const url = absoluteImageUrl(img.imageUrl, req);
-    if (isProbablyDurable(url)) return { img, broken: false, checked: false };
-    const ok = await probeUrl(url);
-    return { img, broken: !ok, checked: true };
-  });
-
-  const toDelete = decisions.filter((d) => d.broken).map((d) => d.img._id);
-  if (toDelete.length) {
-    await Image.updateMany(
-      { _id: { $in: toDelete }, userId: req.user.id, deletedAt: null },
-      { $set: { deletedAt: new Date() } }
-    );
-  }
-
-  return res.status(200).json({
-    success: true,
-    total: images.length,
-    checked: decisions.filter((d) => d.checked).length,
-    cleaned: toDelete.length,
-  });
 });

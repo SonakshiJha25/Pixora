@@ -1,20 +1,13 @@
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import BrandLogo from "./BrandLogo.jsx";
-import CreditsResetCountdown from "./CreditsResetCountdown.jsx";
 import { Menu, X } from "lucide-react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import NavbarCredits from "./NavbarCredits.jsx";
 import { openStudio, scrollPageTop } from "../lib/navigation.js";
-import {
-  CREDITS_PER_IMAGE,
-  DAILY_CREDITS_LIMIT,
-  generationsRemaining,
-  normalizeCreditsPoints,
-} from "../lib/credits.js";
+import { DAILY_CREDITS_LIMIT, normalizeCreditsPoints } from "../lib/credits.js";
 import { WORKSPACE_NAME } from "../lib/site.js";
-import { CREDITS_UI_ENABLED } from "../lib/creditsEnabled.js";
 
 const linkClass = ({ isActive }) =>
   `nav-link ${isActive ? "nav-link-active" : ""}`.trim();
@@ -43,8 +36,6 @@ function ProfileDropdownFixed({
   user,
   isWorkspaceNav,
   credit,
-  gensLeft,
-  nextResetAtIso,
   showCredits,
   menuBoxClass,
   onLogout,
@@ -52,7 +43,6 @@ function ProfileDropdownFixed({
   panelRef,
 }) {
   const rowBorder = isWorkspaceNav ? "border-white/[0.08]" : "border-slate-100";
-  const muted = "text-[10px] leading-snug text-slate-500";
 
   if (!open || !coords) return null;
 
@@ -78,13 +68,7 @@ function ProfileDropdownFixed({
           {showCredits ? (
             <div className={`border-t px-4 py-2 ${rowBorder}`}>
               <p className={`text-sm font-semibold ${isWorkspaceNav ? "text-slate-100" : "text-slate-800"}`}>
-                Credits: {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT}
-              </p>
-              <p className={`mt-1 text-[11px] font-medium leading-snug ${isWorkspaceNav ? "text-slate-400" : "text-slate-600"}`}>
-                <CreditsResetCountdown nextResetAtIso={nextResetAtIso} className="tabular-nums" />
-              </p>
-              <p className={`mt-1 ${muted}`}>
-                ~{gensLeft} new picture{gensLeft === 1 ? "" : "s"} left today ({CREDITS_PER_IMAGE} credits each) · small tweaks often free
+                {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT} Credits
               </p>
             </div>
           ) : null}
@@ -118,7 +102,7 @@ function ProfileDropdownFixed({
 }
 
 export default function NavBar() {
-  const { user, setShowLogin, credit, logout, token, dailyCreditSchedule } = useContext(AppContext);
+  const { user, setShowLogin, credit, logout, token } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -138,8 +122,6 @@ export default function NavBar() {
   const isWorkspaceNav =
     isStudioRoute || (isGallery && Boolean(String(token || "").trim()));
   const navLink = isWorkspaceNav ? studioLinkClass : linkClass;
-  const gensLeft = generationsRemaining(credit);
-
   const closeProfile = () => {
     setProfileOpen(false);
     setMenuCoords(null);
@@ -309,13 +291,12 @@ export default function NavBar() {
           </nav>
 
           <div className="flex shrink-0 flex-nowrap items-center justify-end gap-2 lg:gap-3">
-            {user && CREDITS_UI_ENABLED ? (
+            {user ? (
               <>
                 <div ref={creditsDeskWrapRef} className="shrink-0">
                   <NavbarCredits
                     workspace={isWorkspaceNav}
                     credits={credit}
-                    nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
                     onPress={() => toggleProfileFromRef(creditsDeskWrapRef)}
                   />
                 </div>
@@ -395,12 +376,11 @@ export default function NavBar() {
           </button>
 
           <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-2.5">
-            {user && CREDITS_UI_ENABLED ? (
+            {user ? (
               <div ref={creditsMobWrapRef}>
                 <NavbarCredits
                   workspace={isWorkspaceNav}
                   credits={credit}
-                  nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
                   onPress={() => toggleProfileFromRef(creditsMobWrapRef)}
                 />
               </div>
@@ -457,9 +437,7 @@ export default function NavBar() {
         user={user}
         isWorkspaceNav={isWorkspaceNav}
         credit={credit}
-        gensLeft={gensLeft}
-        nextResetAtIso={dailyCreditSchedule?.nextResetAtIso}
-        showCredits={CREDITS_UI_ENABLED}
+        showCredits={Boolean(user)}
         menuBoxClass={`border ${menuSurface}`}
         onLogout={() => {
           closeProfile();
@@ -489,16 +467,10 @@ export default function NavBar() {
             <nav className="flex flex-col gap-0.5 [&_a]:flex [&_a]:min-h-[2.75rem] [&_a]:items-center [&_a]:px-1 [&_a]:text-[15px]">
               {renderNavLinks(closeMobile)}
             </nav>
-            {user && CREDITS_UI_ENABLED ? (
+            {user ? (
               <div className={`mt-5 border-t pt-4 ${isWorkspaceNav ? "border-white/[0.08]" : "border-slate-100"}`}>
                 <p className={`text-sm font-semibold ${isWorkspaceNav ? "text-slate-100" : "text-slate-800"}`}>
-                  Credits · {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT}
-                </p>
-                <p className={`mt-2 text-xs font-medium leading-snug ${isWorkspaceNav ? "text-slate-400" : "text-slate-600"}`}>
-                  <CreditsResetCountdown nextResetAtIso={dailyCreditSchedule?.nextResetAtIso} className="tabular-nums" />
-                </p>
-                <p className={`mt-1 text-[11px] ${isWorkspaceNav ? "text-slate-500" : "text-slate-600"}`}>
-                  ~{gensLeft} new picture{gensLeft === 1 ? "" : "s"} left today ({CREDITS_PER_IMAGE} credits each)
+                  {normalizeCreditsPoints(credit)} / {DAILY_CREDITS_LIMIT} Credits
                 </p>
               </div>
             ) : null}

@@ -8,12 +8,9 @@ import { fileURLToPath } from "url";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import { isCloudinaryConfigured } from "./services/cloudinaryService.js";
-import authRouter from "./routes/authRoutes.js";
-import creditRouter from "./routes/creditRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import imageRouter from "./routes/imageRoutes.js";
 import feedbackRouter from "./routes/feedbackRoutes.js";
@@ -94,35 +91,12 @@ app.use(helmet());
 app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
 app.set("trust proxy", 1);
 
-const generationLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 12,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    error: {
-      code: "RATE_LIMITED",
-      message: "Too many generation attempts. Retry in a minute.",
-    },
-  },
-});
-
-// --- API route mounts (behavior unchanged; aliases kept for backward compatibility) ---
-// Auth + profile + credits read: canonical prefix is /api/user (see userRoutes.js).
+// --- API route mounts ---
 app.use("/api/user", userRouter);
-// Deprecated alias — same router as /api/user; prefer /api/user for new clients.
-app.use("/api/auth", authRouter);
-// Deprecated alias — credits read/use also available at GET|POST /api/user/credits.
-app.use("/api/credits", creditRouter);
-// Image API: canonical prefix is /api/images (see imageRoutes.js).
 app.use("/api/images", imageRouter);
-// Deprecated alias — identical imageRouter; some clients still call /api/image/*.
+/** Deprecated alias — identical imageRouter; client still uses some /api/image/* paths. */
 app.use("/api/image", imageRouter);
 app.use("/api/feedback", feedbackRouter);
-// Temporary v1 aliases — same routers as /api/user and /api/images (rate limit on image only).
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/image", generationLimiter, imageRouter);
 
 app.get("/health", (req, res) => {
   const dbOk = mongoose.connection.readyState === 1;

@@ -6,6 +6,7 @@ This repository is the **Pixorify** product (user-facing branding). The codebase
 
 | Doc | Contents |
 |-----|----------|
+| [`FOLDER_STRUCTURE.md`](./FOLDER_STRUCTURE.md) | **Full repo tree** — what each folder and important file does |
 | [`GENERATION_PIPELINE_AND_API.md`](./GENERATION_PIPELINE_AND_API.md) | Text-to-image pipeline, API orchestration, Mermaid diagrams, env vars |
 | [`DESIGN_SYSTEM_AND_ASSETS.md`](./DESIGN_SYSTEM_AND_ASSETS.md) | **Color palette (all hex)**, typography, buttons, **every `photos/` file**, SVG icons, Home section order |
 
