@@ -9,6 +9,7 @@ import HomeRefineTeaser from "../components/home/HomeRefineTeaser.jsx";
 import HomeStudioCta from "../components/home/HomeStudioCta.jsx";
 import HomeStyleRail from "../components/home/HomeStyleRail.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
+import HomeCreditsSection from "../components/HomeCreditsSection.jsx";
 import { WORKSPACE_NAME } from "../lib/site.js";
 
 const faqs = [
@@ -22,7 +23,7 @@ const faqs = [
   },
   {
     q: "Is Pixorify free right now?",
-    a: "Yes—sign in and create without credit counters on screen. Paid Pro extras may arrive later; we'll say so clearly when they do.",
+    a: "Yes! Every user receives 100 free credits daily. Generating a high-quality image costs 10 credits, and your balance resets automatically every day.",
   },
   {
     q: "What about Refine?",
@@ -76,8 +77,9 @@ export default function Home() {
       <div className="home-marketing-scope relative w-full">
         <HomeHero />
         <HomeWhatIs />
-        <HomeShortcuts />
         <HomeFeelThree />
+        <HomeShortcuts />
+        <HomeCreditsSection />
         <HomeRefineTeaser />
         <HomeStyleRail />
         <HomeStudioCta />

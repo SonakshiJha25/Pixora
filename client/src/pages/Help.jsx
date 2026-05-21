@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import HelpContactForm from "../components/HelpContactForm.jsx";
 import { TipBrandCardGrid } from "../components/TipsCarousel.jsx";
+import HelpCreditsSection from "../components/HelpCreditsSection.jsx";
 import MarketingPageShell from "../components/MarketingPageShell.jsx";
 import { HeroDecorBleed } from "../components/MarketingDecorPieces.jsx";
 import { MARKETING_STYLE_TILES as styleTiles } from "../content/marketingShared.js";
@@ -84,7 +85,7 @@ const workflowCards = [
     title: "Create",
     body: (
       <>
-        Pick a style, describe your scene, and generate. There are <strong>no daily limits</strong> right now—focus on making pictures.
+        Pick a style, describe your scene, and generate. Every user gets <strong>100 free credits daily</strong>, and each image costs 10 credits.
       </>
     ),
     icon: Zap,
@@ -300,6 +301,8 @@ export default function Help() {
           })}
         </div>
       </section>
+
+      <HelpCreditsSection />
 
       {/* Fun facts marquee-ish */}
       <section className="relative mt-10">

@@ -1,28 +1,60 @@
+import { useEffect, useState } from "react";
+import { Zap } from "lucide-react";
 import { DAILY_CREDITS_LIMIT, normalizeCreditsPoints } from "../lib/credits.js";
+import { getNextIstMidnightUtcMs } from "../lib/nextDailyReset.js";
 
 /**
- * Minimal nav credits label — no countdowns or extra chrome.
+ * Modern pill-style credits indicator matching the mock image.
+ * Shows remaining credits with a lightning bolt and a live reset countdown.
  */
 export default function NavbarCredits({ workspace = false, credits, onPress }) {
   const pts = normalizeCreditsPoints(credits);
+  const [timeLeft, setTimeLeft] = useState("Resets in --h --m");
 
-  const strong = workspace ? "text-slate-100" : "text-slate-900";
-  const muted = workspace ? "text-slate-400" : "text-slate-500";
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = Date.now();
+      const nextReset = getNextIstMidnightUtcMs(now);
+      const diffMs = nextReset - now;
+      if (diffMs <= 0) {
+        setTimeLeft("Updating…");
+        return;
+      }
+      const totalSec = Math.floor(diffMs / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      setTimeLeft(`Resets in ${h}h ${m}m`);
+    };
+    updateTimer();
+    const interval = setInterval(updateTimer, 15000); // update every 15s to keep fresh
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <button
       type="button"
       onClick={onPress}
-      className={`rounded-full border px-3 py-1.5 text-left text-[12px] font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 sm:text-[13px] ${
+      className={`rounded-full border px-4 py-1.5 flex flex-col items-center justify-center text-center transition focus-visible:outline-none focus-visible:ring-2 select-none ${
         workspace
-          ? "border-white/12 bg-white/[0.06] text-slate-200 focus-visible:ring-cyan-400/35 focus-visible:ring-offset-[#13151c]"
-          : "border-pastel-cyan/50 bg-gradient-to-r from-white via-pastel-mist to-[#eaf8ff] text-slate-800 focus-visible:ring-pastel-cyan/50 focus-visible:ring-offset-pastel-mist"
+          ? "border-cyan-500/20 bg-cyan-950/20 text-slate-200 hover:bg-cyan-950/30 focus-visible:ring-cyan-500/35"
+          : "border-[#d9f2ff] bg-[#f0f9ff] text-slate-800 hover:bg-[#e0f4ff] focus-visible:ring-sky-300"
       }`}
-      title={`${pts} of ${DAILY_CREDITS_LIMIT} credits remaining`}
-      aria-label={`${pts} of ${DAILY_CREDITS_LIMIT} credits`}
+      title={`${pts} of ${DAILY_CREDITS_LIMIT} credits remaining. Resets daily.`}
+      aria-label={`${pts} credits left. ${timeLeft}`}
     >
-      <span className={strong}>{pts}</span>
-      <span className={`font-medium ${muted}`}> / {DAILY_CREDITS_LIMIT} Credits</span>
+      <span className="flex items-center justify-center gap-1 text-[12px] sm:text-[13px] font-bold">
+        <Zap
+          className={`h-3.5 w-3.5 ${
+            workspace ? "fill-cyan-400 stroke-cyan-400" : "fill-sky-500 stroke-sky-500"
+          }`}
+          aria-hidden="true"
+        />
+        <span>{pts} left</span>
+      </span>
+      <span className={`text-[10px] font-medium leading-none mt-0.5 tracking-tight ${workspace ? "text-slate-400/90" : "text-slate-500/90"}`}>
+        {timeLeft}
+      </span>
     </button>
   );
 }
+
