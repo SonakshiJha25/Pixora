@@ -14,7 +14,7 @@ export async function optimizeGeneratedBuffer(buffer) {
         fit: "inside",
         withoutEnlargement: true,
       })
-      .png({ compressionLevel: 9, adaptiveFiltering: true })
+      .webp({ quality: 85 })
       .toBuffer();
   } catch {
     return buffer;

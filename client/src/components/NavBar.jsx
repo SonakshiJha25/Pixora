@@ -377,7 +377,7 @@ export default function NavBar() {
 
           <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-2.5">
             {user ? (
-              <div ref={creditsMobWrapRef}>
+              <div ref={creditsMobWrapRef} className="hidden sm:block">
                 <NavbarCredits
                   workspace={isWorkspaceNav}
                   credits={credit}

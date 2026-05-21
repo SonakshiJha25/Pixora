@@ -95,33 +95,36 @@ const Login = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
 
-        className='relative max-w-md w-[92vw] rounded-2xl border border-slate-200 bg-white p-10 text-slate-600 shadow-card'>
+        className='relative max-w-md w-[92vw] rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 text-slate-600 shadow-card'>
             <h1 className='text-center text-2xl text-neutral-700 font-medium'>{state}</h1>
-            <p className='text-sm'>
+            <p className='text-sm mt-1'>
               {state === 'Login'
                 ? `Welcome back — sign in to continue using ${SITE.name}.`
                 : `Create your ${SITE.name} account to generate and save pictures.`}
             </p>
 
             {state !=='Login' && (
-                <div className ='border px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
+                <div className ='border px-4 sm:px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
                 <img src = {assets.profile_icon} alt="" className='w-5' />
                 <input onChange={e => setName(e.target.value)} value={name}
                 type = "text" placeholder='Full Name' required
+                className='outline-none text-sm w-full bg-transparent'
                 disabled={loading}/>
             </div>
             )}
 
-            <div className ='border px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
+            <div className ='border px-4 sm:px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
                 <img src = {assets.email_icon} alt="" />
                 <input onChange={e => setEmail(e.target.value)} value={email}
                 type = "email" placeholder='Email id' required
+                className='outline-none text-sm w-full bg-transparent'
                 disabled={loading}/>
             </div>
-            <div className ='border px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
+            <div className ='border px-4 sm:px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
                 <img src = {assets.lock_icon} alt="" />
                 <input onChange={e => setPassword(e.target.value)} value={password}
                 type = "password" placeholder='Password' required
+                className='outline-none text-sm w-full bg-transparent'
                 disabled={loading}/>
             </div>
             

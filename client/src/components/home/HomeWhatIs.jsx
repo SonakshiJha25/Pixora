@@ -23,9 +23,9 @@ export default function HomeWhatIs() {
         className="rounded-3xl bg-pastel-mist/35 px-4 py-7 sm:px-6 sm:py-8"
       >
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 sm:gap-5">
-          <div className="flex w-full items-start gap-4 sm:gap-6">
+          <div className="flex w-full flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
             <motion.figure
-              className="w-[11.5rem] shrink-0 sm:w-[14rem] md:w-[16rem] lg:w-[17.5rem]"
+              className="w-full max-w-[14rem] sm:w-[14rem] md:w-[16rem] lg:w-[17.5rem] shrink-0"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.28, ease: "easeOut" }}
             >
@@ -41,7 +41,7 @@ export default function HomeWhatIs() {
               </div>
             </motion.figure>
 
-            <div className="min-w-0 flex-1 text-left">
+            <div className="min-w-0 flex-1 text-center sm:text-left">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
                 {eyebrow}
               </p>

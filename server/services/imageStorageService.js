@@ -37,7 +37,7 @@ export async function persistImageBuffer(buffer, { publicId } = {}) {
       logInfo(`Image stored on Cloudinary (${baseName})`);
       if (process.env.NODE_ENV !== "production") {
         try {
-          await saveLocally(optimized, `${baseName}.png`);
+          await saveLocally(optimized, `${baseName}.webp`);
         } catch {
           /* optional local copy in dev */
         }
@@ -52,7 +52,7 @@ export async function persistImageBuffer(buffer, { publicId } = {}) {
     );
   }
 
-  const relativeUrl = await saveLocally(optimized, `${baseName}.png`);
-  logInfo(`Image stored locally (${baseName}.png)`);
+  const relativeUrl = await saveLocally(optimized, `${baseName}.webp`);
+  logInfo(`Image stored locally (${baseName}.webp)`);
   return relativeUrl;
 }
