@@ -12,7 +12,7 @@ const PLAN_ICONS = [Image, MessageSquare, Palette, SlidersHorizontal, Sparkles, 
 
 /** `/coming-soon?feature=refine` — hero plus planning cards. */
 export default function RefineComingSoon() {
-  const { eyebrow, title, lede, planHeading, planIntro } = REFINE_COMING_SOON_PAGE;
+  const { eyebrow, lede, planHeading, planIntro } = REFINE_COMING_SOON_PAGE;
 
   useLayoutEffect(() => {
     scrollPageTop(false);

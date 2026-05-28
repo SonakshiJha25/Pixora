@@ -1,0 +1,29 @@
+# Environment (secrets)
+server/.env
+client/.env
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+**/node_modules/
+
+# Build
+client/dist/
+server/dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Local drops in repo root — ship art from client/src/assets instead
+/pixorify logo.png
+
+server/public/generated/*.png
+
+# Local Python vendor drop (Clipdrop experiments — not app source)
+server/_pyclipdrop_tmp/
+
+# Raw uploads / screenshots — not wired in photos.js
+photos/ChatGPT*.png
+photos/Screenshot*.png

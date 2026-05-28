@@ -1,0 +1,190 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import mongoose from "mongoose";
+import connectDB from "./config/db.js";
+import { isCloudinaryConfigured } from "./services/cloudinaryService.js";
+import userRouter from "./routes/userRoutes.js";
+import imageRouter from "./routes/imageRoutes.js";
+import feedbackRouter from "./routes/feedbackRoutes.js";
+import errorHandler from "./middlewares/errorHandler.js";
+import { logError, logInfo } from "./utils/logger.js";
+
+if (!process.env.JWT_SECRET?.trim()) {
+  logError("Server startup aborted: JWT_SECRET is not set (configure server/.env)");
+  process.exit(1);
+}
+
+const app = express();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const generatedDir = path.join(__dirname, "public", "generated");
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+];
+if (process.env.ALLOWED_ORIGINS) {
+  for (const origin of process.env.ALLOWED_ORIGINS.split(",")) {
+    const trimmed = origin.trim();
+    if (trimmed) allowedOrigins.push(trimmed);
+  }
+}
+
+app.use(express.json({ limit: "1mb" }));
+function isAllowedCorsOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const { protocol, hostname } = new URL(origin);
+    if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) {
+      return true;
+    }
+    if (
+      protocol === "https:" &&
+      (hostname.endsWith(".vercel.app") ||
+        hostname.endsWith(".onrender.com") ||
+        hostname.endsWith(".netlify.app") ||
+        hostname.endsWith(".netlify.live"))
+    ) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (isAllowedCorsOrigin(origin)) return callback(null, true);
+      return callback(null, false);
+    },
+    credentials: true,
+    exposedHeaders: ["Content-Disposition", "Content-Length", "Content-Type"],
+  })
+);
+app.use(
+  "/generated",
+  express.static(generatedDir, {
+    maxAge: process.env.NODE_ENV === "production" ? "7d" : 0,
+    immutable: false,
+    setHeaders(res) {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      if (process.env.NODE_ENV === "production") {
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      }
+    },
+  })
+);
+app.use(helmet());
+app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
+app.set("trust proxy", 1);
+
+// --- API route mounts ---
+app.use("/api/user", userRouter);
+app.use("/api/images", imageRouter);
+/** Deprecated alias — identical imageRouter; client still uses some /api/image/* paths. */
+app.use("/api/image", imageRouter);
+app.use("/api/feedback", feedbackRouter);
+
+app.get("/health", (req, res) => {
+  const dbOk = mongoose.connection.readyState === 1;
+  res.status(dbOk ? 200 : 503).json({
+    success: dbOk,
+    status: dbOk ? "ok" : "degraded",
+    database: dbOk ? "connected" : "disconnected",
+    databaseName: mongoose.connection?.db?.databaseName ?? null,
+    cloudinary: isCloudinaryConfigured() ? "configured" : "missing",
+  });
+});
+
+/** Optional: load from another host via <script src="https://your-api…/pixora-runtime.js"></script> before app bundle. */
+function resolvePublicBackendOrigin() {
+  const explicit = process.env.PUBLIC_BACKEND_ORIGIN?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+  const railway = process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (railway) {
+    const host = railway.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+    return `https://${host}`;
+  }
+  const renderUrl = process.env.RENDER_EXTERNAL_URL?.trim();
+  if (renderUrl) return renderUrl.replace(/\/+$/, "");
+  return "";
+}
+
+app.get("/pixora-runtime.js", (_req, res) => {
+  res.type("application/javascript");
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.set("Cache-Control", "public, max-age=120");
+  const origin = resolvePublicBackendOrigin();
+  if (!origin) {
+    res.send(
+      '// Pixora: set PUBLIC_BACKEND_ORIGIN (full https origin) when the SPA loads from a separate host.'
+    );
+    return;
+  }
+  res.send(`globalThis.__PIXORA_API_BASE__=${JSON.stringify(origin)};\n`);
+});
+
+const clientDist = path.join(__dirname, "..", "client", "dist");
+
+if (fs.existsSync(clientDist)) {
+  logInfo(`Serving SPA static files from built client (${clientDist})`);
+  app.use(express.static(clientDist));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    if (req.path.startsWith("/api") || req.path.startsWith("/generated")) return next();
+    res.sendFile(path.join(clientDist, "index.html"), (err) => {
+      if (err) next(err);
+    });
+  });
+} else {
+  app.get("/", (_req, res) =>
+    res.type("text/plain").send(
+      "API working — build the React app into ../client/dist (npm run build from server/) to serve the web UI here."
+    )
+  );
+}
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: {
+      code: "NOT_FOUND",
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+    },
+  });
+});
+
+app.use(errorHandler);
+
+async function startServer() {
+  try {
+    logInfo("Pixorify API startup: initializing MongoDB connection");
+    await connectDB();
+
+    const PORT = process.env.PORT || 4000;
+
+    app.listen(PORT, () => {
+      logInfo(
+        `Server listening on port ${PORT} (${process.env.NODE_ENV === "production" ? "production" : "development"})`
+      );
+    });
+  } catch (error) {
+    logError("Server startup failed", error);
+    process.exit(1);
+  }
+}
+
+startServer();

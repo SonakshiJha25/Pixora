@@ -1,0 +1,37 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --test tests/**/*.test.js",
+    "start": "node server.js",
+    "build": "cd ../client && npm install && npm run build",
+    "dev": "nodemon server.js",
+    "server": "nodemon server.js",
+    "wipe-images": "node scripts/wipeAllImages.js",
+    "wipe-images:confirm": "node scripts/wipeAllImages.js --confirm",
+    "wipe-full:confirm": "node scripts/wipeAllImages.js --confirm --users"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "form-data": "^4.0.5",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.1",
+    "morgan": "^1.10.1",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
